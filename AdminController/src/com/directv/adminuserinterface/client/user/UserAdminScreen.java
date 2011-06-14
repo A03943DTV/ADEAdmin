@@ -168,7 +168,7 @@ public class UserAdminScreen extends Composite {
 			public void onClick(ClickEvent event) {
 
 				//Getting user entered values
-				User user = getUserFromFrom();
+				User user = getUserFromForm();
 
 				if (editUserIndex == null) {//Adding new user
 
@@ -238,7 +238,7 @@ public class UserAdminScreen extends Composite {
 			public void onClick(ClickEvent event) {
 
 				//Getting user entered values
-				final User user = getUserFromFrom();
+				final User user = getUserFromForm();
 				String userId = (user.getUserId() != null && user.getUserId() != "") ? EMailIdUtil.getEmailIdFromName(user.getUserId()) : null;
 				user.setUserId(userId);
 
@@ -365,11 +365,11 @@ public class UserAdminScreen extends Composite {
 	}
 
 	/**
-	 * Gets the user from from.
+	 * Gets the user from form.
 	 *
-	 * @return the user from from
+	 * @return the user from form
 	 */
-	protected User getUserFromFrom() {
+	protected User getUserFromForm() {
 
 		return new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), GROUP_DROP_DOWN_VALUES[groupDropBox
 				.getSelectedIndex()], locationTextField.getValue(), managersIdTextField.getValue(), ROLE_DROP_DOWN_VALUES[roleDropBox
