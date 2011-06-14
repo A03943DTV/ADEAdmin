@@ -1,0 +1,265 @@
+/*
+ * Author : Meiy
+ */
+package com.directv.adminuserinterface.shared;
+
+import java.io.Serializable;
+
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class User.
+ */
+@XmlRootElement(name = "userList")
+@PersistenceCapable(identityType = IdentityType.APPLICATION)
+public class User implements Serializable {
+
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = -6671354226828460153L;
+
+	/** The user id. */
+	@PrimaryKey
+	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	private String userId;
+
+	/** The first name. */
+	@Persistent
+	private String firstName;
+
+	/** The last name. */
+	@Persistent
+	private String lastName;
+
+	/** The group. */
+	@Persistent
+	private String group;
+
+	/** The location. */
+	@Persistent
+	private String location;
+
+	/** The managers id. */
+	@Persistent
+	private String managersId;
+
+	/** The role. */
+	@Persistent
+	private String role;
+
+	/** The campaign. */
+	@Persistent
+	private String campaign;
+
+	/** The admin. */
+	@Persistent
+	private boolean admin;
+
+	/**
+	 * Instantiates a new user.
+	 *
+	 * @param firstName the first name
+	 * @param lastName the last name
+	 * @param userId the user id
+	 * @param group the group
+	 * @param location the location
+	 * @param managersId the managers id
+	 * @param role the role
+	 * @param campaign the campaign
+	 */
+	public User(String firstName, String lastName, String userId, String group, String location, String managersId, String role, String campaign) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.userId = userId;
+		this.group = group;
+		this.location = location;
+		this.managersId = managersId;
+		this.role = role;
+		this.campaign = campaign;
+	}
+
+	/**
+	 * Instantiates a new user.
+	 */
+	public User() {
+		super();
+	}
+
+	/**
+	 * Gets the first name.
+	 *
+	 * @return the first name
+	 */
+	@XmlElement
+	public String getFirstName() {
+		return firstName == null ? "" : firstName.trim();
+	}
+
+	/**
+	 * Sets the first name.
+	 *
+	 * @param firstName the new first name
+	 */
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	/**
+	 * Gets the last name.
+	 *
+	 * @return the last name
+	 */
+	@XmlElement
+	public String getLastName() {
+		return lastName == null ? "" : lastName.trim();
+	}
+
+	/**
+	 * Sets the last name.
+	 *
+	 * @param lastName the new last name
+	 */
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	/**
+	 * Gets the user id.
+	 *
+	 * @return the user id
+	 */
+	@XmlElement
+	public String getUserId() {
+		return userId == null ? "" : userId.trim();
+	}
+
+	/**
+	 * Sets the user id.
+	 *
+	 * @param userId the new user id
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * Gets the group.
+	 *
+	 * @return the group
+	 */
+	@XmlElement
+	public String getGroup() {
+		return group == null ? "" : group.trim();
+	}
+
+	/**
+	 * Sets the group.
+	 *
+	 * @param group the new group
+	 */
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	/**
+	 * Gets the location.
+	 *
+	 * @return the location
+	 */
+	@XmlElement
+	public String getLocation() {
+		return location == null ? "" : location.trim();
+	}
+
+	/**
+	 * Sets the location.
+	 *
+	 * @param location the new location
+	 */
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	/**
+	 * Gets the managers id.
+	 *
+	 * @return the managers id
+	 */
+	@XmlElement
+	public String getManagersId() {
+		return managersId == null ? "" : managersId.trim();
+	}
+
+	/**
+	 * Sets the managers id.
+	 *
+	 * @param managersId the new managers id
+	 */
+	public void setManagersId(String managersId) {
+		this.managersId = managersId;
+	}
+
+	/**
+	 * Gets the role.
+	 *
+	 * @return the role
+	 */
+	@XmlElement
+	public String getRole() {
+		return role == null ? "" : role.trim();
+	}
+
+	/**
+	 * Sets the role.
+	 *
+	 * @param role the new role
+	 */
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	/**
+	 * Gets the campaign.
+	 *
+	 * @return the campaign
+	 */
+	@XmlElement
+	public String getCampaign() {
+		return campaign == null ? "" : campaign.trim();
+	}
+
+	/**
+	 * Sets the campaign.
+	 *
+	 * @param campaign the new campaign
+	 */
+	public void setCampaign(String campaign) {
+		this.campaign = campaign;
+	}
+
+	/**
+	 * Checks if is admin.
+	 *
+	 * @return true, if is admin
+	 */
+	@XmlElement
+	public boolean isAdmin() {
+		return admin;
+	}
+
+	/**
+	 * Sets the admin.
+	 *
+	 * @param admin the new admin
+	 */
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
+	}
+}

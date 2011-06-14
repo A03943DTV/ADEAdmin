@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" output="test-classes" path="test"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jasypt-1.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jersey-bundle-1.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr311-api-1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/asm-3.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-io-1.4.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jackson-jaxrs-1.2.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jaxb-api-2.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/ezmorph-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-beanutils-1.7.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-0.9.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jackson-mapper-asl-1.5.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jettison-1.0-RC1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-appsforyourdomain-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-appsforyourdomain-meta-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-base-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-client-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-client-meta-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gdata-core-1.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/google-collect-1.0-rc2.jar"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+</classpath>
