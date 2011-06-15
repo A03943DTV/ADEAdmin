@@ -17,6 +17,16 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>codeTableServlet</servlet-name>
+		<servlet-class>com.directv.adminuserinterface.server.CodeTableServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>codeTableServlet</servlet-name>
+		<url-pattern>/admincontroller/codetable</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>loginServlet</servlet-name>
 		<servlet-class>com.directv.adminuserinterface.server.LoginServiceImpl</servlet-class>
 	</servlet>
@@ -39,7 +49,7 @@
 		<servlet-name>restService</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>userDownloadServlet</servlet-name>
 		<servlet-class>com.directv.adminuserinterface.server.export.UserDownloadServlet</servlet-class>
