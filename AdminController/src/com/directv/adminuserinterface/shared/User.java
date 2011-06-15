@@ -10,6 +10,7 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Transactional;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -58,7 +59,8 @@ public class User implements Serializable {
 	private String campaign;
 
 	/** The admin. */
-	@Persistent
+	//No need to be stored in DB so using Transactional
+	@Transactional
 	private boolean admin;
 
 	/**

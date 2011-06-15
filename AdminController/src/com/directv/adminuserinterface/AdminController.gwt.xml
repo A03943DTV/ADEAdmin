@@ -26,5 +26,6 @@
   <source path='util'/>
   <source path='dialog'/>
   <source path='login'/>
+  <source path='codetable'/>
 
 </module>

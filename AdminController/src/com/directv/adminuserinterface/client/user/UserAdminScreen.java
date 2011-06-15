@@ -8,12 +8,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import com.directv.adminuserinterface.client.codetable.CodeTableService;
+import com.directv.adminuserinterface.client.codetable.CodeTableServiceAsync;
 import com.directv.adminuserinterface.client.dialog.ConfirmDialogBox;
 import com.directv.adminuserinterface.client.dialog.LoadingDialogBox;
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
 import com.directv.adminuserinterface.client.table.CustomizedImageCell;
 import com.directv.adminuserinterface.login.LoginService;
 import com.directv.adminuserinterface.login.LoginServiceAsync;
+import com.directv.adminuserinterface.shared.Group;
+import com.directv.adminuserinterface.shared.Location;
+import com.directv.adminuserinterface.shared.ManagersId;
+import com.directv.adminuserinterface.shared.Role;
 import com.directv.adminuserinterface.shared.User;
 import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.EMailIdUtil;
@@ -58,11 +64,20 @@ public class UserAdminScreen extends Composite {
 	/** The user service. */
 	private final UserServiceAsync userService = GWT.create(UserService.class);
 
-	/** The Constant GROUP_DROP_DOWN_VALUES. */
-	private static final String GROUP_DROP_DOWN_VALUES[] = { "", "test" };
+	/** The code table service. */
+	private final CodeTableServiceAsync codeTableService = GWT.create(CodeTableService.class);
 
-	/** The Constant ROLE_DROP_DOWN_VALUES. */
-	private static final String ROLE_DROP_DOWN_VALUES[] = { "", "csr", "manager", "teamlead" };
+	/** The group dropdown array. */
+	private String groupDropdownArray[];
+
+	/** The role drop down array. */
+	private String roleDropDownArray[];
+
+	/** The location drop down array. */
+	private String locationDropDownArray[];
+
+	/** The managers id drop down array. */
+	private String managersIdDropDownArray[];
 
 	/** The first name label. */
 	private Label firstNameLabel = new Label("First Name");
@@ -91,14 +106,14 @@ public class UserAdminScreen extends Composite {
 	/** The location label. */
 	private Label locationLabel = new Label("Location");
 
-	/** The location text field. */
-	private TextBox locationTextField = new TextBox();
+	/** The location drop box. */
+	private ListBox locationDropBox = new ListBox(false);
 
 	/** The managers id label. */
 	private Label managersIdLabel = new Label("Manager's Id");
 
-	/** The managers id text field. */
-	private TextBox managersIdTextField = new TextBox();
+	/** The managers id drop box. */
+	private ListBox managersIdDropBox = new ListBox(false);
 
 	/** The role label. */
 	private Label roleLabel = new Label("Role");
@@ -371,9 +386,9 @@ public class UserAdminScreen extends Composite {
 	 */
 	protected User getUserFromForm() {
 
-		return new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), GROUP_DROP_DOWN_VALUES[groupDropBox
-				.getSelectedIndex()], locationTextField.getValue(), managersIdTextField.getValue(), ROLE_DROP_DOWN_VALUES[roleDropBox
-				.getSelectedIndex()], campaignTextField.getValue());
+		return new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), groupDropdownArray[groupDropBox
+				.getSelectedIndex()], locationDropDownArray[locationDropBox.getSelectedIndex()], managersIdDropDownArray[managersIdDropBox
+				.getSelectedIndex()], roleDropDownArray[roleDropBox.getSelectedIndex()], campaignTextField.getValue());
 	}
 
 	/**
@@ -491,13 +506,12 @@ public class UserAdminScreen extends Composite {
 	 */
 	private Grid getFormGrid() {
 
-		addDropDownValues();
+		//Filling up the drop down values from code table
+		loadAndFillDropDownValues();
 
 		firstNameTextField.setWidth("220px");
 		lastNameTextField.setWidth("220px");
 		userIdTextField.setWidth("150px");
-		locationTextField.setWidth("220px");
-		managersIdTextField.setWidth("220px");
 		campaignTextField.setWidth("220px");
 
 		HorizontalPanel hPanel = new HorizontalPanel();
@@ -515,9 +529,9 @@ public class UserAdminScreen extends Composite {
 		formGrid.setWidget(1, 2, groupLabel);
 		formGrid.setWidget(1, 3, groupDropBox);
 		formGrid.setWidget(2, 0, locationLabel);
-		formGrid.setWidget(2, 1, locationTextField);
+		formGrid.setWidget(2, 1, locationDropBox);
 		formGrid.setWidget(2, 2, managersIdLabel);
-		formGrid.setWidget(2, 3, managersIdTextField);
+		formGrid.setWidget(2, 3, managersIdDropBox);
 		formGrid.setWidget(3, 0, roleLabel);
 		formGrid.setWidget(3, 1, roleDropBox);
 		formGrid.setWidget(3, 2, campaignLabel);
@@ -535,19 +549,6 @@ public class UserAdminScreen extends Composite {
 		formGrid.setCellSpacing(5);
 
 		return formGrid;
-	}
-
-	/**
-	 * Adds the drop down values.
-	 */
-	private void addDropDownValues() {
-
-		for (int i = 0; i < GROUP_DROP_DOWN_VALUES.length; i++) {
-			groupDropBox.addItem(GROUP_DROP_DOWN_VALUES[i]);
-		}
-		for (int i = 0; i < ROLE_DROP_DOWN_VALUES.length; i++) {
-			roleDropBox.addItem(ROLE_DROP_DOWN_VALUES[i]);
-		}
 	}
 
 	/**
@@ -595,13 +596,25 @@ public class UserAdminScreen extends Composite {
 		firstNameTextField.setText(user.getFirstName());
 		lastNameTextField.setText(user.getLastName());
 		userIdTextField.setText(EMailIdUtil.getNameFromEmailId(user.getUserId()));
-		if (Arrays.asList(GROUP_DROP_DOWN_VALUES).contains(user.getGroup())) {
-			groupDropBox.setSelectedIndex(Arrays.asList(GROUP_DROP_DOWN_VALUES).indexOf(user.getGroup()));
+		if (Arrays.asList(groupDropdownArray).contains(user.getGroup())) {
+			groupDropBox.setSelectedIndex(Arrays.asList(groupDropdownArray).indexOf(user.getGroup()));
+		} else {
+			groupDropBox.setSelectedIndex(Arrays.asList(groupDropdownArray).indexOf(0));
 		}
-		locationTextField.setText(user.getLocation());
-		managersIdTextField.setText(user.getManagersId());
-		if (Arrays.asList(ROLE_DROP_DOWN_VALUES).contains(user.getRole())) {
-			roleDropBox.setSelectedIndex(Arrays.asList(ROLE_DROP_DOWN_VALUES).indexOf(user.getRole()));
+		if (Arrays.asList(locationDropDownArray).contains(user.getLocation())) {
+			locationDropBox.setSelectedIndex(Arrays.asList(locationDropDownArray).indexOf(user.getLocation()));
+		} else {
+			locationDropBox.setSelectedIndex(Arrays.asList(locationDropDownArray).indexOf(0));
+		}
+		if (Arrays.asList(managersIdDropDownArray).contains(user.getManagersId())) {
+			managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(user.getManagersId()));
+		} else {
+			managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(0));
+		}
+		if (Arrays.asList(roleDropDownArray).contains(user.getRole())) {
+			roleDropBox.setSelectedIndex(Arrays.asList(roleDropDownArray).indexOf(user.getRole()));
+		} else {
+			roleDropBox.setSelectedIndex(Arrays.asList(roleDropDownArray).indexOf(0));
 		}
 		campaignTextField.setText(user.getCampaign());
 		editUserIndex = new Integer(index);//To identify which item in list to be updated
@@ -616,8 +629,8 @@ public class UserAdminScreen extends Composite {
 		lastNameTextField.setText("");
 		userIdTextField.setText("");
 		groupDropBox.setSelectedIndex(0);
-		locationTextField.setText("");
-		managersIdTextField.setText("");
+		locationDropBox.setSelectedIndex(0);
+		managersIdDropBox.setSelectedIndex(0);
 		roleDropBox.setSelectedIndex(0);
 		campaignTextField.setText("");
 		editUserIndex = null;//For safety purpose clear editUserIndex
@@ -982,6 +995,141 @@ public class UserAdminScreen extends Composite {
 			@Override
 			public void onSuccess(Void result) {
 				System.out.println("Reflect Add user in User List in session Success");
+			}
+		});
+	}
+
+	/**
+	 * Load and fill drop down values.
+	 */
+	private void loadAndFillDropDownValues() {
+
+		loadGroups();
+		loadLocations();
+		loadManagersIds();
+		loadRoles();
+	}
+
+	/**
+	 * Load roles.
+	 */
+	private void loadRoles() {
+
+		codeTableService.getRolesList(new AsyncCallback<List<Role>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+				new NormalDialogBox("Error", "Error retreving role list : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<Role> result) {
+				int idx = 1;
+				roleDropDownArray = new String[result.size() + 1];
+				roleDropDownArray[0] = "";
+				if (result.size() > 0) {
+					for (Role role : result) {
+						roleDropDownArray[idx] = role.getDescription();
+						idx++;
+					}
+					for (int i = 0; i < roleDropDownArray.length; i++) {
+						roleDropBox.addItem(roleDropDownArray[i]);
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Load managers ids.
+	 */
+	private void loadManagersIds() {
+
+		codeTableService.getManagersIdsList(new AsyncCallback<List<ManagersId>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+				new NormalDialogBox("Error", "Error retreving managersId list : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<ManagersId> result) {
+				int idx = 1;
+				managersIdDropDownArray = new String[result.size() + 1];
+				managersIdDropDownArray[0] = "";
+				if (result.size() > 0) {
+					for (ManagersId managersId : result) {
+						managersIdDropDownArray[idx] = managersId.getDescription();
+						idx++;
+					}
+					for (int i = 0; i < managersIdDropDownArray.length; i++) {
+						managersIdDropBox.addItem(managersIdDropDownArray[i]);
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Load locations.
+	 */
+	private void loadLocations() {
+
+		codeTableService.getLocationsList(new AsyncCallback<List<Location>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+				new NormalDialogBox("Error", "Error retreving location list : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<Location> result) {
+				int idx = 1;
+				locationDropDownArray = new String[result.size() + 1];
+				locationDropDownArray[0] = "";
+				if (result.size() > 0) {
+					for (Location location : result) {
+						locationDropDownArray[idx] = location.getDescription();
+						idx++;
+					}
+					for (int i = 0; i < locationDropDownArray.length; i++) {
+						locationDropBox.addItem(locationDropDownArray[i]);
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Load groups.
+	 */
+	private void loadGroups() {
+
+		codeTableService.getGroupsList(new AsyncCallback<List<com.directv.adminuserinterface.shared.Group>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+				new NormalDialogBox("Error", "Error retreving group list : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<Group> result) {
+				int idx = 1;
+				groupDropdownArray = new String[result.size() + 1];
+				groupDropdownArray[0] = "";
+				if (result.size() > 0) {
+					for (Group group : result) {
+						groupDropdownArray[idx] = group.getDescription();
+						idx++;
+					}
+					for (int i = 0; i < groupDropdownArray.length; i++) {
+						groupDropBox.addItem(groupDropdownArray[i]);
+					}
+				}
 			}
 		});
 	}

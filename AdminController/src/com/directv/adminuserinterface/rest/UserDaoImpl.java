@@ -3,7 +3,6 @@
  */
 package com.directv.adminuserinterface.rest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -14,7 +13,7 @@ import com.directv.adminuserinterface.shared.User;
 /**
  * The Class UserDaoImpl.
  */
-public class UserDaoImpl implements UserDao {
+public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 
 	/**
 	 * Overridden Method
@@ -23,33 +22,17 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	public User addUser(User user) {
 
-		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
-		try {
-			pm.makePersistent(user);
-		} catch (Exception excep) {
-			throw new RuntimeException(excep);
-		} finally {
-			pm.close();
-		}
-		return user;
+		return (User) add(user);
 	}
 
 	/**
 	 * Overridden Method
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> listUsers() {
 
-		List<User> userListNew = new ArrayList<User>();
-		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
-		String query = "select from " + User.class.getName();
-		List<User> userList = (List<User>) pm.newQuery(query).execute();
-		if (userList != null && userList.size() > 0) {
-			userListNew.addAll(userList);//To prevent Serialization exception at RunTime
-		}
-		return userListNew;
+		return getList(User.class);
 	}
 
 	/**

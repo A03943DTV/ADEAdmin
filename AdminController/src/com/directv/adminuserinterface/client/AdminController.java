@@ -3,6 +3,7 @@
  */
 package com.directv.adminuserinterface.client;
 
+import com.directv.adminuserinterface.client.codetable.CodeTableScreen;
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
 import com.directv.adminuserinterface.client.user.UserAdminScreen;
 import com.directv.adminuserinterface.login.LoginService;
@@ -111,6 +112,9 @@ public class AdminController implements EntryPoint {
 
 		//User Administration Tab
 		tabPanel.add(new UserAdminScreen(GWT.getHostPageBaseURL()), "User Administration");
+
+		//Code Table Tab
+		tabPanel.add(new CodeTableScreen(), "Code Table");
 
 		tabPanel.selectTab(2);
 
