@@ -1,0 +1,2 @@
+serviceClass: com.directv.adminuserinterface.client.codetable.CodeTableService
+path: FE36CACC4DA49A662097CD6A826B08E3.gwt.rpc

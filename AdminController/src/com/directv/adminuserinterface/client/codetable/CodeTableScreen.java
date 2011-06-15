@@ -1,0 +1,209 @@
+/*
+ * Author : Meiy
+ */
+package com.directv.adminuserinterface.client.codetable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
+import com.directv.adminuserinterface.shared.Group;
+import com.directv.adminuserinterface.shared.Location;
+import com.directv.adminuserinterface.shared.ManagersId;
+import com.directv.adminuserinterface.shared.Role;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CodeTableScreen.
+ */
+public class CodeTableScreen extends Composite {
+
+	/** The code table service. */
+	private final CodeTableServiceAsync codeTableService = GWT.create(CodeTableService.class);
+
+	/** The insert button. */
+	private Button insertButton = new Button("Insert Values");
+
+	/** The delete button. */
+	private Button deleteButton = new Button("Delete Values");
+
+	/**
+	 * Instantiates a new code table screen.
+	 */
+	public CodeTableScreen() {
+
+		insertButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				insertCodeTableValues();
+			}
+		});
+
+		deleteButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				deleteCodeTableValues();
+			}
+		});
+
+		HorizontalPanel hPanel = new HorizontalPanel();
+		hPanel.setSpacing(5);
+		hPanel.add(insertButton);
+		hPanel.add(deleteButton);
+
+		VerticalPanel vPanel = new VerticalPanel();
+		vPanel.add(hPanel);
+
+		initWidget(vPanel);
+	}
+
+	/**
+	 * Delete code table values.
+	 */
+	protected void deleteCodeTableValues() {
+
+		codeTableService.deleteCodeTableValues(new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+				new NormalDialogBox("Error", "Code table values deletion error : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				new NormalDialogBox("Success", "All code table values sucessfully deleted");
+			}
+		});
+	}
+
+	/**
+	 * Insert code table values.
+	 */
+	protected void insertCodeTableValues() {
+
+		insertGroups();
+		insertLocations();
+		insertManagersIds();
+		insertRoles();
+	}
+
+	/**
+	 * Insert roles.
+	 */
+	private void insertRoles() {
+
+		List<Role> roleList = new ArrayList<Role>();
+		roleList.add(new Role(1L, "CSR"));
+		roleList.add(new Role(2L, "Team Lead"));
+		roleList.add(new Role(3L, "Manager"));
+		roleList.add(new Role(4L, "QA"));
+		roleList.add(new Role(5L, "Coach"));
+		roleList.add(new Role(6L, "Trainer/Learning Specalist"));
+
+		for (Role role : roleList) {
+
+			codeTableService.addRole(role, new AsyncCallback<Role>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+					new NormalDialogBox("Error", "Role add error : " + caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(Role result) {
+					System.out.println("Role add success : " + result.getDescription());
+				}
+			});
+		}
+	}
+
+	/**
+	 * Insert managers ids.
+	 */
+	private void insertManagersIds() {
+
+		List<ManagersId> managersIdList = new ArrayList<ManagersId>();
+		managersIdList.add(new ManagersId(1L, "manager1@dtv.com"));
+		managersIdList.add(new ManagersId(2L, "manager2@dtv.com"));
+
+		for (ManagersId managersId : managersIdList) {
+
+			codeTableService.addManagersId(managersId, new AsyncCallback<ManagersId>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+					new NormalDialogBox("Error", "ManagersId add error : " + caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(ManagersId result) {
+					System.out.println("ManagersId add success : " + result.getDescription());
+				}
+			});
+		}
+	}
+
+	/**
+	 * Insert locations.
+	 */
+	private void insertLocations() {
+
+		List<Location> locationList = new ArrayList<Location>();
+		locationList.add(new Location(1L, "Huntsville"));
+		locationList.add(new Location(2L, "Boise"));
+		locationList.add(new Location(3L, "Chattanoga"));
+
+		for (Location location : locationList) {
+
+			codeTableService.addLocation(location, new AsyncCallback<Location>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+					new NormalDialogBox("Error", "Location add error : " + caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(Location result) {
+					System.out.println("Location add success : " + result.getDescription());
+				}
+			});
+		}
+	}
+
+	/**
+	 * Insert groups.
+	 */
+	private void insertGroups() {
+
+		List<Group> groupList = new ArrayList<Group>();
+		groupList.add(new Group(1L, "test1"));
+		groupList.add(new Group(2L, "test2"));
+
+		for (Group group : groupList) {
+
+			codeTableService.addGroup(group, new AsyncCallback<Group>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+					new NormalDialogBox("Error", "Group add error : " + caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(Group result) {
+					System.out.println("Group add success : " + result.getDescription());
+				}
+			});
+		}
+	}
+}
