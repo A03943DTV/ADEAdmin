@@ -83,7 +83,7 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	@Override
 	public List<Group> getGroupsList() {
 
-		return getGenericDaoImpl().getList(Group.class);
+		return getGenericDaoImpl().getList(Group.class, null, null);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	@Override
 	public List<Location> getLocationsList() {
 
-		return getGenericDaoImpl().getList(Location.class);
+		return getGenericDaoImpl().getList(Location.class, null, null);
 	}
 
 	/**
@@ -101,9 +101,9 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	 * @return
 	 */
 	@Override
-	public List<ManagersId> getManagersIdsList() {
+	public List<ManagersId> getManagersIdsList(String location) {
 
-		return getGenericDaoImpl().getList(ManagersId.class);
+		return getGenericDaoImpl().getList(ManagersId.class, ManagersId.LOCATION_PARAM, location);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	@Override
 	public List<Role> getRolesList() {
 
-		return getGenericDaoImpl().getList(Role.class);
+		return getGenericDaoImpl().getList(Role.class, null, null);
 	}
 
 	/**
@@ -121,10 +121,10 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	 */
 	@Override
 	public void deleteCodeTableValues() {
-		
-		getGenericDaoImpl().deleteCodeTableObjects(Group.class);
-		getGenericDaoImpl().deleteCodeTableObjects(Location.class);
-		getGenericDaoImpl().deleteCodeTableObjects(Role.class);
-		getGenericDaoImpl().deleteCodeTableObjects(ManagersId.class);
+
+		getGenericDaoImpl().deleteCodeTable(Group.class);
+		getGenericDaoImpl().deleteCodeTable(Location.class);
+		getGenericDaoImpl().deleteCodeTable(Role.class);
+		getGenericDaoImpl().deleteCodeTable(ManagersId.class);
 	}
 }

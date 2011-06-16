@@ -131,8 +131,12 @@ public class CodeTableScreen extends Composite {
 	private void insertManagersIds() {
 
 		List<ManagersId> managersIdList = new ArrayList<ManagersId>();
-		managersIdList.add(new ManagersId(1L, "manager1@dtv.com"));
-		managersIdList.add(new ManagersId(2L, "manager2@dtv.com"));
+		managersIdList.add(new ManagersId(1L, "manager1@dtv.com", "Boise"));
+		managersIdList.add(new ManagersId(2L, "manager2@dtv.com", "Huntsville"));
+		managersIdList.add(new ManagersId(3L, "manager3@dtv.com", "Huntsville"));
+		managersIdList.add(new ManagersId(4L, "manager4@dtv.com", "Huntsville"));
+		managersIdList.add(new ManagersId(5L, "manager5@dtv.com", "Chattanoga"));
+		managersIdList.add(new ManagersId(6L, "manager6@dtv.com", "Chattanoga"));
 
 		for (ManagersId managersId : managersIdList) {
 
@@ -188,6 +192,9 @@ public class CodeTableScreen extends Composite {
 		List<Group> groupList = new ArrayList<Group>();
 		groupList.add(new Group(1L, "test1"));
 		groupList.add(new Group(2L, "test2"));
+		groupList.add(new Group(3L, "test3"));
+		groupList.add(new Group(4L, "test4"));
+		groupList.add(new Group(5L, "test5"));
 
 		for (Group group : groupList) {
 

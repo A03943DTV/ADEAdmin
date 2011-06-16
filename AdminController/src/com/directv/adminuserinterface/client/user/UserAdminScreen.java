@@ -18,6 +18,7 @@ import com.directv.adminuserinterface.login.LoginService;
 import com.directv.adminuserinterface.login.LoginServiceAsync;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
+import com.directv.adminuserinterface.shared.LoginInfo;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
 import com.directv.adminuserinterface.shared.User;
@@ -27,6 +28,8 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -67,6 +70,9 @@ public class UserAdminScreen extends Composite {
 	/** The code table service. */
 	private final CodeTableServiceAsync codeTableService = GWT.create(CodeTableService.class);
 
+	/** The login info. */
+	private LoginInfo loginInfo;
+
 	/** The group dropdown array. */
 	private String groupDropdownArray[];
 
@@ -78,6 +84,10 @@ public class UserAdminScreen extends Composite {
 
 	/** The managers id drop down array. */
 	private String managersIdDropDownArray[];
+
+	/** The credential drop down array. */
+	private String credentialDropDownArray[] = { "", AdminConstants.CREDENTIAL_USER, AdminConstants.CREDENTIAL_ADMIN_USER,
+			AdminConstants.CREDENTIAL_SUPER_ADMIN_USER };
 
 	/** The first name label. */
 	private Label firstNameLabel = new Label("First Name");
@@ -160,6 +170,12 @@ public class UserAdminScreen extends Composite {
 	/** The csv download image. */
 	private Image csvDownloadImage = new Image();
 
+	/** The credential lable. */
+	private Label credentialLable = new Label("Credential");
+
+	/** The credential drop box. */
+	private ListBox credentialDropBox = new ListBox();
+
 	/**
 	 * Instantiates a new user admin screen.
 	 */
@@ -171,10 +187,12 @@ public class UserAdminScreen extends Composite {
 	 * Instantiates a new user admin screen.
 	 *
 	 * @param hostPageBaseURL the host page base url
+	 * @param loginInfo the login info
 	 */
-	public UserAdminScreen(String hostPageBaseURL) {
+	public UserAdminScreen(String hostPageBaseURL, final LoginInfo loginInfo) {
 
 		this.hostPageBaseURL = hostPageBaseURL;
+		this.loginInfo = loginInfo;
 		csvDownloadImage.setUrl("images/csv.png");
 
 		loadingDialogBox = new LoadingDialogBox("Loading.....", "Loading user informations..... Please wait for few seconds.....");
@@ -228,6 +246,7 @@ public class UserAdminScreen extends Composite {
 							dataProvider.getList().get(editUserIndex).setManagersId(userUpdated.getManagersId());
 							dataProvider.getList().get(editUserIndex).setRole(userUpdated.getRole());
 							dataProvider.getList().get(editUserIndex).setCampaign(userUpdated.getCampaign());
+							dataProvider.getList().get(editUserIndex).setCredential(userUpdated.getCredential());
 							dataProvider.refresh();//To replicate the change in table
 							userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
 							clearFormFields();
@@ -316,6 +335,16 @@ public class UserAdminScreen extends Composite {
 			}
 		});
 
+		locationDropBox.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+
+				//Since location and managerId are depended dropdown
+				getManagersIdFromServiceAndFillDropDown(locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
+			}
+		});
+
 		//Loading DB data and Setting the Columns,Values and Pagination for User Table
 		VerticalPanel vTablePanel = loadDataAndSetUserTableValues();
 
@@ -388,7 +417,8 @@ public class UserAdminScreen extends Composite {
 
 		return new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), groupDropdownArray[groupDropBox
 				.getSelectedIndex()], locationDropDownArray[locationDropBox.getSelectedIndex()], managersIdDropDownArray[managersIdDropBox
-				.getSelectedIndex()], roleDropDownArray[roleDropBox.getSelectedIndex()], campaignTextField.getValue());
+				.getSelectedIndex()], roleDropDownArray[roleDropBox.getSelectedIndex()], campaignTextField.getValue(),
+				credentialDropDownArray[credentialDropBox.getSelectedIndex()]);
 	}
 
 	/**
@@ -409,7 +439,14 @@ public class UserAdminScreen extends Composite {
 	 */
 	private void listUserInfo() {
 
-		userService.listUsers(hostPageBaseURL, new AsyncCallback<List<User>>() {
+		//If loggedin user is SuperAdmin then display all user not location specific so he can add/edit/remove all users
+		//If loggedin user is Admin then location specific so he can add/edit/remove users in that specific location
+		String location = null;
+		if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
+			location = loginInfo.getUser().getLocation();
+		}
+
+		userService.listUsers(location, hostPageBaseURL, new AsyncCallback<List<User>>() {
 
 			public void onFailure(Throwable caught) {
 				System.out.println("User List Error : " + caught.getMessage());
@@ -451,21 +488,23 @@ public class UserAdminScreen extends Composite {
 		Column<User, String> managersIdColumn = generateManagersIdColumn();
 		Column<User, String> roleColumn = generateRoleColumn();
 		Column<User, String> campaignColumn = generateCampaignColumn();
+		Column<User, String> credentialColumn = generateCredentialColumn();
 
 		// Set the width of the userTable and put the userTable in fixed width mode.
-		userTable.setWidth("1150px", true);
+		userTable.setWidth("1250px", true);
 
 		// Set the width of each column.
-		userTable.setColumnWidth(editColumn, 5.0, Unit.PCT);
+		userTable.setColumnWidth(editColumn, 4.0, Unit.PCT);
 		userTable.setColumnWidth(removecolumn, 5.0, Unit.PCT);
-		userTable.setColumnWidth(userIdColumn, 16, Unit.PCT);
-		userTable.setColumnWidth(firstNameColumn, 11.0, Unit.PCT);
-		userTable.setColumnWidth(lastNameColumn, 11.0, Unit.PCT);
-		userTable.setColumnWidth(groupColumn, 8.0, Unit.PCT);
-		userTable.setColumnWidth(locationColumn, 10.0, Unit.PCT);
-		userTable.setColumnWidth(managersIdColumn, 16.0, Unit.PCT);
-		userTable.setColumnWidth(roleColumn, 9.0, Unit.PCT);
-		userTable.setColumnWidth(campaignColumn, 9.0, Unit.PCT);
+		userTable.setColumnWidth(userIdColumn, 14, Unit.PCT);
+		userTable.setColumnWidth(firstNameColumn, 9.0, Unit.PCT);
+		userTable.setColumnWidth(lastNameColumn, 9.0, Unit.PCT);
+		userTable.setColumnWidth(groupColumn, 7.0, Unit.PCT);
+		userTable.setColumnWidth(locationColumn, 8.0, Unit.PCT);
+		userTable.setColumnWidth(managersIdColumn, 14.0, Unit.PCT);
+		userTable.setColumnWidth(roleColumn, 15.0, Unit.PCT);
+		userTable.setColumnWidth(campaignColumn, 7.0, Unit.PCT);
+		userTable.setColumnWidth(credentialColumn, 8.0, Unit.PCT);
 
 		dataProvider.addDataDisplay(userTable);
 		List<User> dataProviderList = dataProvider.getList();
@@ -475,7 +514,7 @@ public class UserAdminScreen extends Composite {
 
 		//Adding sort handler for header
 		addSortHandlersForHeader(dataProviderList, userIdColumn, firstNameColumn, lastNameColumn, groupColumn, locationColumn, managersIdColumn,
-				roleColumn, campaignColumn);
+				roleColumn, campaignColumn, credentialColumn);
 
 		//Adding Pagination
 		SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
@@ -518,7 +557,13 @@ public class UserAdminScreen extends Composite {
 		hPanel.add(userIdTextField);
 		hPanel.add(new Label("@" + AdminConstants.DOMAIN_NAME));
 
-		Grid formGrid = new Grid(4, 4);
+		Grid formGrid = null;
+
+		if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+			formGrid = new Grid(5, 4);
+		} else {
+			formGrid = new Grid(4, 4);
+		}
 
 		formGrid.setWidget(0, 0, firstNameLabel);
 		formGrid.setWidget(0, 1, firstNameTextField);
@@ -536,6 +581,12 @@ public class UserAdminScreen extends Composite {
 		formGrid.setWidget(3, 1, roleDropBox);
 		formGrid.setWidget(3, 2, campaignLabel);
 		formGrid.setWidget(3, 3, campaignTextField);
+
+		if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+			formGrid.setWidget(4, 0, credentialLable);
+			formGrid.setWidget(4, 1, credentialDropBox);
+			formGrid.getCellFormatter().setAlignment(4, 0, HasHorizontalAlignment.ALIGN_RIGHT, HasVerticalAlignment.ALIGN_MIDDLE);
+		}
 
 		formGrid.getCellFormatter().setAlignment(0, 0, HasHorizontalAlignment.ALIGN_RIGHT, HasVerticalAlignment.ALIGN_MIDDLE);
 		formGrid.getCellFormatter().setAlignment(0, 2, HasHorizontalAlignment.ALIGN_RIGHT, HasVerticalAlignment.ALIGN_MIDDLE);
@@ -593,6 +644,9 @@ public class UserAdminScreen extends Composite {
 	 */
 	protected void editSelectedData(int index, User user) {
 
+		//Since location and managerId are depended dropdown
+		getManagersIdFromServiceAndFillDropDown(user.getLocation(), true, user.getManagersId());
+
 		firstNameTextField.setText(user.getFirstName());
 		lastNameTextField.setText(user.getLastName());
 		userIdTextField.setText(EMailIdUtil.getNameFromEmailId(user.getUserId()));
@@ -606,15 +660,15 @@ public class UserAdminScreen extends Composite {
 		} else {
 			locationDropBox.setSelectedIndex(Arrays.asList(locationDropDownArray).indexOf(0));
 		}
-		if (Arrays.asList(managersIdDropDownArray).contains(user.getManagersId())) {
-			managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(user.getManagersId()));
-		} else {
-			managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(0));
-		}
 		if (Arrays.asList(roleDropDownArray).contains(user.getRole())) {
 			roleDropBox.setSelectedIndex(Arrays.asList(roleDropDownArray).indexOf(user.getRole()));
 		} else {
 			roleDropBox.setSelectedIndex(Arrays.asList(roleDropDownArray).indexOf(0));
+		}
+		if (Arrays.asList(credentialDropDownArray).contains(user.getCredential())) {
+			credentialDropBox.setSelectedIndex(Arrays.asList(credentialDropDownArray).indexOf(user.getCredential()));
+		} else {
+			credentialDropBox.setSelectedIndex(Arrays.asList(credentialDropDownArray).indexOf(0));
 		}
 		campaignTextField.setText(user.getCampaign());
 		editUserIndex = new Integer(index);//To identify which item in list to be updated
@@ -625,6 +679,13 @@ public class UserAdminScreen extends Composite {
 	 */
 	protected void clearFormFields() {
 
+		managersIdDropDownArray = new String[1];
+		managersIdDropDownArray[0] = "";
+		managersIdDropBox.clear();
+		for (int i = 0; i < managersIdDropDownArray.length; i++) {
+			managersIdDropBox.addItem(managersIdDropDownArray[i]);
+		}
+
 		firstNameTextField.setText("");
 		lastNameTextField.setText("");
 		userIdTextField.setText("");
@@ -633,6 +694,7 @@ public class UserAdminScreen extends Composite {
 		managersIdDropBox.setSelectedIndex(0);
 		roleDropBox.setSelectedIndex(0);
 		campaignTextField.setText("");
+		credentialDropBox.setSelectedIndex(0);
 		editUserIndex = null;//For safety purpose clear editUserIndex
 	}
 
@@ -648,10 +710,12 @@ public class UserAdminScreen extends Composite {
 	 * @param managersIdColumn the managers id column
 	 * @param roleColumn the role column
 	 * @param campaignColumn the campaign column
+	 * @param credentialColumn the credential column
 	 */
 	private void addSortHandlersForHeader(List<User> dataProviderList, Column<User, String> userIdColumn, Column<User, String> firstNameColumn,
 			Column<User, String> lastNameColumn, Column<User, String> groupColumn, Column<User, String> locationColumn,
-			Column<User, String> managersIdColumn, Column<User, String> roleColumn, Column<User, String> campaignColumn) {
+			Column<User, String> managersIdColumn, Column<User, String> roleColumn, Column<User, String> campaignColumn,
+			Column<User, String> credentialColumn) {
 
 		ListHandler<User> columnSortHandler = new ListHandler<User>(dataProviderList);
 		columnSortHandler.setComparator(userIdColumn, new Comparator<User>() {
@@ -742,10 +806,39 @@ public class UserAdminScreen extends Composite {
 				return -1;
 			}
 		});
+		columnSortHandler.setComparator(credentialColumn, new Comparator<User>() {
+			public int compare(User o1, User o2) {
+				if (o1 == o2) {
+					return 0;
+				}
+				if (o1 != null) {
+					return (o2 != null) ? o1.getCredential().compareTo(o2.getCredential()) : 1;
+				}
+				return -1;
+			}
+		});
 		userTable.addColumnSortHandler(columnSortHandler);
 
 		// We know that the data is sorted alphabetically by default.
 		userTable.getColumnSortList().push(userIdColumn);
+	}
+
+	/**
+	 * Generate credential column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateCredentialColumn() {
+
+		Column<User, String> credentialColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getCredential();
+			}
+		};
+		credentialColumn.setSortable(true);//For sorting
+		userTable.addColumn(credentialColumn, "Credential");
+		return credentialColumn;
 	}
 
 	/**
@@ -1006,8 +1099,19 @@ public class UserAdminScreen extends Composite {
 
 		loadGroups();
 		loadLocations();
-		loadManagersIds();
 		loadRoles();
+		loadCredentials();
+	}
+
+	/**
+	 * Load credentials.
+	 */
+	private void loadCredentials() {
+
+		credentialDropBox.clear();
+		for (int i = 0; i < credentialDropDownArray.length; i++) {
+			credentialDropBox.addItem(credentialDropDownArray[i]);
+		}
 	}
 
 	/**
@@ -1025,6 +1129,7 @@ public class UserAdminScreen extends Composite {
 
 			@Override
 			public void onSuccess(List<Role> result) {
+
 				int idx = 1;
 				roleDropDownArray = new String[result.size() + 1];
 				roleDropDownArray[0] = "";
@@ -1033,40 +1138,10 @@ public class UserAdminScreen extends Composite {
 						roleDropDownArray[idx] = role.getDescription();
 						idx++;
 					}
-					for (int i = 0; i < roleDropDownArray.length; i++) {
-						roleDropBox.addItem(roleDropDownArray[i]);
-					}
 				}
-			}
-		});
-	}
-
-	/**
-	 * Load managers ids.
-	 */
-	private void loadManagersIds() {
-
-		codeTableService.getManagersIdsList(new AsyncCallback<List<ManagersId>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				caught.printStackTrace();
-				new NormalDialogBox("Error", "Error retreving managersId list : " + caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(List<ManagersId> result) {
-				int idx = 1;
-				managersIdDropDownArray = new String[result.size() + 1];
-				managersIdDropDownArray[0] = "";
-				if (result.size() > 0) {
-					for (ManagersId managersId : result) {
-						managersIdDropDownArray[idx] = managersId.getDescription();
-						idx++;
-					}
-					for (int i = 0; i < managersIdDropDownArray.length; i++) {
-						managersIdDropBox.addItem(managersIdDropDownArray[i]);
-					}
+				roleDropBox.clear();
+				for (int i = 0; i < roleDropDownArray.length; i++) {
+					roleDropBox.addItem(roleDropDownArray[i]);
 				}
 			}
 		});
@@ -1077,30 +1152,51 @@ public class UserAdminScreen extends Composite {
 	 */
 	private void loadLocations() {
 
-		codeTableService.getLocationsList(new AsyncCallback<List<Location>>() {
+		//If logged in user is Admin then allow that user to create only users in that particular location
+		if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				caught.printStackTrace();
-				new NormalDialogBox("Error", "Error retreving location list : " + caught.getMessage());
-			}
+			locationDropDownArray = new String[2];
+			locationDropDownArray[0] = "";
+			locationDropDownArray[1] = loginInfo.getUser().getLocation();
+			addlocDropDownValues();
 
-			@Override
-			public void onSuccess(List<Location> result) {
-				int idx = 1;
-				locationDropDownArray = new String[result.size() + 1];
-				locationDropDownArray[0] = "";
-				if (result.size() > 0) {
-					for (Location location : result) {
-						locationDropDownArray[idx] = location.getDescription();
-						idx++;
-					}
-					for (int i = 0; i < locationDropDownArray.length; i++) {
-						locationDropBox.addItem(locationDropDownArray[i]);
-					}
+		} else {//If logged in user is SuperAdmin then allow that user to create users in all location
+
+			codeTableService.getLocationsList(new AsyncCallback<List<Location>>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+					new NormalDialogBox("Error", "Error retreving location list : " + caught.getMessage());
 				}
-			}
-		});
+
+				@Override
+				public void onSuccess(List<Location> result) {
+
+					int idx = 1;
+					locationDropDownArray = new String[result.size() + 1];
+					locationDropDownArray[0] = "";
+					if (result.size() > 0) {
+						for (Location location : result) {
+							locationDropDownArray[idx] = location.getDescription();
+							idx++;
+						}
+					}
+					addlocDropDownValues();
+				}
+			});
+		}
+	}
+
+	/**
+	 * Addloc drop down values.
+	 */
+	private void addlocDropDownValues() {
+
+		locationDropBox.clear();
+		for (int i = 0; i < locationDropDownArray.length; i++) {
+			locationDropBox.addItem(locationDropDownArray[i]);
+		}
 	}
 
 	/**
@@ -1118,6 +1214,7 @@ public class UserAdminScreen extends Composite {
 
 			@Override
 			public void onSuccess(List<Group> result) {
+
 				int idx = 1;
 				groupDropdownArray = new String[result.size() + 1];
 				groupDropdownArray[0] = "";
@@ -1126,8 +1223,56 @@ public class UserAdminScreen extends Composite {
 						groupDropdownArray[idx] = group.getDescription();
 						idx++;
 					}
-					for (int i = 0; i < groupDropdownArray.length; i++) {
-						groupDropBox.addItem(groupDropdownArray[i]);
+				}
+				groupDropBox.clear();
+				for (int i = 0; i < groupDropdownArray.length; i++) {
+					groupDropBox.addItem(groupDropdownArray[i]);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Gets the managers id from service and fill drop down.
+	 *
+	 * @param location the location
+	 * @param isEditClicked the is edit clicked
+	 * @param managersId the managers id
+	 * @return the managers id from service and fill drop down
+	 */
+	private void getManagersIdFromServiceAndFillDropDown(String location, final boolean isEditClicked, final String managersId) {
+
+		codeTableService.getManagersIdsList(location, new AsyncCallback<List<ManagersId>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+				new NormalDialogBox("Error", "Error retreving managersId list : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<ManagersId> result) {
+
+				int idx = 1;
+				managersIdDropDownArray = new String[result.size() + 1];
+				managersIdDropDownArray[0] = "";
+				if (result.size() > 0) {
+					for (ManagersId managersId : result) {
+						managersIdDropDownArray[idx] = managersId.getDescription();
+						idx++;
+					}
+				}
+				managersIdDropBox.clear();
+				for (int i = 0; i < managersIdDropDownArray.length; i++) {
+					managersIdDropBox.addItem(managersIdDropDownArray[i]);
+				}
+				//If user clicked on edit icon in table then for a location then loading managersIds for that location
+				//And making corresponding managersId selected
+				if (isEditClicked) {
+					if (Arrays.asList(managersIdDropDownArray).contains(managersId)) {
+						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(managersId));
+					} else {
+						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(0));
 					}
 				}
 			}

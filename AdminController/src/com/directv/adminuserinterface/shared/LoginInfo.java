@@ -29,6 +29,27 @@ public class LoginInfo implements Serializable {
 	/** The nickname. */
 	private String nickname;
 
+	/** The user. */
+	private User user = new User();
+
+	/**
+	 * Gets the user.
+	 *
+	 * @return the user
+	 */
+	public User getUser() {
+		return user;
+	}
+
+	/**
+	 * Sets the user.
+	 *
+	 * @param user the new user
+	 */
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	/**
 	 * Checks if is logged in.
 	 *

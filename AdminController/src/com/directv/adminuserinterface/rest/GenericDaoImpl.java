@@ -34,18 +34,45 @@ public class GenericDaoImpl {
 	}
 
 	/**
+	 * Gets the.
+	 *
+	 * @param <T> the generic type
+	 * @param clazz the clazz
+	 * @param id the id
+	 * @return the t
+	 */
+	public <T> T get(Class<T> clazz, String id) {
+
+		T object = null;
+		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
+		try {
+			object = (T) pm.getObjectById(clazz, id);
+		} catch (Exception excep) {
+			throw new RuntimeException(excep);
+		} finally {
+			pm.close();
+		}
+		return object;
+	}
+
+	/**
 	 * Gets the list.
 	 *
 	 * @param <T> the generic type
 	 * @param clazz the clazz
+	 * @param param the param
+	 * @param value the value
 	 * @return the list
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> List<T> getList(Class<T> clazz) {
+	public <T> List<T> getList(Class<T> clazz, String param, String value) {
 
 		List<T> listNew = new ArrayList<T>();
 		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
 		String query = "select from " + clazz.getName();
+		if (param != null && value != null) {
+			query = query + " where " + param + " == '" + value + "'";
+		}
 		List<T> list = (List<T>) pm.newQuery(query).execute();
 		if (list != null && list.size() > 0) {
 			listNew.addAll(list);//To prevent Serialization exception at RunTime
@@ -54,23 +81,22 @@ public class GenericDaoImpl {
 	}
 
 	/**
-	 * Delete code table objects.
+	 * Delete code table.
 	 *
 	 * @param <T> the generic type
 	 * @param clazz the clazz
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> void deleteCodeTableObjects(Class<T> clazz) {
+	public <T> void deleteCodeTable(Class<T> clazz) {
 
 		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
 		String query = "select from " + clazz.getName();
-		for (T data : (List<T>) pm.newQuery(query).execute()) {
-
+		List<T> list = (List<T>) pm.newQuery(query).execute();
+		for (T object : list) {
 			try {
 				pm.currentTransaction().begin();
-				pm.deletePersistent(data);
+				pm.deletePersistent(object);
 				pm.currentTransaction().commit();
-
 			} catch (Exception ex) {
 				pm.currentTransaction().rollback();
 				throw new RuntimeException(ex);

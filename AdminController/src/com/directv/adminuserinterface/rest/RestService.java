@@ -37,8 +37,8 @@ public class RestService {
 	public User restUpdate(@QueryParam("userid") String userid, @QueryParam("group") String group, @QueryParam("location") String location,
 			@QueryParam("managerid") String managerid, @QueryParam("role") String role, @QueryParam("campaign") String campaign) {
 
-		//TODO : firstName/lastName Param null to be changed
-		User user = new User(null, null, userid, group, location, managerid, role, campaign);
+		//TODO : firstName/lastName/credential Param null to be changed
+		User user = new User(null, null, userid, group, location, managerid, role, campaign, null);
 		UserDao userDao = new UserDaoImpl();
 		return userDao.addUser(user);
 	}
@@ -59,8 +59,8 @@ public class RestService {
 	public String restDelete(@QueryParam("userid") String userid, @QueryParam("group") String group, @QueryParam("location") String location,
 			@QueryParam("managerid") String managerid, @QueryParam("role") String role, @QueryParam("campaign") String campaign) {
 
-		//TODO : firstName/lastName Param null to be changed
-		User user = new User(null, null, userid, group, location, managerid, role, campaign);
+		//TODO : firstName/lastName/credential Param null to be changed
+		User user = new User(null, null, userid, group, location, managerid, role, campaign, null);
 		UserDao userDao = new UserDaoImpl();
 		userDao.removeUser(user);
 		return "User Deleted Successfully";
@@ -77,6 +77,6 @@ public class RestService {
 	public List<User> restGetUsers() {
 
 		UserDao userDao = new UserDaoImpl();
-		return userDao.listUsers();
+		return userDao.listUsers(null, null);
 	}
 }

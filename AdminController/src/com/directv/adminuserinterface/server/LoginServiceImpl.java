@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.directv.adminuserinterface.login.LoginService;
+import com.directv.adminuserinterface.rest.UserDaoImpl;
 import com.directv.adminuserinterface.shared.LoginInfo;
 import com.directv.adminuserinterface.util.AdminConstants;
 import com.google.appengine.api.users.User;
@@ -43,6 +44,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			loginInfo.setLoggedIn(false);
 			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
 		}
+
+		loginInfo.setUser(new UserDaoImpl().getUser(user.getEmail()));
 		return loginInfo;
 	}
 
@@ -69,29 +72,30 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	}
 
 	/**
-	 * Reflect added user in session.
-	 *
-	 * @param user the user
+	 * Overridden Method
+	 * @param user
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void reflectAddedUserInSession(com.directv.adminuserinterface.shared.User user) {
 
-		((List<com.directv.adminuserinterface.shared.User>) this.getThreadLocalRequest().getSession().getAttribute(
-				AdminConstants.SESSION_DATA_STORE_ATTRIBUTE)).add(0, user);
+		List<com.directv.adminuserinterface.shared.User> userListSession = (List<com.directv.adminuserinterface.shared.User>) this
+				.getThreadLocalRequest().getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE);
+		userListSession.add(0, user);
+		storeUserListInSession(userListSession);
 	}
 
 	/**
-	 * Reflect updated user in session.
-	 *
-	 * @param user the user
+	 * Overridden Method
+	 * @param user
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void reflectUpdatedUserInSession(com.directv.adminuserinterface.shared.User user) {
 
-		for (com.directv.adminuserinterface.shared.User userSession : (List<com.directv.adminuserinterface.shared.User>) this.getThreadLocalRequest()
-				.getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE)) {
+		List<com.directv.adminuserinterface.shared.User> userListSession = (List<com.directv.adminuserinterface.shared.User>) this
+				.getThreadLocalRequest().getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE);
+		for (com.directv.adminuserinterface.shared.User userSession : userListSession) {
 			if (userSession.getUserId().equals(user.getUserId())) {
 				userSession.setFirstName(user.getFirstName());
 				userSession.setLastName(user.getLastName());
@@ -102,27 +106,28 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 				userSession.setCampaign(user.getCampaign());
 			}
 		}
+		storeUserListInSession(userListSession);
 	}
 
 	/**
-	 * Reflect deleted user in session.
-	 *
-	 * @param user the user
+	 * Overridden Method
+	 * @param user
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void reflectDeletedUserInSession(com.directv.adminuserinterface.shared.User user) {
 
 		List<com.directv.adminuserinterface.shared.User> userToBeRemoved = new ArrayList<com.directv.adminuserinterface.shared.User>();
+		List<com.directv.adminuserinterface.shared.User> userListSession = (List<com.directv.adminuserinterface.shared.User>) this
+				.getThreadLocalRequest().getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE);
 
-		for (com.directv.adminuserinterface.shared.User userSession : (List<com.directv.adminuserinterface.shared.User>) this.getThreadLocalRequest()
-				.getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE)) {
+		for (com.directv.adminuserinterface.shared.User userSession : userListSession) {
 			if (userSession.getUserId().equals(user.getUserId())) {
 				userToBeRemoved.add(userSession);
 			}
 		}
 
-		((List<com.directv.adminuserinterface.shared.User>) this.getThreadLocalRequest().getSession().getAttribute(
-				AdminConstants.SESSION_DATA_STORE_ATTRIBUTE)).remove(userToBeRemoved.get(0));
+		userListSession.remove(userToBeRemoved.get(0));
+		storeUserListInSession(userListSession);
 	}
 }

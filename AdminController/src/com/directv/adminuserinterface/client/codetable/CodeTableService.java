@@ -46,9 +46,10 @@ public interface CodeTableService extends RemoteService {
 	/**
 	 * Gets the managers ids list.
 	 *
+	 * @param location the location
 	 * @return the managers ids list
 	 */
-	List<ManagersId> getManagersIdsList();
+	List<ManagersId> getManagersIdsList(String location);
 
 	/**
 	 * Adds the role.

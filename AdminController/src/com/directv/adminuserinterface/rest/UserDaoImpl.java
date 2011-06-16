@@ -27,12 +27,25 @@ public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 
 	/**
 	 * Overridden Method
+	 * @param userId
 	 * @return
 	 */
 	@Override
-	public List<User> listUsers() {
+	public User getUser(String userId) {
 
-		return getList(User.class);
+		return get(User.class, userId);
+	}
+
+	/**
+	 * Overridden Method
+	 * @param location 
+	 * @param location 
+	 * @return
+	 */
+	@Override
+	public List<User> listUsers(String locationParam, String locationValue) {
+
+		return getList(User.class, locationParam, locationValue);
 	}
 
 	/**
@@ -81,6 +94,7 @@ public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 			userDB.setManagersId(user.getManagersId());
 			userDB.setRole(user.getRole());
 			userDB.setCampaign(user.getCampaign());
+			userDB.setCredential(user.getCredential());
 
 			pm.makePersistent(userDB);
 			pm.currentTransaction().commit();

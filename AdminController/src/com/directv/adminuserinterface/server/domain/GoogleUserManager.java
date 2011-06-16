@@ -167,7 +167,6 @@ public class GoogleUserManager {
 				user.setUserId(EMailIdUtil.getEmailIdFromName(entry.getTitle().getPlainText()));
 				user.setFirstName(entry.getName().getGivenName());
 				user.setLastName(entry.getName().getFamilyName());
-				user.setAdmin(entry.getLogin().getAdmin());
 				userList.add(user);
 			}
 		}

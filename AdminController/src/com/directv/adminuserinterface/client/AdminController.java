@@ -3,12 +3,13 @@
  */
 package com.directv.adminuserinterface.client;
 
-import com.directv.adminuserinterface.client.codetable.CodeTableScreen;
+import com.directv.adminuserinterface.client.dialog.ConfirmDialogBox;
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
 import com.directv.adminuserinterface.client.user.UserAdminScreen;
 import com.directv.adminuserinterface.login.LoginService;
 import com.directv.adminuserinterface.login.LoginServiceAsync;
 import com.directv.adminuserinterface.shared.LoginInfo;
+import com.directv.adminuserinterface.util.AdminConstants;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -59,11 +60,24 @@ public class AdminController implements EntryPoint {
 			}
 
 			public void onSuccess(LoginInfo result) {
+
 				loginInfo = result;
-				if (loginInfo.isLoggedIn()) {
+				if (loginInfo.isLoggedIn()
+						&& (loginInfo.getUser().getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER) || loginInfo.getUser().getCredential()
+								.equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER))) {
+
 					setMainScreen();
 				} else {
-					Window.Location.replace(loginInfo.getLogoutUrl());
+
+					final ConfirmDialogBox confirmDialog = new ConfirmDialogBox();
+					Button yesButton = confirmDialog.initializeConfirmDialog("Credential Error",
+							"You don't have permission to access this application contact ADELite admin, Click Yes to logout");
+					yesButton.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							confirmDialog.hideDialogBox();
+							Window.Location.replace(loginInfo.getLogoutUrl());
+						}
+					});
 				}
 			}
 		});
@@ -111,10 +125,10 @@ public class AdminController implements EntryPoint {
 		tabPanel.add(new HTML(), "Offer Administration");
 
 		//User Administration Tab
-		tabPanel.add(new UserAdminScreen(GWT.getHostPageBaseURL()), "User Administration");
+		tabPanel.add(new UserAdminScreen(GWT.getHostPageBaseURL(), loginInfo), "User Administration");
 
 		//Code Table Tab
-		tabPanel.add(new CodeTableScreen(), "Code Table");
+		//tabPanel.add(new CodeTableScreen(), "Code Table");
 
 		tabPanel.selectTab(2);
 

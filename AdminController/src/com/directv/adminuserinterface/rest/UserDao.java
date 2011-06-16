@@ -40,7 +40,17 @@ public interface UserDao {
 	/**
 	 * List users.
 	 *
+	 * @param locationParam the location param
+	 * @param locationValue the location value
 	 * @return the list
 	 */
-	public List<User> listUsers();
+	public List<User> listUsers(String locationParam, String locationValue);
+
+	/**
+	 * Gets the user.
+	 *
+	 * @param userId the user id
+	 * @return the user
+	 */
+	public User getUser(String userId);
 }

@@ -33,14 +33,6 @@ public interface UserServiceAsync {
 	void updateUser(String hostPageBaseURL, User user, AsyncCallback<User> callback);
 
 	/**
-	 * List users.
-	 *
-	 * @param hostPageBaseURL the host page base url
-	 * @param callback the callback
-	 */
-	void listUsers(String hostPageBaseURL, AsyncCallback<List<User>> callback);
-
-	/**
 	 * Removes the user.
 	 *
 	 * @param hostPageBaseURL the host page base url
@@ -48,4 +40,13 @@ public interface UserServiceAsync {
 	 * @param callback the callback
 	 */
 	void removeUser(String hostPageBaseURL, User user, AsyncCallback<User> callback);
+
+	/**
+	 * List users.
+	 *
+	 * @param location the location
+	 * @param hostPageBaseURL the host page base url
+	 * @param callback the callback
+	 */
+	void listUsers(String location, String hostPageBaseURL, AsyncCallback<List<User>> callback);
 }

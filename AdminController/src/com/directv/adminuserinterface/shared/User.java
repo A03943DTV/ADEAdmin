@@ -10,7 +10,6 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.Transactional;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -24,6 +23,9 @@ public class User implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -6671354226828460153L;
+
+	/** The Constant LOCATION_PARAM. */
+	public static final String LOCATION_PARAM = "location";
 
 	/** The user id. */
 	@PrimaryKey
@@ -58,10 +60,9 @@ public class User implements Serializable {
 	@Persistent
 	private String campaign;
 
-	/** The admin. */
-	//No need to be stored in DB so using Transactional
-	@Transactional
-	private boolean admin;
+	/** The credential. */
+	@Persistent
+	private String credential;
 
 	/**
 	 * Instantiates a new user.
@@ -74,8 +75,10 @@ public class User implements Serializable {
 	 * @param managersId the managers id
 	 * @param role the role
 	 * @param campaign the campaign
+	 * @param credential the credential
 	 */
-	public User(String firstName, String lastName, String userId, String group, String location, String managersId, String role, String campaign) {
+	public User(String firstName, String lastName, String userId, String group, String location, String managersId, String role, String campaign,
+			String credential) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -85,6 +88,7 @@ public class User implements Serializable {
 		this.managersId = managersId;
 		this.role = role;
 		this.campaign = campaign;
+		setCredential(credential);
 	}
 
 	/**
@@ -247,21 +251,23 @@ public class User implements Serializable {
 	}
 
 	/**
-	 * Checks if is admin.
+	 * Gets the credential.
 	 *
-	 * @return true, if is admin
+	 * @return the credential
 	 */
 	@XmlElement
-	public boolean isAdmin() {
-		return admin;
+	public String getCredential() {
+		return credential == null ? "" : credential.trim();
 	}
 
 	/**
-	 * Sets the admin.
+	 * Sets the credential.
 	 *
-	 * @param admin the new admin
+	 * @param credential the new credential
 	 */
-	public void setAdmin(boolean admin) {
-		this.admin = admin;
+	public void setCredential(String credential) {
+		if (credential != null && !credential.equals("")) {
+			this.credential = credential;
+		}
 	}
 }

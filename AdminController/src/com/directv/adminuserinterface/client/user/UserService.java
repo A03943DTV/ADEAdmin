@@ -40,11 +40,12 @@ public interface UserService extends RemoteService {
 	/**
 	 * List users.
 	 *
+	 * @param location the location
 	 * @param hostPageBaseURL the host page base url
 	 * @return the list
 	 * @throws AdminException the admin exception
 	 */
-	List<User> listUsers(String hostPageBaseURL) throws AdminException;
+	List<User> listUsers(String location, String hostPageBaseURL) throws AdminException;
 
 	/**
 	 * Removes the user.

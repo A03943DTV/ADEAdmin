@@ -10,6 +10,7 @@ import com.directv.adminuserinterface.rest.UserDao;
 import com.directv.adminuserinterface.rest.UserDaoImpl;
 import com.directv.adminuserinterface.server.domain.GoogleUserManager;
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.AdminException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -28,7 +29,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	 * @return the user dao
 	 */
 	public UserDao getUserDao() {
-		
+
 		return new UserDaoImpl();
 	}
 
@@ -44,20 +45,11 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		//Creating a new user in the domain
 		user = new GoogleUserManager().createDomainUser(user);
 		//Creating a new user in the DB
+		if (user.getCredential() == null || user.getCredential().equals("")) {
+			user.setCredential(AdminConstants.CREDENTIAL_USER);//By default newly created user will have user credential
+		}
 		user = getUserDao().addUser(user);
 		return user;
-	}
-
-	/**
-	 * Overridden Method
-	 * @return
-	 * @throws AdminException 
-	 */
-	@Override
-	public List<User> listUsers(String hostPageBaseURL) throws AdminException {
-
-		//Retrieving all the users from the DB/Domain[DB Domain both count will be the same]
-		return new UserDaoImpl().listUsers();
 	}
 
 	/**
@@ -91,5 +83,19 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		//Updating an existing user in the DB
 		user = getUserDao().updateUser(user);
 		return user;
+	}
+
+	/**
+	 * Overridden Method
+	 * @param location
+	 * @param hostPageBaseURL
+	 * @return
+	 * @throws AdminException
+	 */
+	@Override
+	public List<User> listUsers(String location, String hostPageBaseURL) throws AdminException {
+
+		//Retrieving all the users in a particular location from the DB/Domain[DB Domain both count will be the same]
+		return new UserDaoImpl().listUsers(User.LOCATION_PARAM, location);
 	}
 }

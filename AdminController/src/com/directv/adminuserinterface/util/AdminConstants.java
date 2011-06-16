@@ -35,4 +35,14 @@ public class AdminConstants {
 
 	/** The Constant SESSION_DATA_STORE_ATTRIBUTE. */
 	public static final String SESSION_DATA_STORE_ATTRIBUTE = "SessionDataStore";
+
+	/** The Constant CREDENTIAL_USER. */
+	public static final String CREDENTIAL_USER = "User";
+
+	/** The Constant CREDENTIAL_ADMIN_USER. */
+	public static final String CREDENTIAL_ADMIN_USER = "Admin";
+
+	/** The Constant CREDENTIAL_SUPER_ADMIN_USER. */
+	public static final String CREDENTIAL_SUPER_ADMIN_USER = "SuperAdmin";
+
 }
