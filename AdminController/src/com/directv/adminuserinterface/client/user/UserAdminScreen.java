@@ -1194,9 +1194,10 @@ public class UserAdminScreen extends Composite {
 
 		//If logged in user is Admin then allow that user to create only users in that particular location
 		if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
-
-			locationDropDownArray = new String[1];
-			locationDropDownArray[0] = loginInfo.getUser().getLocation();
+			
+			locationDropDownArray = new String[2];
+			locationDropDownArray[0] = "";
+			locationDropDownArray[1] = loginInfo.getUser().getLocation();
 			addlocDropDownValues();
 
 		} else {//If logged in user is SuperAdmin then allow that user to create users in all location
