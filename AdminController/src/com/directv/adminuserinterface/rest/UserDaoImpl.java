@@ -55,22 +55,7 @@ public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 	@Override
 	public User removeUser(User user) {
 
-		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
-		try {
-
-			pm.currentTransaction().begin();
-			// We don't have a reference to the selected Product.
-			// So we have to look it up first,
-			user = pm.getObjectById(User.class, user.getUserId());
-			pm.deletePersistent(user);
-			pm.currentTransaction().commit();
-
-		} catch (Exception ex) {
-			pm.currentTransaction().rollback();
-			throw new RuntimeException(ex);
-		} finally {
-			pm.close();
-		}
+		remove(User.class, user.getUserId());
 		return user;
 	}
 

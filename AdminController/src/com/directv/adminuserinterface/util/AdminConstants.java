@@ -45,4 +45,7 @@ public class AdminConstants {
 	/** The Constant CREDENTIAL_SUPER_ADMIN_USER. */
 	public static final String CREDENTIAL_SUPER_ADMIN_USER = "SuperAdmin";
 
+	/** The Constant MANAGER_ROLE_CONSTANT. */
+	public static final String MANAGER_ROLE_CONSTANT = "Manager";
+
 }

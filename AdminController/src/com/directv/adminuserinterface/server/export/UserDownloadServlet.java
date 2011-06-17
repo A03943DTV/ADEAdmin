@@ -30,7 +30,7 @@ public class UserDownloadServlet extends HttpServlet {
 
 	/** The Constant HEADER_DATA. */
 	private static final String HEADER_DATA[] = new String[] { "User Id", "First Name", "Last Name", "Group", "Location", "Manager's Id", "Role",
-			"Campaign" };
+			"Campaign", "Privilege" };
 
 	/**
 	 * Overridden Method
@@ -38,8 +38,12 @@ public class UserDownloadServlet extends HttpServlet {
 	 * @throws ServletException
 	 */
 	@Override
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
+	public void init(ServletConfig config) {
+		try {
+			super.init(config);
+		} catch (ServletException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -50,7 +54,7 @@ public class UserDownloadServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		StringBuffer stringBuilder = new StringBuffer();
 		for (String headerData : HEADER_DATA) {
@@ -76,17 +80,26 @@ public class UserDownloadServlet extends HttpServlet {
 			stringBuilder.append(user.getRole());
 			stringBuilder.append(",");
 			stringBuilder.append(user.getCampaign());
+			stringBuilder.append(",");
+			stringBuilder.append(user.getCredential());
 			stringBuilder.append("\n");
 		}
 
-		ServletOutputStream out = response.getOutputStream();
+		ServletOutputStream out = null;
+		try {
 
-		response.setContentType("text/csv");
-		response.setHeader("Content-Disposition", "attachment; filename=" + FILE_NAME + ".csv");
-		response.setContentLength(stringBuilder.toString().getBytes().length);
+			out = response.getOutputStream();
 
-		out.write(stringBuilder.toString().getBytes());
-		out.flush();
-		out.close();
+			response.setContentType("text/csv");
+			response.setHeader("Content-Disposition", "attachment; filename=" + FILE_NAME + ".csv");
+			response.setContentLength(stringBuilder.toString().getBytes().length);
+
+			out.write(stringBuilder.toString().getBytes());
+			out.flush();
+			out.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -127,4 +127,17 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 		getGenericDaoImpl().deleteCodeTable(Role.class);
 		getGenericDaoImpl().deleteCodeTable(ManagersId.class);
 	}
+
+	/**
+	 * Delete managers id data.
+	 *
+	 * @param managersId the managers id
+	 */
+	public void deleteManagersIdData(String managersId) {
+
+		for (ManagersId managersIdObject : (List<ManagersId>) getGenericDaoImpl().getList(ManagersId.class, ManagersId.DESCRIPTION_PARAM, managersId)) {
+
+			getGenericDaoImpl().remove(ManagersId.class, managersIdObject.getId());
+		}
+	}
 }

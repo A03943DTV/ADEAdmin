@@ -5,6 +5,7 @@ package com.directv.adminuserinterface.client.dialog;
 
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 // TODO: Auto-generated Javadoc
@@ -18,6 +19,9 @@ public class LoadingDialogBox {
 
 	/** The loader dialog content. */
 	private HTML loaderDialogContent = new HTML();
+
+	/** The loader image. */
+	private Image loaderImage = new Image();
 
 	/**
 	 * Instantiates a new loading dialog box.
@@ -39,7 +43,9 @@ public class LoadingDialogBox {
 	private void initializeLoaderDialog(String title, String message) {
 
 		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
+
+		loaderImage.setUrl("images/ajaxloader.gif");
+		dialogVPanel.add(loaderImage);
 		dialogVPanel.add(loaderDialogContent);
 
 		loaderDialogBox.setWidget(dialogVPanel);

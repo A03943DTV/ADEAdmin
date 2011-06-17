@@ -22,7 +22,9 @@ import com.directv.adminuserinterface.shared.LoginInfo;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.shared.validator.UserValidator;
 import com.directv.adminuserinterface.util.AdminConstants;
+import com.directv.adminuserinterface.util.AdminException;
 import com.directv.adminuserinterface.util.EMailIdUtil;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
@@ -86,8 +88,7 @@ public class UserAdminScreen extends Composite {
 	private String managersIdDropDownArray[];
 
 	/** The credential drop down array. */
-	private String credentialDropDownArray[] = { "", AdminConstants.CREDENTIAL_USER, AdminConstants.CREDENTIAL_ADMIN_USER,
-			AdminConstants.CREDENTIAL_SUPER_ADMIN_USER };
+	private String credentialDropDownArray[] = { "", AdminConstants.CREDENTIAL_USER, AdminConstants.CREDENTIAL_ADMIN_USER };
 
 	/** The first name label. */
 	private Label firstNameLabel = new Label("First Name");
@@ -171,7 +172,7 @@ public class UserAdminScreen extends Composite {
 	private Image csvDownloadImage = new Image();
 
 	/** The credential lable. */
-	private Label credentialLable = new Label("Credential");
+	private Label credentialLable = new Label("Privilege");
 
 	/** The credential drop box. */
 	private ListBox credentialDropBox = new ListBox();
@@ -203,11 +204,22 @@ public class UserAdminScreen extends Composite {
 				//Getting user entered values
 				User user = getUserFromForm();
 
+				//Validating required fields
+				try {
+					UserValidator.validate(user);
+				} catch (AdminException e) {
+					new NormalDialogBox("Validation Error", e.getMessage());
+					return;
+				}
+
+				loadingDialogBox = new LoadingDialogBox("Processing.....", "Processing save/update..... Please wait for few seconds.....");
+
 				if (editUserIndex == null) {//Adding new user
 
 					userService.addUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
 
 						public void onFailure(Throwable caught) {
+							loadingDialogBox.hideLoaderDialog();
 							System.out.println("User Add Error : " + caught.getMessage());
 							new NormalDialogBox("Error", "User Add Error : " + caught.getMessage());
 						}
@@ -222,6 +234,7 @@ public class UserAdminScreen extends Composite {
 							userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
 							clearFormFields();
 							reflectAddedUserInSession(userAdded);
+							loadingDialogBox.hideLoaderDialog();
 						}
 					});
 				} else {//Updating existing user
@@ -229,6 +242,7 @@ public class UserAdminScreen extends Composite {
 					userService.updateUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
 
 						public void onFailure(Throwable caught) {
+							loadingDialogBox.hideLoaderDialog();
 							System.out.println("User Update Error : " + caught.getMessage());
 							new NormalDialogBox("Error", "User Update Error : " + caught.getMessage());
 						}
@@ -251,6 +265,7 @@ public class UserAdminScreen extends Composite {
 							userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
 							clearFormFields();
 							reflectUpdatedUserInSession(userUpdated);
+							loadingDialogBox.hideLoaderDialog();
 						}
 					});
 				}
@@ -258,6 +273,12 @@ public class UserAdminScreen extends Composite {
 		});
 
 		clearButton.addClickHandler(new ClickHandler() {
+
+			/**
+			 * On click.
+			 *
+			 * @param event the event
+			 */
 			public void onClick(ClickEvent event) {
 				clearFormFields();
 			}
@@ -331,7 +352,11 @@ public class UserAdminScreen extends Composite {
 			 */
 			public void onClick(ClickEvent event) {
 
-				Window.open(GWT.getModuleBaseURL() + "userDownloadServlet", "Download Data", "");
+				try {
+					Window.open(GWT.getModuleBaseURL() + "userDownloadServlet", "", "");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -416,9 +441,9 @@ public class UserAdminScreen extends Composite {
 	protected User getUserFromForm() {
 
 		return new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), groupDropdownArray[groupDropBox
-				.getSelectedIndex()], locationDropDownArray[locationDropBox.getSelectedIndex()], managersIdDropDownArray[managersIdDropBox
-				.getSelectedIndex()], roleDropDownArray[roleDropBox.getSelectedIndex()], campaignTextField.getValue(),
-				credentialDropDownArray[credentialDropBox.getSelectedIndex()]);
+				.getSelectedIndex()], locationDropDownArray[locationDropBox.getSelectedIndex()],
+				managersIdDropDownArray != null ? managersIdDropDownArray[managersIdDropBox.getSelectedIndex()] : "", roleDropDownArray[roleDropBox
+						.getSelectedIndex()], campaignTextField.getValue(), credentialDropDownArray[credentialDropBox.getSelectedIndex()]);
 	}
 
 	/**
@@ -460,7 +485,10 @@ public class UserAdminScreen extends Composite {
 				listUsersMainFromWebService = listUsers;
 				List<User> dataProviderList = dataProvider.getList();
 				for (User user : listUsersMainFromWebService) {
-					dataProviderList.add(user);
+					//Preventing logged in user info to be displayed in grid/table
+					if (!user.getUserId().equals(loginInfo.getUser().getUserId())) {
+						dataProviderList.add(user);
+					}
 				}
 				loadingDialogBox.hideLoaderDialog();
 				storeUsersListInSession();
@@ -548,10 +576,15 @@ public class UserAdminScreen extends Composite {
 		//Filling up the drop down values from code table
 		loadAndFillDropDownValues();
 
-		firstNameTextField.setWidth("220px");
-		lastNameTextField.setWidth("220px");
-		userIdTextField.setWidth("150px");
-		campaignTextField.setWidth("220px");
+		firstNameTextField.setWidth("205px");
+		lastNameTextField.setWidth("205px");
+		userIdTextField.setWidth("140px");
+		campaignTextField.setWidth("205px");
+		groupDropBox.setWidth("210px");
+		locationDropBox.setWidth("210px");
+		managersIdDropBox.setWidth("210px");
+		roleDropBox.setWidth("210px");
+		credentialDropBox.setWidth("210px");
 
 		HorizontalPanel hPanel = new HorizontalPanel();
 		hPanel.add(userIdTextField);
@@ -616,9 +649,12 @@ public class UserAdminScreen extends Composite {
 			public void onClick(ClickEvent event) {
 				confirmDialog.hideDialogBox();
 
+				loadingDialogBox = new LoadingDialogBox("Processing.....", "Processing delete..... Please wait for few seconds.....");
+
 				userService.removeUser(hostPageBaseURL, user, new AsyncCallback<User>() {
 
 					public void onFailure(Throwable caught) {
+						loadingDialogBox.hideLoaderDialog();
 						System.out.println("User Removal Error : " + caught.getMessage());
 						new NormalDialogBox("Error", "User Removal Error : " + caught.getMessage());
 					}
@@ -630,6 +666,7 @@ public class UserAdminScreen extends Composite {
 						userTable.setRowCount(dataProvider.getList().size(), true);
 						clearFormFields();
 						reflectDeletedUserInSession(user);
+						loadingDialogBox.hideLoaderDialog();
 					}
 				});
 			}
@@ -645,7 +682,7 @@ public class UserAdminScreen extends Composite {
 	protected void editSelectedData(int index, User user) {
 
 		//Since location and managerId are depended dropdown
-		getManagersIdFromServiceAndFillDropDown(user.getLocation(), true, user.getManagersId());
+		getManagersIdFromServiceAndFillDropDown(user.getLocation(), true, user);
 
 		firstNameTextField.setText(user.getFirstName());
 		lastNameTextField.setText(user.getLastName());
@@ -671,6 +708,8 @@ public class UserAdminScreen extends Composite {
 			credentialDropBox.setSelectedIndex(Arrays.asList(credentialDropDownArray).indexOf(0));
 		}
 		campaignTextField.setText(user.getCampaign());
+
+		userIdTextField.setEnabled(false);//Making the user not to edit the userId
 		editUserIndex = new Integer(index);//To identify which item in list to be updated
 	}
 
@@ -695,6 +734,7 @@ public class UserAdminScreen extends Composite {
 		roleDropBox.setSelectedIndex(0);
 		campaignTextField.setText("");
 		credentialDropBox.setSelectedIndex(0);
+		userIdTextField.setEnabled(true);//Making the userId field enabled
 		editUserIndex = null;//For safety purpose clear editUserIndex
 	}
 
@@ -837,7 +877,7 @@ public class UserAdminScreen extends Composite {
 			}
 		};
 		credentialColumn.setSortable(true);//For sorting
-		userTable.addColumn(credentialColumn, "Credential");
+		userTable.addColumn(credentialColumn, "Privilege");
 		return credentialColumn;
 	}
 
@@ -1155,9 +1195,8 @@ public class UserAdminScreen extends Composite {
 		//If logged in user is Admin then allow that user to create only users in that particular location
 		if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
 
-			locationDropDownArray = new String[2];
-			locationDropDownArray[0] = "";
-			locationDropDownArray[1] = loginInfo.getUser().getLocation();
+			locationDropDownArray = new String[1];
+			locationDropDownArray[0] = loginInfo.getUser().getLocation();
 			addlocDropDownValues();
 
 		} else {//If logged in user is SuperAdmin then allow that user to create users in all location
@@ -1237,10 +1276,10 @@ public class UserAdminScreen extends Composite {
 	 *
 	 * @param location the location
 	 * @param isEditClicked the is edit clicked
-	 * @param managersId the managers id
+	 * @param user the user
 	 * @return the managers id from service and fill drop down
 	 */
-	private void getManagersIdFromServiceAndFillDropDown(String location, final boolean isEditClicked, final String managersId) {
+	private void getManagersIdFromServiceAndFillDropDown(String location, final boolean isEditClicked, final User user) {
 
 		codeTableService.getManagersIdsList(location, new AsyncCallback<List<ManagersId>>() {
 
@@ -1264,13 +1303,24 @@ public class UserAdminScreen extends Composite {
 				}
 				managersIdDropBox.clear();
 				for (int i = 0; i < managersIdDropDownArray.length; i++) {
-					managersIdDropBox.addItem(managersIdDropDownArray[i]);
+					//If the SuperAdmin is creating a new user with manager role the user will be added in the grid
+					//And userId/Location will be added in the ManagersId code table
+					//As soon as he created if he edit that user then in the managers id drop down he will get the 
+					//created userid as managers id since there is an entry in the code table so preventing that to be added in dropdown
+					//Wile editing there will be a possibility that userId and managersId be the same that should be prevented
+					if (isEditClicked) {
+						if (!managersIdDropDownArray[i].equals(user.getUserId())) {
+							managersIdDropBox.addItem(managersIdDropDownArray[i]);
+						}
+					} else {
+						managersIdDropBox.addItem(managersIdDropDownArray[i]);
+					}
 				}
 				//If user clicked on edit icon in table then for a location then loading managersIds for that location
 				//And making corresponding managersId selected
 				if (isEditClicked) {
-					if (Arrays.asList(managersIdDropDownArray).contains(managersId)) {
-						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(managersId));
+					if (Arrays.asList(managersIdDropDownArray).contains(user.getManagersId())) {
+						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(user.getManagersId()));
 					} else {
 						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(0));
 					}

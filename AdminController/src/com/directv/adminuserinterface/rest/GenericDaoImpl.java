@@ -41,12 +41,16 @@ public class GenericDaoImpl {
 	 * @param id the id
 	 * @return the t
 	 */
-	public <T> T get(Class<T> clazz, String id) {
+	public <T> T get(Class<T> clazz, Object id) {
 
 		T object = null;
 		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
 		try {
-			object = (T) pm.getObjectById(clazz, id);
+			if (id instanceof String) {
+				object = (T) pm.getObjectById(clazz, id.toString());
+			} else if (id instanceof Long) {
+				object = (T) pm.getObjectById(clazz, new Long(id.toString()));
+			}
 		} catch (Exception excep) {
 			throw new RuntimeException(excep);
 		} finally {
@@ -101,6 +105,35 @@ public class GenericDaoImpl {
 				pm.currentTransaction().rollback();
 				throw new RuntimeException(ex);
 			}
+		}
+	}
+
+	/**
+	 * Removes the.
+	 *
+	 * @param <T> the generic type
+	 * @param clazz the clazz
+	 * @param id the id
+	 */
+	public <T> void remove(Class<T> clazz, Object id) {
+
+		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
+		T object = null;
+		try {
+			pm.currentTransaction().begin();
+			if (id instanceof String) {
+				object = pm.getObjectById(clazz, id.toString());
+			} else if (id instanceof Long) {
+				object = pm.getObjectById(clazz, new Long(id.toString()));
+			}
+			pm.deletePersistent(object);
+			pm.currentTransaction().commit();
+
+		} catch (Exception ex) {
+			pm.currentTransaction().rollback();
+			throw new RuntimeException(ex);
+		} finally {
+			pm.close();
 		}
 	}
 }

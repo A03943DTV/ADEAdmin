@@ -24,6 +24,9 @@ public class ManagersId implements Serializable {
 	/** The Constant LOCATION_PARAM. */
 	public static final String LOCATION_PARAM = "location";
 
+	/** The Constant DESCRIPTION_PARAM. */
+	public static final String DESCRIPTION_PARAM = "description";
+
 	/** The id. */
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
