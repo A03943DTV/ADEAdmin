@@ -10,6 +10,7 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Transactional;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -26,6 +27,12 @@ public class User implements Serializable {
 
 	/** The Constant LOCATION_PARAM. */
 	public static final String LOCATION_PARAM = "location";
+
+	/** The Constant STATUS_SUCCESS. */
+	public static final String STATUS_SUCCESS = "Success";
+
+	/** The Constant STATUS_ERROR. */
+	public static final String STATUS_ERROR = "Error";
 
 	/** The user id. */
 	@PrimaryKey
@@ -63,6 +70,14 @@ public class User implements Serializable {
 	/** The credential. */
 	@Persistent
 	private String credential;
+
+	/** The status. */
+	@Transactional
+	private String status;
+
+	/** The error message. */
+	@Transactional
+	private String errorMessage;
 
 	/**
 	 * Instantiates a new user.
@@ -270,4 +285,43 @@ public class User implements Serializable {
 			this.credential = credential;
 		}
 	}
+
+	/**
+	 * Gets the status.
+	 *
+	 * @return the status
+	 */
+	@XmlElement
+	public String getStatus() {
+		return status == null ? "" : status.trim();
+	}
+
+	/**
+	 * Sets the status.
+	 *
+	 * @param status the new status
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	/**
+	 * Gets the error message.
+	 *
+	 * @return the error message
+	 */
+	@XmlElement
+	public String getErrorMessage() {
+		return errorMessage == null ? "" : errorMessage.trim();
+	}
+
+	/**
+	 * Sets the error message.
+	 *
+	 * @param errorMessage the new error message
+	 */
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
 }

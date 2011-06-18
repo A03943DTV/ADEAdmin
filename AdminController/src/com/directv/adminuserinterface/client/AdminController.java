@@ -3,6 +3,7 @@
  */
 package com.directv.adminuserinterface.client;
 
+import com.directv.adminuserinterface.client.bulkupload.BulkUploadScreen;
 import com.directv.adminuserinterface.client.dialog.ConfirmDialogBox;
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
 import com.directv.adminuserinterface.client.user.UserAdminScreen;
@@ -126,6 +127,9 @@ public class AdminController implements EntryPoint {
 
 		//User Administration Tab
 		tabPanel.add(new UserAdminScreen(GWT.getHostPageBaseURL(), loginInfo), "User Administration");
+
+		//Bulk Upload Tab
+		tabPanel.add(new BulkUploadScreen(), "Bulk upload");
 
 		//Code Table Tab
 		//tabPanel.add(new CodeTableScreen(), "Code Table");

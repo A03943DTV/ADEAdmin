@@ -27,6 +27,26 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>userBulkUploadHandlerServlet</servlet-name>
+		<servlet-class>com.directv.adminuserinterface.server.upload.BulkUploadHandlerServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>userBulkUploadHandlerServlet</servlet-name>
+		<url-pattern>userBulkUpload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>bulkUploadServlet</servlet-name>
+		<servlet-class>com.directv.adminuserinterface.server.BulkUploadServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>bulkUploadServlet</servlet-name>
+		<url-pattern>/admincontroller/bulkUpload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>loginServlet</servlet-name>
 		<servlet-class>com.directv.adminuserinterface.server.LoginServiceImpl</servlet-class>
 	</servlet>

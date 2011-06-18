@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.directv.adminuserinterface.shared.User;
 import com.directv.adminuserinterface.util.AdminConstants;
+import com.directv.adminuserinterface.util.FormCSVData;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -29,7 +30,7 @@ public class UserDownloadServlet extends HttpServlet {
 	private static final String FILE_NAME = "UsersInfo";
 
 	/** The Constant HEADER_DATA. */
-	private static final String HEADER_DATA[] = new String[] { "User Id", "First Name", "Last Name", "Group", "Location", "Manager's Id", "Role",
+	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Location", "Manager's Id", "Role",
 			"Campaign", "Privilege" };
 
 	/**
@@ -56,34 +57,8 @@ public class UserDownloadServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-		StringBuffer stringBuilder = new StringBuffer();
-		for (String headerData : HEADER_DATA) {
-			stringBuilder.append(headerData);
-			stringBuilder.append(",");
-		}
-		stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove last ","
-		stringBuilder.append("\n");
-
-		for (User user : (ArrayList<User>) request.getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE)) {
-			stringBuilder.append(user.getUserId());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getFirstName());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getLastName());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getGroup());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getLocation());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getManagersId());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getRole());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getCampaign());
-			stringBuilder.append(",");
-			stringBuilder.append(user.getCredential());
-			stringBuilder.append("\n");
-		}
+		StringBuffer stringBuilder = FormCSVData.formData(HEADER_DATA, (ArrayList<User>) request.getSession().getAttribute(
+				AdminConstants.SESSION_DATA_STORE_ATTRIBUTE), false);
 
 		ServletOutputStream out = null;
 		try {

@@ -11,6 +11,7 @@ import com.directv.adminuserinterface.rest.UserDaoImpl;
 import com.directv.adminuserinterface.server.domain.GoogleUserManager;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.shared.validator.UserValidator;
 import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.AdminException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -52,6 +53,9 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	 */
 	@Override
 	public User addUser(String hostPageBaseURL, User user) throws AdminException {
+
+		//Validating user for Bulkupload
+		UserValidator.validate(user);
 
 		//Creating a new user in the domain
 		user = new GoogleUserManager().createDomainUser(user);

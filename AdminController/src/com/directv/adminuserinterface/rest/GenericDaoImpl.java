@@ -85,6 +85,31 @@ public class GenericDaoImpl {
 	}
 
 	/**
+	 * Gets the not equal list.
+	 *
+	 * @param <T> the generic type
+	 * @param clazz the clazz
+	 * @param param the param
+	 * @param value the value
+	 * @return the not equal list
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> List<T> getNotEqualList(Class<T> clazz, String param, String value) {
+
+		List<T> listNew = new ArrayList<T>();
+		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
+		String query = "select from " + clazz.getName();
+		if (param != null && value != null) {
+			query = query + " where " + param + " != '" + value + "'";
+		}
+		List<T> list = (List<T>) pm.newQuery(query).execute();
+		if (list != null && list.size() > 0) {
+			listNew.addAll(list);//To prevent Serialization exception at RunTime
+		}
+		return listNew;
+	}
+
+	/**
 	 * Delete code table.
 	 *
 	 * @param <T> the generic type

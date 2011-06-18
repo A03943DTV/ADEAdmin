@@ -1,0 +1,2 @@
+serviceClass: com.directv.adminuserinterface.client.user.UserService
+path: 9680C765877A805FCAFE9E40E8BA7950.gwt.rpc
