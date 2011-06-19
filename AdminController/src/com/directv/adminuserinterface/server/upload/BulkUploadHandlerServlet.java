@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.server.upload;
 
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +21,10 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 
 import com.directv.adminuserinterface.rest.BulkUploadDaoImpl;
+import com.directv.adminuserinterface.server.LoginServiceImpl;
 import com.directv.adminuserinterface.server.dao.BulkUpload;
+import com.directv.adminuserinterface.util.AdminException;
+import com.directv.adminuserinterface.util.ErrorMessageUtil;
 import com.google.appengine.api.datastore.Blob;
 
 // TODO: Auto-generated Javadoc
@@ -36,6 +41,9 @@ public class BulkUploadHandlerServlet extends HttpServlet {
 
 	/** The Constant UPLOAD_FORM_FIELD. */
 	private static final String UPLOAD_FORM_FIELD = "uploadFormField";
+
+	/** The Constant CSV_EXTENSION. */
+	private static final String CSV_EXTENSION = ".csv";
 
 	/**
 	 * Overridden Method
@@ -93,6 +101,11 @@ public class BulkUploadHandlerServlet extends HttpServlet {
 					} else {
 
 						System.out.println("File field " + name + " with file name " + item.getName() + " detected.");
+
+						if (!item.getName().endsWith(CSV_EXTENSION)) {
+							throw new AdminException("Uploaded template is not a .csv extension file");
+						}
+
 						if (name.equals(UPLOAD_FORM_FIELD)) {
 							uploadedData = Streams.asString(stream);
 						}
@@ -102,13 +115,48 @@ public class BulkUploadHandlerServlet extends HttpServlet {
 				byte byteArray[] = uploadedData.getBytes();
 				Blob blob = new Blob(byteArray);
 
+				com.directv.adminuserinterface.shared.User user = new LoginServiceImpl().getUserForBulkUpload();
+
 				Long id = new Long(new BulkUploadDaoImpl().getCount() + 1);
 				new BulkUploadDaoImpl().add(new BulkUpload(id, description, blob, BulkUpload.PROCESS_STATUS_TO_BE_PROCESSED, (new Timestamp(System
-						.currentTimeMillis())).toString()));
+						.currentTimeMillis())).toString(), user.getUserId()));
 
 			} catch (Exception e) {
-				e.printStackTrace();
+
+				if (e instanceof AdminException) {
+					sendErrorResponse(response, e);
+				} else {
+					e.printStackTrace();
+				}
 			}
 		}
+	}
+
+	/**
+	 * Send error response.
+	 *
+	 * @param response the response
+	 * @param e the e
+	 */
+	private void sendErrorResponse(HttpServletResponse response, Exception e) {
+
+		String errorMessage = ErrorMessageUtil.formErrorMessage(e);
+
+		ServletOutputStream out = null;
+		try {
+
+			out = response.getOutputStream();
+
+			response.setContentType("text/plain");
+			response.setContentLength(errorMessage.getBytes().length);
+
+			out.write(errorMessage.getBytes());
+			out.flush();
+			out.close();
+
+		} catch (IOException excep) {
+			excep.printStackTrace();
+		}
+
 	}
 }

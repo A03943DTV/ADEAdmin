@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.client.dialog;
 
@@ -71,7 +72,7 @@ public class ConfirmDialogBox {
 		dialogContent.setText(message);
 		dialogBox.center();
 		yesButton.setFocus(true);
-		
+
 		return yesButton;
 	}
 

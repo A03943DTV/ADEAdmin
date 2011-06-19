@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.server.dao;
 
@@ -34,12 +35,15 @@ public class BulkUpload implements Serializable {
 	/** The Constant PROCESS_STATUS_PROPERTY. */
 	public static final String PROCESS_STATUS_PROPERTY = "processStatus";
 
+	/** The Constant USERID_PROPERTY. */
+	public static final String USERID_PROPERTY = "userId";
+
 	/** The Constant STATUS_SUCCESS. */
 	public static final String STATUS_SUCCESS = "Success";
 
 	/** The Constant STATUS_ERROR. */
 	public static final String STATUS_ERROR = "Error";
-	
+
 	/** The id. */
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -48,6 +52,10 @@ public class BulkUpload implements Serializable {
 	/** The description. */
 	@Persistent
 	private String description;
+
+	/** The user id. */
+	@Persistent
+	private String userId;
 
 	/** The blob. */
 	@Persistent
@@ -100,14 +108,16 @@ public class BulkUpload implements Serializable {
 	 * @param blob the blob
 	 * @param processStatus the process status
 	 * @param submittedTime the submitted time
+	 * @param userId the user id
 	 */
-	public BulkUpload(Long id, String description, Blob blob, String processStatus, String submittedTime) {
+	public BulkUpload(Long id, String description, Blob blob, String processStatus, String submittedTime, String userId) {
 		super();
 		this.id = id;
 		this.description = description;
 		this.blob = blob;
 		this.processStatus = processStatus;
 		this.submittedTime = submittedTime;
+		this.userId = userId;
 	}
 
 	/**
@@ -144,6 +154,24 @@ public class BulkUpload implements Serializable {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/**
+	 * Gets the user id.
+	 *
+	 * @return the user id
+	 */
+	public String getUserId() {
+		return userId;
+	}
+
+	/**
+	 * Sets the user id.
+	 *
+	 * @param userId the new user id
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	/**

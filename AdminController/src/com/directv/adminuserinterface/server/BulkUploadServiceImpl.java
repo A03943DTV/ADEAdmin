@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.server;
 
@@ -33,10 +34,10 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 
 	/** The Constant HEADER_DATA. */
 	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Location", "Manager's Id", "Role",
-			"Campaign", "Status", "ErrorMessage" };
+			"Campaign", "Privilege", "Status", "ErrorMessage" };
 
 	/** The Constant COLUMN_COUNT. */
-	private static final int COLUMN_COUNT = 8;
+	private static final int COLUMN_COUNT = (HEADER_DATA.length - 2);//Excluding {"Status", "ErrorMessage"}
 
 	/**
 	 * Overridden Method
@@ -88,7 +89,7 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 					User user = getSingleUserData(line);
 					try {
 
-						new UserServiceImpl().addUser(null, user);
+						new UserServiceImpl().addBulkUploadUser(user);
 						user.setStatus(User.STATUS_SUCCESS);
 						noOfSuccessfullRecords++;
 					} catch (AdminException e) {
@@ -136,7 +137,7 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 		}
 
 		return new User(userInfoArray[0], userInfoArray[1], userInfoArray[2], userInfoArray[3], userInfoArray[4], userInfoArray[5], userInfoArray[6],
-				userInfoArray[7], null);
+				userInfoArray[7], userInfoArray[8]);
 	}
 
 	/**
@@ -144,15 +145,15 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	 * @return
 	 */
 	@Override
-	public List<BulkUploadDto> getBulkUploadResults() {
+	public List<BulkUploadDto> getBulkUploadResults(String userId) {
 
 		List<BulkUploadDto> bulkuploadDtoList = new ArrayList<BulkUploadDto>();
-		for (BulkUpload bulkUpload : new BulkUploadDaoImpl().getBulkUploadResults()) {
+		for (BulkUpload bulkUpload : new BulkUploadDaoImpl().getBulkUploadResults(userId)) {
 
 			byte[] byteArray = bulkUpload.getBlob().getBytes();
-			bulkuploadDtoList.add(new BulkUploadDto(bulkUpload.getId(), bulkUpload.getDescription(), byteArray, bulkUpload.getProcessStatus(),
-					bulkUpload.getResultStatus(), bulkUpload.getSubmittedTime(), bulkUpload.getProcessStratTime(), bulkUpload.getProcessEndTime(),
-					bulkUpload.getNoOfSuccessRecords(), bulkUpload.getNoOfFailureRecords(), bulkUpload.getStatus()));
+			bulkuploadDtoList.add(new BulkUploadDto(bulkUpload.getId(), bulkUpload.getDescription(), bulkUpload.getUserId(), byteArray, bulkUpload
+					.getProcessStatus(), bulkUpload.getResultStatus(), bulkUpload.getSubmittedTime(), bulkUpload.getProcessStratTime(), bulkUpload
+					.getProcessEndTime(), bulkUpload.getNoOfSuccessRecords(), bulkUpload.getNoOfFailureRecords(), bulkUpload.getStatus()));
 		}
 		return bulkuploadDtoList;
 	}

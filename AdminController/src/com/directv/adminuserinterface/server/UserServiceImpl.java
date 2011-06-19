@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.server;
 
@@ -9,7 +10,10 @@ import com.directv.adminuserinterface.client.user.UserService;
 import com.directv.adminuserinterface.rest.UserDao;
 import com.directv.adminuserinterface.rest.UserDaoImpl;
 import com.directv.adminuserinterface.server.domain.GoogleUserManager;
+import com.directv.adminuserinterface.shared.Group;
+import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
+import com.directv.adminuserinterface.shared.Role;
 import com.directv.adminuserinterface.shared.User;
 import com.directv.adminuserinterface.shared.validator.UserValidator;
 import com.directv.adminuserinterface.util.AdminConstants;
@@ -54,9 +58,6 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	@Override
 	public User addUser(String hostPageBaseURL, User user) throws AdminException {
 
-		//Validating user for Bulkupload
-		UserValidator.validate(user);
-
 		//Creating a new user in the domain
 		user = new GoogleUserManager().createDomainUser(user);
 
@@ -68,6 +69,81 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 		verifyIfRoleIsManager(true, user);
 		return user;
+	}
+
+	/**
+	 * Adds the bulk upload user.
+	 *
+	 * @param user the user
+	 * @return the user
+	 * @throws AdminException the admin exception
+	 */
+	public User addBulkUploadUser(User user) throws AdminException {
+
+		UserValidator.validate(user);
+		doValidations(user);
+		return addUser(null, user);
+	}
+
+	/**
+	 * Do validations.
+	 *
+	 * @param userToBeCreated the user to be created
+	 * @throws AdminException the admin exception
+	 */
+	private void doValidations(User userToBeCreated) throws AdminException {
+
+		CodeTableServiceImpl codeTableService = getCodeTableServiceImpl();
+
+		if (userToBeCreated.getLocation() != null && !userToBeCreated.getLocation().equals("")
+				&& !(codeTableService.getLocationsList(Location.DESCRIPTION_PARAM, userToBeCreated.getLocation()).size() > 0)) {
+			throw new AdminException("Invalid Location");
+		}
+		if (userToBeCreated.getGroup() != null && !userToBeCreated.getGroup().equals("")
+				&& !(codeTableService.getGroupsList(Group.DESCRIPTION_PARAM, userToBeCreated.getGroup()).size() > 0)) {
+			throw new AdminException("Invalid Group");
+		}
+		if (userToBeCreated.getRole() != null && !userToBeCreated.getRole().equals("")
+				&& !(codeTableService.getRolesList(Role.DESCRIPTION_PARAM, userToBeCreated.getRole()).size() > 0)) {
+			throw new AdminException("Invalid Role");
+		}
+
+		List<ManagersId> managersIdList = codeTableService.getManagersIdsList(ManagersId.DESCRIPTION_PARAM, userToBeCreated.getManagersId());
+		if (userToBeCreated.getManagersId() != null && !userToBeCreated.getManagersId().equals("")) {
+			if (!(managersIdList.size() > 0)) {
+				throw new AdminException("Invalid ManagersId");
+			} else {
+				if (!managersIdList.get(0).getLocation().equals(userToBeCreated.getLocation())) {
+					throw new AdminException("Invalid Location/ManagersId combination");
+				}
+			}
+		}
+
+		if (userToBeCreated.getCredential() != null && userToBeCreated.getCredential() != "") {
+
+			if (!userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)
+					&& !userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)
+					&& !userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_USER)) {
+				throw new AdminException("Invalid Privilege");
+			}
+			if (userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+				throw new AdminException("SuperAdmin user can't be created through ADELite application");
+			}
+		}
+
+		User userLoggedIn = new LoginServiceImpl().getUserForBulkUpload();
+		if (userLoggedIn.getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
+
+			if (!userLoggedIn.getLocation().equals(userToBeCreated.getLocation())) {
+				throw new AdminException("You don't have privilege to add user to other location");
+			}
+
+			if (userToBeCreated.getCredential() != null && userToBeCreated.getCredential() != "") {
+				if (userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)) {
+					throw new AdminException("You don't have privilege to create an admin user");
+				}
+			}
+		}
 	}
 
 	/**

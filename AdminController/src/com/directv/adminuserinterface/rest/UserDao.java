@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.rest;
 
@@ -11,7 +12,7 @@ import com.directv.adminuserinterface.shared.User;
 /**
  * The Interface UserDao.
  */
-public interface UserDao {
+public interface UserDao extends GenericDao {
 
 	/**
 	 * Adds the user.

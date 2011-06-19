@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.client;
 
@@ -129,7 +130,7 @@ public class AdminController implements EntryPoint {
 		tabPanel.add(new UserAdminScreen(GWT.getHostPageBaseURL(), loginInfo), "User Administration");
 
 		//Bulk Upload Tab
-		tabPanel.add(new BulkUploadScreen(), "Bulk upload");
+		tabPanel.add(new BulkUploadScreen(loginInfo), "Bulk upload");
 
 		//Code Table Tab
 		//tabPanel.add(new CodeTableScreen(), "Code Table");

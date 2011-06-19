@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.shared;
 
@@ -14,11 +15,32 @@ public class BulkUploadDto implements IsSerializable {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 8438043394383476179L;
 
+	/** The Constant PROCESS_STATUS_TO_BE_PROCESSED. */
+	public static final String PROCESS_STATUS_TO_BE_PROCESSED = "ToBeProcessed";
+
+	/** The Constant PROCESS_STATUS_PROCESSING. */
+	public static final String PROCESS_STATUS_PROCESSING = "Processing";
+
+	/** The Constant PROCESS_STATUS_COMPLETED. */
+	public static final String PROCESS_STATUS_COMPLETED = "Completed";
+
+	/** The Constant PROCESS_STATUS_PROPERTY. */
+	public static final String PROCESS_STATUS_PROPERTY = "processStatus";
+
+	/** The Constant STATUS_SUCCESS. */
+	public static final String STATUS_SUCCESS = "Success";
+
+	/** The Constant STATUS_ERROR. */
+	public static final String STATUS_ERROR = "Error";
+
 	/** The id. */
 	private Long id;
 
 	/** The description. */
 	private String description;
+
+	/** The user id. */
+	private String userId;
 
 	/** The blob byte. */
 	private byte[] blobByte;
@@ -52,6 +74,7 @@ public class BulkUploadDto implements IsSerializable {
 	 *
 	 * @param id the id
 	 * @param description the description
+	 * @param userId the user id
 	 * @param blobByte the blob byte
 	 * @param processStatus the process status
 	 * @param resultStatus the result status
@@ -62,12 +85,13 @@ public class BulkUploadDto implements IsSerializable {
 	 * @param noOfFailureRecords the no of failure records
 	 * @param status the status
 	 */
-	public BulkUploadDto(Long id, String description, byte[] blobByte, String processStatus, String resultStatus, String submittedTime,
-			String processStratTime, String processEndTime, Long noOfSuccessRecords, Long noOfFailureRecords, String status) {
+	public BulkUploadDto(Long id, String description, String userId, byte[] blobByte, String processStatus, String resultStatus,
+			String submittedTime, String processStratTime, String processEndTime, Long noOfSuccessRecords, Long noOfFailureRecords, String status) {
 
 		super();
 		this.id = id;
 		this.description = description;
+		this.userId = userId;
 		this.blobByte = blobByte;
 		this.processStatus = processStatus;
 		this.resultStatus = resultStatus;
@@ -110,7 +134,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the description
 	 */
 	public String getDescription() {
-		return description;
+		return description == null ? "" : description.trim();
 	}
 
 	/**
@@ -120,6 +144,24 @@ public class BulkUploadDto implements IsSerializable {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/**
+	 * Gets the user id.
+	 *
+	 * @return the user id
+	 */
+	public String getUserId() {
+		return userId == null ? "" : userId.trim();
+	}
+
+	/**
+	 * Sets the user id.
+	 *
+	 * @param userId the new user id
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	/**
@@ -146,7 +188,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the process status
 	 */
 	public String getProcessStatus() {
-		return processStatus;
+		return processStatus == null ? "" : processStatus.trim();
 	}
 
 	/**
@@ -164,7 +206,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the result status
 	 */
 	public String getResultStatus() {
-		return resultStatus;
+		return resultStatus == null ? "" : resultStatus.trim();
 	}
 
 	/**
@@ -182,7 +224,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the submitted time
 	 */
 	public String getSubmittedTime() {
-		return submittedTime;
+		return submittedTime == null ? "" : submittedTime.trim();
 	}
 
 	/**
@@ -200,7 +242,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the process strat time
 	 */
 	public String getProcessStratTime() {
-		return processStratTime;
+		return processStratTime == null ? "" : processStratTime.trim();
 	}
 
 	/**
@@ -218,7 +260,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the process end time
 	 */
 	public String getProcessEndTime() {
-		return processEndTime;
+		return processEndTime == null ? "" : processEndTime.trim();
 	}
 
 	/**
@@ -236,7 +278,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the no of success records
 	 */
 	public Long getNoOfSuccessRecords() {
-		return noOfSuccessRecords;
+		return noOfSuccessRecords == null ? 0 : noOfSuccessRecords;
 	}
 
 	/**
@@ -254,7 +296,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the no of failure records
 	 */
 	public Long getNoOfFailureRecords() {
-		return noOfFailureRecords;
+		return noOfFailureRecords == null ? 0 : noOfFailureRecords;
 	}
 
 	/**
@@ -272,7 +314,7 @@ public class BulkUploadDto implements IsSerializable {
 	 * @return the status
 	 */
 	public String getStatus() {
-		return status;
+		return status == null ? "" : status.trim();
 	}
 
 	/**

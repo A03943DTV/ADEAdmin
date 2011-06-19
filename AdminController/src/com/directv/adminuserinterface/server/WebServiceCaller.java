@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.server;
 
@@ -26,7 +27,7 @@ public class WebServiceCaller {
 	 *
 	 * @param paramUrl the param url
 	 * @return the string
-	 * @throws AdminException 
+	 * @throws AdminException the admin exception
 	 */
 	public static String callRestService(String paramUrl) throws AdminException {
 

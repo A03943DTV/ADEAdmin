@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.server;
 
@@ -83,7 +84,19 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	@Override
 	public List<Group> getGroupsList() {
 
-		return getGenericDaoImpl().getList(Group.class, null, null);
+		return getGroupsList(null, null);
+	}
+
+	/**
+	 * Gets the groups list.
+	 *
+	 * @param param the param
+	 * @param value the value
+	 * @return the groups list
+	 */
+	public List<Group> getGroupsList(String param, String value) {
+
+		return getGenericDaoImpl().getList(Group.class, param, value);
 	}
 
 	/**
@@ -93,7 +106,19 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	@Override
 	public List<Location> getLocationsList() {
 
-		return getGenericDaoImpl().getList(Location.class, null, null);
+		return getLocationsList(null, null);
+	}
+
+	/**
+	 * Gets the locations list.
+	 *
+	 * @param param the param
+	 * @param value the value
+	 * @return the locations list
+	 */
+	public List<Location> getLocationsList(String param, String value) {
+
+		return getGenericDaoImpl().getList(Location.class, param, value);
 	}
 
 	/**
@@ -103,7 +128,19 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	@Override
 	public List<ManagersId> getManagersIdsList(String location) {
 
-		return getGenericDaoImpl().getList(ManagersId.class, ManagersId.LOCATION_PARAM, location);
+		return getManagersIdsList(ManagersId.LOCATION_PARAM, location);
+	}
+
+	/**
+	 * Gets the managers ids list.
+	 *
+	 * @param param the param
+	 * @param value the value
+	 * @return the managers ids list
+	 */
+	public List<ManagersId> getManagersIdsList(String param, String value) {
+
+		return getGenericDaoImpl().getList(ManagersId.class, param, value);
 	}
 
 	/**
@@ -113,7 +150,19 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	@Override
 	public List<Role> getRolesList() {
 
-		return getGenericDaoImpl().getList(Role.class, null, null);
+		return getRolesList(null, null);
+	}
+
+	/**
+	 * Gets the roles list.
+	 *
+	 * @param param the param
+	 * @param value the value
+	 * @return the roles list
+	 */
+	public List<Role> getRolesList(String param, String value) {
+
+		return getGenericDaoImpl().getList(Role.class, param, value);
 	}
 
 	/**

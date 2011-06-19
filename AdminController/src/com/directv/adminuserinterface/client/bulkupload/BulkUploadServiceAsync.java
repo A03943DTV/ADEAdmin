@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.client.bulkupload;
 
@@ -32,9 +33,10 @@ public interface BulkUploadServiceAsync {
 	/**
 	 * Gets the bulk upload results.
 	 *
+	 * @param userId the user id
 	 * @param callback the callback
 	 * @return the bulk upload results
 	 */
-	void getBulkUploadResults(AsyncCallback<List<BulkUploadDto>> callback);
+	void getBulkUploadResults(String userId, AsyncCallback<List<BulkUploadDto>> callback);
 
 }

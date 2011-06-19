@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.util;
 
@@ -49,6 +50,8 @@ public class FormCSVData {
 			stringBuilder.append(user.getRole());
 			stringBuilder.append(",");
 			stringBuilder.append(user.getCampaign());
+			stringBuilder.append(",");
+			stringBuilder.append(user.getCredential());
 
 			if (isBulkUploadResultData) {
 
@@ -56,10 +59,6 @@ public class FormCSVData {
 				stringBuilder.append(user.getStatus());
 				stringBuilder.append(",");
 				stringBuilder.append(user.getErrorMessage());
-			} else {
-
-				stringBuilder.append(",");
-				stringBuilder.append(user.getCredential());
 			}
 			stringBuilder.append("\n");
 		}

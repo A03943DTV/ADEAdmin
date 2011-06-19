@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.shared;
 
@@ -20,6 +21,9 @@ public class Location implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 312440159207568949L;
+
+	/** The Constant DESCRIPTION_PARAM. */
+	public static final String DESCRIPTION_PARAM = "description";
 
 	/** The id. */
 	@PrimaryKey

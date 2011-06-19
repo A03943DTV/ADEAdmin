@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.rest;
 
@@ -8,7 +9,6 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 
 import com.directv.adminuserinterface.server.dao.BulkUpload;
-
 
 // TODO: Auto-generated Javadoc
 /**
@@ -28,6 +28,17 @@ public class BulkUploadDaoImpl extends GenericDaoImpl {
 	}
 
 	/**
+	 * Gets the bulk upload by id.
+	 *
+	 * @param id the id
+	 * @return the bulk upload by id
+	 */
+	public BulkUpload getBulkUploadById(Long id) {
+
+		return (BulkUpload) get(BulkUpload.class, id);
+	}
+
+	/**
 	 * Gets the un processed bu list.
 	 *
 	 * @return the un processed bu list
@@ -40,11 +51,12 @@ public class BulkUploadDaoImpl extends GenericDaoImpl {
 	/**
 	 * Gets the bulk upload results.
 	 *
+	 * @param userId the user id
 	 * @return the bulk upload results
 	 */
-	public List<BulkUpload> getBulkUploadResults() {
+	public List<BulkUpload> getBulkUploadResults(String userId) {
 
-		return getNotEqualList(BulkUpload.class, BulkUpload.PROCESS_STATUS_PROPERTY, BulkUpload.PROCESS_STATUS_TO_BE_PROCESSED);
+		return getList(BulkUpload.class, BulkUpload.USERID_PROPERTY, userId);
 	}
 
 	/**

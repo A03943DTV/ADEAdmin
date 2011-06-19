@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.rest;
 
@@ -12,7 +13,7 @@ import javax.jdo.PersistenceManager;
 /**
  * The Class GenericDaoImpl.
  */
-public class GenericDaoImpl {
+public class GenericDaoImpl implements GenericDao {
 
 	/**
 	 * Adds the.
@@ -20,6 +21,7 @@ public class GenericDaoImpl {
 	 * @param object the object
 	 * @return the object
 	 */
+	@Override
 	public Object add(Object object) {
 
 		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
@@ -41,6 +43,7 @@ public class GenericDaoImpl {
 	 * @param id the id
 	 * @return the t
 	 */
+	@Override
 	public <T> T get(Class<T> clazz, Object id) {
 
 		T object = null;
@@ -69,6 +72,7 @@ public class GenericDaoImpl {
 	 * @return the list
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T> List<T> getList(Class<T> clazz, String param, String value) {
 
 		List<T> listNew = new ArrayList<T>();
@@ -94,6 +98,7 @@ public class GenericDaoImpl {
 	 * @return the not equal list
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T> List<T> getNotEqualList(Class<T> clazz, String param, String value) {
 
 		List<T> listNew = new ArrayList<T>();
@@ -116,6 +121,7 @@ public class GenericDaoImpl {
 	 * @param clazz the clazz
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T> void deleteCodeTable(Class<T> clazz) {
 
 		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();

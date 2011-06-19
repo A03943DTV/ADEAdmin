@@ -80,6 +80,16 @@
 		<url-pattern>/admincontroller/userDownloadServlet</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>buDownloadServlet</servlet-name>
+		<servlet-class>com.directv.adminuserinterface.server.export.BulkUploadDownloadServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>buDownloadServlet</servlet-name>
+		<url-pattern>/admincontroller/buDownloadServlet</url-pattern>
+	</servlet-mapping>
+
 	<!-- Google account login settings -->
 	<security-constraint>
 		<web-resource-collection>

@@ -1,5 +1,6 @@
 /*
- * Author : Meiy
+ * Author  : Meiyazhagan Arjunan
+ * Company : Ilink Multitech Solutions
  */
 package com.directv.adminuserinterface.server;
 
@@ -46,6 +47,18 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		}
 		loginInfo.setUser(new UserDaoImpl().getUser(user.getEmail()));
 		return loginInfo;
+	}
+
+	/**
+	 * Gets the user for bulk upload.
+	 *
+	 * @return the user for bulk upload
+	 */
+	public com.directv.adminuserinterface.shared.User getUserForBulkUpload() {
+
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		return new UserDaoImpl().getUser(user.getEmail());
 	}
 
 	/**
