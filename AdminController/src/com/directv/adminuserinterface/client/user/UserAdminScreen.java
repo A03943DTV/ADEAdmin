@@ -7,6 +7,7 @@ package com.directv.adminuserinterface.client.user;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import com.directv.adminuserinterface.client.codetable.CodeTableService;
@@ -41,6 +42,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -199,7 +201,218 @@ public class UserAdminScreen extends Composite {
 
 		loadingDialogBox = new LoadingDialogBox("Loading.....", "Loading user informations..... Please wait for few seconds.....");
 
+		saveOrUpdateButtonManagement();
+		clearButtonManagement();
+		searchButtonManagement();
+		listAllUserButtonManagement();
+		csvDownloadImageManagement();
+
+		scheduleTimerForUserListSessionUpdate();
+
+		locationDropBox.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+
+				//Since location and managerId are depended dropdown
+				getManagersIdFromServiceAndFillDropDown(locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
+			}
+		});
+
+		//Loading DB data and Setting the Columns,Values and Pagination for User Table
+		VerticalPanel vTablePanel = loadDataAndSetUserTableValues();
+
+		//Grid that contain form fields
+		Grid formGrid = getFormGrid();
+
+		HorizontalPanel hPanel = new HorizontalPanel();
+		hPanel.setSpacing(5);
+		hPanel.add(searchButton);
+		hPanel.add(saveOrUpdateButton);
+		hPanel.add(clearButton);
+		hPanel.add(listAllUsersButton);
+
+		//Export Data Fields
+		HorizontalPanel hDownloadPanel = new HorizontalPanel();
+		hDownloadPanel.setSpacing(5);
+		hDownloadPanel.add(csvDownloadImage);
+
+		DockPanel dockPanel = new DockPanel();
+		dockPanel.setStyleName("cw-DockPanel");
+		dockPanel.setSpacing(4);
+		dockPanel.add(hPanel, DockPanel.WEST);
+		dockPanel.setHorizontalAlignment(DockPanel.ALIGN_RIGHT);
+		dockPanel.add(hDownloadPanel, DockPanel.EAST);
+		dockPanel.setWidth("950px");
+
+		//Final Panel
+		VerticalPanel vPanel = new VerticalPanel();
+		vPanel.setSpacing(5);
+		vPanel.add(formGrid);
+		vPanel.add(dockPanel);
+		vPanel.add(vTablePanel);
+
+		initWidget(vPanel);
+	}
+
+	/**
+	 * Schedule timer for user list session update.
+	 */
+	private void scheduleTimerForUserListSessionUpdate() {
+
+		Timer t = new Timer() {
+			@Override
+			public void run() {
+				process();
+			}
+
+			private void process() {
+
+				//If loggedin user is SuperAdmin then display all user not location specific so he can add/edit/remove all users
+				//If loggedin user is Admin then location specific so he can add/edit/remove users in that specific location
+				String location = null;
+				if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
+					location = loginInfo.getUser().getLocation();
+				}
+
+				System.out.println("Scheduler called at : " + new Date().toString());
+				userService.listUsers(location, hostPageBaseURL, new AsyncCallback<List<User>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						System.out.println("Scheduler User List Error : " + caught.getMessage());
+					}
+
+					@SuppressWarnings("unchecked")
+					@Override
+					public void onSuccess(List<User> listUsers) {
+						System.out.println("Scheduler User List Successfull : " + listUsers.size());
+						List<User> listUsersNew = new ArrayList<User>();
+						for (User user : listUsers) {
+							//Preventing logged in user info to be displayed in grid/table
+							if (!user.getUserId().equals(loginInfo.getUser().getUserId())) {
+								listUsersNew.add(user);
+							}
+						}
+						loginService.storeUserListInSession(listUsersNew, new AsyncCallback() {
+							@Override
+							public void onFailure(Throwable caught) {
+								System.out.println("Scheduler UserList Session Storage Error : " + caught.getMessage());
+							}
+
+							@Override
+							public void onSuccess(Object result) {
+								System.out.println("Scheduler UserList Session Storage Success");
+							}
+						});
+					}
+				});
+			}
+		};
+		t.schedule(1000); // Schedule the timer delay.
+		t.scheduleRepeating(5000);// Schedule the timer repeat interval.
+	}
+
+	/**
+	 * Csv download image management.
+	 */
+	private void csvDownloadImageManagement() {
+
+		csvDownloadImage.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+
+				try {
+					Window.open(GWT.getModuleBaseURL() + "userDownloadServlet", "", "");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * List all user button management.
+	 */
+	private void listAllUserButtonManagement() {
+
+		listAllUsersButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+
+				loginService.getUserListFromSession(new AsyncCallback<List<User>>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						System.out.println("Session Retreival Error : " + caught.getMessage());
+						new NormalDialogBox("Error", "Session Retreival Error : " + caught.getMessage());
+					}
+
+					@Override
+					public void onSuccess(List<User> result) {
+						dataProvider.getList().clear();
+						dataProvider.getList().addAll(result);
+						dataProvider.refresh();//To replicate the change in table
+						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+						clearFormFields();
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	 * Search button management.
+	 */
+	private void searchButtonManagement() {
+
+		searchButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+
+				//Getting user entered values
+				final User user = getUserFromForm();
+				String userId = (user.getUserId() != null && user.getUserId() != "") ? EMailIdUtil.getEmailIdFromName(user.getUserId()) : null;
+				user.setUserId(userId);
+
+				loginService.getUserListFromSession(new AsyncCallback<List<User>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						System.out.println("Session Retreival Error : " + caught.getMessage());
+						new NormalDialogBox("Error", "Session Retreival Error : " + caught.getMessage());
+					}
+
+					@Override
+					public void onSuccess(List<User> result) {
+						dataProvider.getList().clear();
+						dataProvider.getList().addAll(UserSearchHelper.searchUser(result, user));//Adding only the search matched values
+						dataProvider.refresh();//To replicate the change in table
+						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	 * Clear button management.
+	 */
+	private void clearButtonManagement() {
+
+		clearButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				clearFormFields();
+			}
+		});
+	}
+
+	/**
+	 * Save or update button management.
+	 */
+	private void saveOrUpdateButtonManagement() {
+
 		saveOrUpdateButton.addClickHandler(new ClickHandler() {
+			@Override
 			public void onClick(ClickEvent event) {
 
 				//Getting user entered values
@@ -272,139 +485,6 @@ public class UserAdminScreen extends Composite {
 				}
 			}
 		});
-
-		clearButton.addClickHandler(new ClickHandler() {
-
-			/**
-			 * On click.
-			 *
-			 * @param event the event
-			 */
-			public void onClick(ClickEvent event) {
-				clearFormFields();
-			}
-		});
-
-		searchButton.addClickHandler(new ClickHandler() {
-
-			/**
-			 * Overridden Method
-			 * @param event
-			 */
-			public void onClick(ClickEvent event) {
-
-				//Getting user entered values
-				final User user = getUserFromForm();
-				String userId = (user.getUserId() != null && user.getUserId() != "") ? EMailIdUtil.getEmailIdFromName(user.getUserId()) : null;
-				user.setUserId(userId);
-
-				loginService.getUserListFromSession(new AsyncCallback<List<User>>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						System.out.println("Session Retreival Error : " + caught.getMessage());
-						new NormalDialogBox("Error", "Session Retreival Error : " + caught.getMessage());
-					}
-
-					@Override
-					public void onSuccess(List<User> result) {
-						dataProvider.getList().clear();
-						dataProvider.getList().addAll(UserSearchHelper.searchUser(result, user));//Adding only the search matched values
-						dataProvider.refresh();//To replicate the change in table
-						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
-					}
-				});
-			}
-		});
-
-		listAllUsersButton.addClickHandler(new ClickHandler() {
-
-			/**
-			 * Overridden Method
-			 * @param event
-			 */
-			public void onClick(ClickEvent event) {
-
-				loginService.getUserListFromSession(new AsyncCallback<List<User>>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						System.out.println("Session Retreival Error : " + caught.getMessage());
-						new NormalDialogBox("Error", "Session Retreival Error : " + caught.getMessage());
-					}
-
-					@Override
-					public void onSuccess(List<User> result) {
-						dataProvider.getList().clear();
-						dataProvider.getList().addAll(result);
-						dataProvider.refresh();//To replicate the change in table
-						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
-						clearFormFields();
-					}
-				});
-			}
-		});
-
-		csvDownloadImage.addClickHandler(new ClickHandler() {
-
-			/**
-			 * Overridden Method
-			 * @param event
-			 */
-			public void onClick(ClickEvent event) {
-
-				try {
-					Window.open(GWT.getModuleBaseURL() + "userDownloadServlet", "", "");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
-		locationDropBox.addChangeHandler(new ChangeHandler() {
-
-			@Override
-			public void onChange(ChangeEvent event) {
-
-				//Since location and managerId are depended dropdown
-				getManagersIdFromServiceAndFillDropDown(locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
-			}
-		});
-
-		//Loading DB data and Setting the Columns,Values and Pagination for User Table
-		VerticalPanel vTablePanel = loadDataAndSetUserTableValues();
-
-		//Grid that contain form fields
-		Grid formGrid = getFormGrid();
-
-		HorizontalPanel hPanel = new HorizontalPanel();
-		hPanel.setSpacing(5);
-		hPanel.add(searchButton);
-		hPanel.add(saveOrUpdateButton);
-		hPanel.add(clearButton);
-		hPanel.add(listAllUsersButton);
-
-		//Export Data Fields
-		HorizontalPanel hDownloadPanel = new HorizontalPanel();
-		hDownloadPanel.setSpacing(5);
-		hDownloadPanel.add(csvDownloadImage);
-
-		DockPanel dockPanel = new DockPanel();
-		dockPanel.setStyleName("cw-DockPanel");
-		dockPanel.setSpacing(4);
-		dockPanel.add(hPanel, DockPanel.WEST);
-		dockPanel.setHorizontalAlignment(DockPanel.ALIGN_RIGHT);
-		dockPanel.add(hDownloadPanel, DockPanel.EAST);
-		dockPanel.setWidth("950px");
-
-		//Final Panel
-		VerticalPanel vPanel = new VerticalPanel();
-		vPanel.setSpacing(5);
-		vPanel.add(formGrid);
-		vPanel.add(dockPanel);
-		vPanel.add(vTablePanel);
-
-		initWidget(vPanel);
 	}
 
 	/**
@@ -472,7 +552,7 @@ public class UserAdminScreen extends Composite {
 		}
 
 		userService.listUsers(location, hostPageBaseURL, new AsyncCallback<List<User>>() {
-
+			@Override
 			public void onFailure(Throwable caught) {
 				System.out.println("User List Error : " + caught.getMessage());
 				loadingDialogBox.hideLoaderDialog();

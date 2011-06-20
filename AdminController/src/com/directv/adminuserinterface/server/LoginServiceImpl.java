@@ -139,7 +139,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			}
 		}
 
-		userListSession.remove(userToBeRemoved.get(0));
+		if (userToBeRemoved != null && userToBeRemoved.size() > 0) {
+			userListSession.remove(userToBeRemoved.get(0));
+		}
 		storeUserListInSession(userListSession);
 	}
 }

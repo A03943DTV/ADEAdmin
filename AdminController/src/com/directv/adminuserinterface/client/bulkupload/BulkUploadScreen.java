@@ -133,8 +133,8 @@ public class BulkUploadScreen extends Composite {
 		//Loading DB data and Setting the Columns,Values and Pagination for BU Table
 		VerticalPanel vTablePanel = loadDataAndSetBuTableValues();
 
-		vPanel.add(hDownloadPanel);
 		vPanel.add(grid);
+		vPanel.add(hDownloadPanel);
 		vPanel.add(hPanel);
 		vPanel.add(vTablePanel);
 
@@ -175,6 +175,7 @@ public class BulkUploadScreen extends Composite {
 					return;
 				}
 
+				clearFormFields();
 				listBuInfo();
 
 				bulkUploadService.processBulkUpload(new AsyncCallback<Void>() {
@@ -438,7 +439,7 @@ public class BulkUploadScreen extends Composite {
 	 */
 	protected void clearFormFields() {
 
-		descriptionTextField.setText("");
+		form.reset();
 	}
 
 	/**
