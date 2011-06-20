@@ -3,7 +3,7 @@
 
 	<application>adeliteadmin</application>
 
-	<version>21</version>
+	<version>23</version>
 
 	<!-- Configure serving/caching of GWT files -->
 	<static-files>

@@ -33,7 +33,7 @@
 
 	<servlet-mapping>
 		<servlet-name>userBulkUploadHandlerServlet</servlet-name>
-		<url-pattern>userBulkUpload</url-pattern>
+		<url-pattern>/userBulkUpload</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
