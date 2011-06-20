@@ -301,11 +301,22 @@ public class BulkUploadScreen extends Composite {
 	 */
 	protected void downloadBuResultTemplate(int index, BulkUploadDto object) {
 
-		try {
-			Window.open(GWT.getModuleBaseURL() + "buDownloadServlet?id=" + object.getId(), "", "");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		bulkUploadService.setDownloadableBulkUploadIdInSession(object.getId().toString(), new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				System.out.println("Bulk Upload setting Id in session for download Error : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				System.out.println("Bulk Upload setting Id in session for download Success");
+				try {
+					Window.open(GWT.getModuleBaseURL() + "buDownloadServlet", "", "");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**

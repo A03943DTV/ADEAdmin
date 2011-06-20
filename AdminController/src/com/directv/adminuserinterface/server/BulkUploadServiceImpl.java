@@ -18,6 +18,7 @@ import com.directv.adminuserinterface.rest.BulkUploadDaoImpl;
 import com.directv.adminuserinterface.server.dao.BulkUpload;
 import com.directv.adminuserinterface.shared.BulkUploadDto;
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.AdminException;
 import com.directv.adminuserinterface.util.FormCSVData;
 import com.google.appengine.api.datastore.Blob;
@@ -165,5 +166,15 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	@Override
 	public void dummy(BulkUploadDto bulkUploadDto) {
 
+	}
+
+	/**
+	 * Overridden Method
+	 * @param id
+	 */
+	@Override
+	public void setDownloadableBulkUploadIdInSession(String id) {
+
+		this.getThreadLocalRequest().getSession().setAttribute(AdminConstants.BU_ID_DATA_STORE_ATTRIBUTE, id);
 	}
 }

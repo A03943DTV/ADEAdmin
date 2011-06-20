@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.directv.adminuserinterface.rest.BulkUploadDaoImpl;
 import com.directv.adminuserinterface.server.dao.BulkUpload;
+import com.directv.adminuserinterface.util.AdminConstants;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -24,9 +25,6 @@ public class BulkUploadDownloadServlet extends HttpServlet {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 7553214876648040781L;
-
-	/** The Constant ID. */
-	private static final String ID = "id";
 
 	/** The Constant FILE_NAME. */
 	private static final String FILE_NAME = "BulkUploadResult";
@@ -57,7 +55,8 @@ public class BulkUploadDownloadServlet extends HttpServlet {
 		ServletOutputStream out = null;
 		try {
 
-			BulkUpload bulkUpload = new BulkUploadDaoImpl().getBulkUploadById(Long.parseLong(request.getParameter(ID)));
+			BulkUpload bulkUpload = new BulkUploadDaoImpl().getBulkUploadById(Long.parseLong(request.getSession().getAttribute(
+					AdminConstants.BU_ID_DATA_STORE_ATTRIBUTE).toString()));
 
 			out = response.getOutputStream();
 

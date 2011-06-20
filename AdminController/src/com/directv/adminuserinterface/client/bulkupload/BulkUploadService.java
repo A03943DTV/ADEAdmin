@@ -20,7 +20,7 @@ public interface BulkUploadService extends RemoteService {
 	/**
 	 * Process bulk upload.
 	 */
-	void processBulkUpload();
+	public void processBulkUpload();
 
 	/**
 	 * Dummy.
@@ -35,6 +35,12 @@ public interface BulkUploadService extends RemoteService {
 	 * @param userId the user id
 	 * @return the bulk upload results
 	 */
-	List<BulkUploadDto> getBulkUploadResults(String userId);
+	public List<BulkUploadDto> getBulkUploadResults(String userId);
 
+	/**
+	 * Sets the downloadable bulk upload id in session.
+	 *
+	 * @param id the new downloadable bulk upload id in session
+	 */
+	public void setDownloadableBulkUploadIdInSession(String id);
 }

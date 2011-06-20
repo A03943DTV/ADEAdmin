@@ -39,4 +39,12 @@ public interface BulkUploadServiceAsync {
 	 */
 	void getBulkUploadResults(String userId, AsyncCallback<List<BulkUploadDto>> callback);
 
+	/**
+	 * Sets the downloadable bulk upload id in session.
+	 *
+	 * @param id the id
+	 * @param callback the callback
+	 */
+	void setDownloadableBulkUploadIdInSession(String id, AsyncCallback<Void> callback);
+
 }

@@ -49,4 +49,7 @@ public class AdminConstants {
 	/** The Constant MANAGER_ROLE_CONSTANT. */
 	public static final String MANAGER_ROLE_CONSTANT = "Manager";
 
+	/** The Constant BU_ID_DATA_STORE_ATTRIBUTE. */
+	public static final String BU_ID_DATA_STORE_ATTRIBUTE = "BuIdSessionDataStore";
+
 }

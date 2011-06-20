@@ -1,2 +1,0 @@
-serviceClass: com.directv.adminuserinterface.client.bulkupload.BulkUploadService
-path: D3A773D2E4E813D3A95D37901CA61A4D.gwt.rpc
