@@ -256,19 +256,19 @@ public class BulkUploadScreen extends Composite {
 		Column<BulkUploadDto, String> statusColumn = generateStatusColumn();
 
 		// Set the width of the buTable and put the buTable in fixed width mode.
-		buTable.setWidth("1375px", true);
+		buTable.setWidth("1385px", true);
 
 		// Set the width of each column.
 		buTable.setColumnWidth(downloadColumn, 7.0, Unit.PCT);
-		buTable.setColumnWidth(processStatusColumn, 12.0, Unit.PCT);
+		buTable.setColumnWidth(processStatusColumn, 11.0, Unit.PCT);
 		buTable.setColumnWidth(idColumn, 4.0, Unit.PCT);
-		buTable.setColumnWidth(descriptionColumn, 11.0, Unit.PCT);
-		buTable.setColumnWidth(submittedTimeColumn, 14.0, Unit.PCT);
-		buTable.setColumnWidth(processStartTimeColumn, 14.0, Unit.PCT);
-		buTable.setColumnWidth(processEndTimeColumn, 14.0, Unit.PCT);
-		buTable.setColumnWidth(noOfFailureRecordsColumn, 12.0, Unit.PCT);
-		buTable.setColumnWidth(noOfSuccessRecordsColumn, 12.0, Unit.PCT);
-		buTable.setColumnWidth(statusColumn, 9.0, Unit.PCT);
+		buTable.setColumnWidth(descriptionColumn, 9.0, Unit.PCT);
+		buTable.setColumnWidth(submittedTimeColumn, 13.0, Unit.PCT);
+		buTable.setColumnWidth(processStartTimeColumn, 13.0, Unit.PCT);
+		buTable.setColumnWidth(processEndTimeColumn, 13.0, Unit.PCT);
+		buTable.setColumnWidth(noOfFailureRecordsColumn, 11.0, Unit.PCT);
+		buTable.setColumnWidth(noOfSuccessRecordsColumn, 11.0, Unit.PCT);
+		buTable.setColumnWidth(statusColumn, 8.0, Unit.PCT);
 
 		dataProvider.addDataDisplay(buTable);
 		List<BulkUploadDto> dataProviderList = dataProvider.getList();
@@ -481,7 +481,7 @@ public class BulkUploadScreen extends Composite {
 			}
 		};
 		statusColumn.setSortable(true);//For sorting
-		buTable.addColumn(statusColumn, "Status");
+		buTable.addColumn(statusColumn, "Result");
 		return statusColumn;
 	}
 
