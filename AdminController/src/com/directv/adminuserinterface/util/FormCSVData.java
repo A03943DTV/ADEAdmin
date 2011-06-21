@@ -59,6 +59,12 @@ public class FormCSVData {
 				stringBuilder.append(user.getStatus());
 				stringBuilder.append(",");
 				stringBuilder.append(user.getErrorMessage());
+			} else {
+
+				stringBuilder.append(",");
+				stringBuilder.append(user.getCreatedDateTime());
+				stringBuilder.append(",");
+				stringBuilder.append(user.getLastLoginDateTime());
 			}
 			stringBuilder.append("\n");
 		}

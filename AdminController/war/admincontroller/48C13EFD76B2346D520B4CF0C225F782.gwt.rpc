@@ -1,7 +1,7 @@
 com.directv.adminuserinterface.login.LoginService, false, false, false, false, _, 1629472243
 com.directv.adminuserinterface.shared.LoginInfo, true, true, false, false, com.directv.adminuserinterface.shared.LoginInfo/2469543985, 2469543985
-com.directv.adminuserinterface.shared.User, true, true, true, true, com.directv.adminuserinterface.shared.User/4271962378, 4271962378
-[Lcom.directv.adminuserinterface.shared.User;, true, true, true, true, [Lcom.directv.adminuserinterface.shared.User;/528582435, 528582435
+com.directv.adminuserinterface.shared.User, true, true, true, true, com.directv.adminuserinterface.shared.User/2788126446, 2788126446
+[Lcom.directv.adminuserinterface.shared.User;, true, true, true, true, [Lcom.directv.adminuserinterface.shared.User;/1895422684, 1895422684
 com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException, true, true, true, true, com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException/3936916533, 3936916533
 com.google.gwt.user.client.rpc.RpcTokenException, true, true, false, false, com.google.gwt.user.client.rpc.RpcTokenException/2345075298, 2345075298
 com.google.gwt.user.client.rpc.XsrfToken, false, false, true, true, com.google.gwt.user.client.rpc.XsrfToken/4254043109, 4254043109

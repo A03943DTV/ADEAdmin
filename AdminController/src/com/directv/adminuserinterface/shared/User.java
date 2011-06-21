@@ -80,6 +80,14 @@ public class User implements Serializable {
 	@Transactional
 	private String errorMessage;
 
+	/** The last login date time. */
+	@Transactional
+	private String lastLoginDateTime;
+
+	/** The created date time. */
+	@Transactional
+	private String createdDateTime;
+
 	/**
 	 * Instantiates a new user.
 	 *
@@ -323,6 +331,44 @@ public class User implements Serializable {
 	 */
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
+	}
+
+	/**
+	 * Gets the last login date time.
+	 *
+	 * @return the last login date time
+	 */
+	@XmlElement
+	public String getLastLoginDateTime() {
+		return lastLoginDateTime == null ? "" : lastLoginDateTime.substring(0, 4).equals("1969") ? "Never logged in" : lastLoginDateTime;
+	}
+
+	/**
+	 * Sets the last login date time.
+	 *
+	 * @param lastLoginDateTime the new last login date time
+	 */
+	public void setLastLoginDateTime(String lastLoginDateTime) {
+		this.lastLoginDateTime = lastLoginDateTime;
+	}
+
+	/**
+	 * Gets the created date time.
+	 *
+	 * @return the created date time
+	 */
+	@XmlElement
+	public String getCreatedDateTime() {
+		return createdDateTime == null ? "" : createdDateTime.trim();
+	}
+
+	/**
+	 * Sets the created date time.
+	 *
+	 * @param createdDateTime the new created date time
+	 */
+	public void setCreatedDateTime(String createdDateTime) {
+		this.createdDateTime = createdDateTime;
 	}
 
 }

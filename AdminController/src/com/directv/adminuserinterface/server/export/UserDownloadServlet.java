@@ -6,6 +6,8 @@ package com.directv.adminuserinterface.server.export;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,6 +16,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.directv.adminuserinterface.server.ReportServiceImpl;
+import com.directv.adminuserinterface.shared.ReportBean;
 import com.directv.adminuserinterface.shared.User;
 import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.FormCSVData;
@@ -32,7 +36,7 @@ public class UserDownloadServlet extends HttpServlet {
 
 	/** The Constant HEADER_DATA. */
 	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Location", "Manager's Id", "Role",
-			"Campaign", "Privilege" };
+			"Campaign", "Privilege", "Created Date", "LastLogin Date" };
 
 	/**
 	 * Overridden Method
@@ -58,8 +62,20 @@ public class UserDownloadServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-		StringBuffer stringBuilder = FormCSVData.formData(HEADER_DATA, (ArrayList<User>) request.getSession().getAttribute(
-				AdminConstants.SESSION_DATA_STORE_ATTRIBUTE), false);
+		List<User> userList = (ArrayList<User>) request.getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE);
+		Map<String, ReportBean> reportBeanMap = new ReportServiceImpl().getReports();
+
+		for (User user : userList) {
+			if (reportBeanMap.containsKey(user.getUserId())) {
+				System.out.println("Report Available for : " + user.getUserId());
+				ReportBean reportBean = reportBeanMap.get(user.getUserId());
+				user.setLastLoginDateTime(reportBean.getLastLoginTime());
+				user.setCreatedDateTime(reportBean.getCreationTime());
+			} else {
+				System.out.println("Report Not Available for : " + user.getUserId());
+			}
+		}
+		StringBuffer stringBuilder = FormCSVData.formData(HEADER_DATA, userList, false);
 
 		ServletOutputStream out = null;
 		try {
