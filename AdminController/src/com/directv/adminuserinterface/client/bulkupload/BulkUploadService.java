@@ -37,10 +37,4 @@ public interface BulkUploadService extends RemoteService {
 	 */
 	public List<BulkUploadDto> getBulkUploadResults(String userId);
 
-	/**
-	 * Sets the downloadable bulk upload id in session.
-	 *
-	 * @param id the new downloadable bulk upload id in session
-	 */
-	public void setDownloadableBulkUploadIdInSession(String id);
 }
