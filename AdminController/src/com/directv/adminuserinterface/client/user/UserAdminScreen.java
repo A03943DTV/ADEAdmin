@@ -1366,11 +1366,14 @@ public class UserAdminScreen extends Composite {
 	 */
 	private void getManagersIdFromServiceAndFillDropDown(String location, final boolean isEditClicked, final User user) {
 
+		loadingDialogBox = new LoadingDialogBox("Loading.....", "Loading ManagerId's..... Please wait for few seconds.....");
+
 		codeTableService.getManagersIdsList(location, new AsyncCallback<List<ManagersId>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
 				caught.printStackTrace();
+				loadingDialogBox.hideLoaderDialog();
 				new NormalDialogBox("Error", "Error retreving managersId list : " + caught.getMessage());
 			}
 
@@ -1410,6 +1413,7 @@ public class UserAdminScreen extends Composite {
 						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(0));
 					}
 				}
+				loadingDialogBox.hideLoaderDialog();
 			}
 		});
 	}
