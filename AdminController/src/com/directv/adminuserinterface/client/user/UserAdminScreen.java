@@ -289,7 +289,9 @@ public class UserAdminScreen extends Composite {
 						List<User> listUsersNew = new ArrayList<User>();
 						for (User user : listUsers) {
 							//Preventing logged in user info to be displayed in grid/table
-							if (!user.getUserId().equals(loginInfo.getUser().getUserId())) {
+							//Preventing superadmin t be displayed in grid/table
+							if (!user.getUserId().equals(loginInfo.getUser().getUserId())
+									&& !user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
 								listUsersNew.add(user);
 							}
 						}
@@ -566,7 +568,9 @@ public class UserAdminScreen extends Composite {
 				List<User> dataProviderList = dataProvider.getList();
 				for (User user : listUsersMainFromWebService) {
 					//Preventing logged in user info to be displayed in grid/table
-					if (!user.getUserId().equals(loginInfo.getUser().getUserId())) {
+					//Preventing superadmin t be displayed in grid/table
+					if (!user.getUserId().equals(loginInfo.getUser().getUserId())
+							&& !user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
 						dataProviderList.add(user);
 					}
 				}

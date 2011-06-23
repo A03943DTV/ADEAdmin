@@ -21,7 +21,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.DockPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -120,12 +119,6 @@ public class AdminController implements EntryPoint {
 		tabPanel.setWidth("1000px");
 		tabPanel.setAnimationEnabled(true);
 
-		//Active Decisions Tab
-		tabPanel.add(new HTML(), "Active Decisions");
-
-		//Offer Administration Tab
-		tabPanel.add(new HTML(), "Offer Administration");
-
 		//User Administration Tab
 		tabPanel.add(new UserAdminScreen(GWT.getHostPageBaseURL(), loginInfo), "User Administration");
 
@@ -135,7 +128,7 @@ public class AdminController implements EntryPoint {
 		//Code Table Tab
 		//tabPanel.add(new CodeTableScreen(), "Code Table");
 
-		tabPanel.selectTab(2);
+		tabPanel.selectTab(0);
 
 		vPanel.add(headerImage);
 		vPanel.add(dockPanel);

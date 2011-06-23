@@ -9,8 +9,10 @@ import java.util.List;
 
 import com.directv.adminuserinterface.login.LoginService;
 import com.directv.adminuserinterface.rest.UserDaoImpl;
+import com.directv.adminuserinterface.server.domain.GoogleUserManager;
 import com.directv.adminuserinterface.shared.LoginInfo;
 import com.directv.adminuserinterface.util.AdminConstants;
+import com.directv.adminuserinterface.util.AdminException;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -45,6 +47,22 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			loginInfo.setLoggedIn(false);
 			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
 		}
+
+		//Super Admin's are only created in the Domain
+		//If a SuperAdmin user is been created in Domain and it won't be in the DB
+		//So while login verify is it super admin if so put an entry in the user table
+		if (!(new UserDaoImpl().listUsers(com.directv.adminuserinterface.shared.User.USERID_PARAM, user.getEmail()).size() > 0)) {
+			try {
+				com.directv.adminuserinterface.shared.User userGoogle = new GoogleUserManager().retrieveUser(user.getEmail());
+				if (userGoogle.getAdmin()) {
+					userGoogle.setCredential(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER);
+					new UserDaoImpl().addUser(userGoogle);
+				}
+			} catch (AdminException e) {
+				e.printStackTrace();
+			}
+		}
+
 		loginInfo.setUser(new UserDaoImpl().getUser(user.getEmail()));
 		return loginInfo;
 	}

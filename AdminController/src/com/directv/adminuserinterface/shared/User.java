@@ -8,10 +8,10 @@ import java.io.Serializable;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.Transactional;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -28,6 +28,9 @@ public class User implements Serializable {
 
 	/** The Constant LOCATION_PARAM. */
 	public static final String LOCATION_PARAM = "location";
+
+	/** The Constant USERID_PARAM. */
+	public static final String USERID_PARAM = "userId";
 
 	/** The Constant STATUS_SUCCESS. */
 	public static final String STATUS_SUCCESS = "Success";
@@ -73,20 +76,24 @@ public class User implements Serializable {
 	private String credential;
 
 	/** The status. */
-	@Transactional
+	@NotPersistent
 	private String status;
 
 	/** The error message. */
-	@Transactional
+	@NotPersistent
 	private String errorMessage;
 
 	/** The last login date time. */
-	@Transactional
+	@NotPersistent
 	private String lastLoginDateTime;
 
 	/** The created date time. */
-	@Transactional
+	@NotPersistent
 	private String createdDateTime;
+
+	/** The admin. */
+	@NotPersistent
+	private Boolean admin;
 
 	/**
 	 * Instantiates a new user.
@@ -369,6 +376,25 @@ public class User implements Serializable {
 	 */
 	public void setCreatedDateTime(String createdDateTime) {
 		this.createdDateTime = createdDateTime;
+	}
+
+	/**
+	 * Gets the admin.
+	 *
+	 * @return the admin
+	 */
+	@XmlElement
+	public Boolean getAdmin() {
+		return admin;
+	}
+
+	/**
+	 * Sets the admin.
+	 *
+	 * @param admin the new admin
+	 */
+	public void setAdmin(Boolean admin) {
+		this.admin = admin;
 	}
 
 }

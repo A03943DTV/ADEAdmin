@@ -175,6 +175,36 @@ public class GoogleUserManager {
 	}
 
 	/**
+	 * Retrieve user.
+	 *
+	 * @param userId the user id
+	 * @return the user
+	 * @throws AdminException the admin exception
+	 */
+	public User retrieveUser(String userId) throws AdminException {
+
+		UserEntry userEntry = null;
+		try {
+			userEntry = getClient().retrieveUser(EMailIdUtil.getNameFromEmailId(userId));
+		} catch (AppsForYourDomainException e) {
+			processAppsForYourDomainException(e);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			throw new AdminException("Service exception occured while retreving user from directv domain.");
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new AdminException("IOException occured while retreving user from directv domain.");
+		}
+
+		User user = new User();
+		user.setUserId(EMailIdUtil.getEmailIdFromName(userEntry.getTitle().getPlainText()));
+		user.setFirstName(userEntry.getName().getGivenName());
+		user.setLastName(userEntry.getName().getFamilyName());
+		user.setAdmin(userEntry.getLogin().getAdmin());
+		return user;
+	}
+
+	/**
 	 * Delete domain user.
 	 *
 	 * @param user the user
