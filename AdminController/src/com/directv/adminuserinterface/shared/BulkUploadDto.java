@@ -48,9 +48,6 @@ public class BulkUploadDto implements IsSerializable {
 	/** The process status. */
 	private String processStatus;
 
-	/** The result status. */
-	private String resultStatus;
-
 	/** The submitted time. */
 	private String submittedTime;
 
@@ -77,7 +74,6 @@ public class BulkUploadDto implements IsSerializable {
 	 * @param userId the user id
 	 * @param blobByte the blob byte
 	 * @param processStatus the process status
-	 * @param resultStatus the result status
 	 * @param submittedTime the submitted time
 	 * @param processStratTime the process strat time
 	 * @param processEndTime the process end time
@@ -85,8 +81,8 @@ public class BulkUploadDto implements IsSerializable {
 	 * @param noOfFailureRecords the no of failure records
 	 * @param status the status
 	 */
-	public BulkUploadDto(Long id, String description, String userId, byte[] blobByte, String processStatus, String resultStatus,
-			String submittedTime, String processStratTime, String processEndTime, Long noOfSuccessRecords, Long noOfFailureRecords, String status) {
+	public BulkUploadDto(Long id, String description, String userId, byte[] blobByte, String processStatus, String submittedTime,
+			String processStratTime, String processEndTime, Long noOfSuccessRecords, Long noOfFailureRecords, String status) {
 
 		super();
 		this.id = id;
@@ -94,7 +90,6 @@ public class BulkUploadDto implements IsSerializable {
 		this.userId = userId;
 		this.blobByte = blobByte;
 		this.processStatus = processStatus;
-		this.resultStatus = resultStatus;
 		this.submittedTime = submittedTime;
 		this.processStratTime = processStratTime;
 		this.processEndTime = processEndTime;
@@ -198,24 +193,6 @@ public class BulkUploadDto implements IsSerializable {
 	 */
 	public void setProcessStatus(String processStatus) {
 		this.processStatus = processStatus;
-	}
-
-	/**
-	 * Gets the result status.
-	 *
-	 * @return the result status
-	 */
-	public String getResultStatus() {
-		return resultStatus == null ? "" : resultStatus.trim();
-	}
-
-	/**
-	 * Sets the result status.
-	 *
-	 * @param resultStatus the new result status
-	 */
-	public void setResultStatus(String resultStatus) {
-		this.resultStatus = resultStatus;
 	}
 
 	/**

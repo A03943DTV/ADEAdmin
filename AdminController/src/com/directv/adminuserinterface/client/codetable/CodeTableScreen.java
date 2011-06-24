@@ -12,6 +12,7 @@ import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
+import com.directv.adminuserinterface.shared.SubOrganization;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -93,6 +94,36 @@ public class CodeTableScreen extends Composite {
 		insertLocations();
 		insertManagersIds();
 		insertRoles();
+		insertSubOrganizations();
+	}
+
+	/**
+	 * Insert sub organizations.
+	 */
+	private void insertSubOrganizations() {
+
+		List<SubOrganization> subOrganizationsList = new ArrayList<SubOrganization>();
+		subOrganizationsList.add(new SubOrganization(1L, "Directv"));
+		subOrganizationsList.add(new SubOrganization(2L, "AT&T"));
+		subOrganizationsList.add(new SubOrganization(3L, "Convergys"));
+		subOrganizationsList.add(new SubOrganization(4L, "Sitel"));
+
+		for (SubOrganization subOrganization : subOrganizationsList) {
+
+			codeTableService.addSubOrganization(subOrganization, new AsyncCallback<SubOrganization>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+					new NormalDialogBox("Error", "SubOrganization add error : " + caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(SubOrganization result) {
+					System.out.println("SubOrganization add success : " + result.getDescription());
+				}
+			});
+		}
 	}
 
 	/**
@@ -163,9 +194,12 @@ public class CodeTableScreen extends Composite {
 	private void insertLocations() {
 
 		List<Location> locationList = new ArrayList<Location>();
-		locationList.add(new Location(1L, "Huntsville"));
-		locationList.add(new Location(2L, "Boise"));
-		locationList.add(new Location(3L, "Chattanoga"));
+		locationList.add(new Location(1L, "Huntsville", "Directv"));
+		locationList.add(new Location(2L, "Boise", "Convergys"));
+		locationList.add(new Location(3L, "Chattanoga", "Sitel"));
+		locationList.add(new Location(4L, "Huntsville", "AT&T"));
+		locationList.add(new Location(5L, "Boise", "AT&T"));
+		locationList.add(new Location(6L, "Chattanoga", "AT&T"));
 
 		for (Location location : locationList) {
 

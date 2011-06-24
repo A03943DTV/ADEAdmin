@@ -39,14 +39,28 @@ public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 
 	/**
 	 * Overridden Method
-	 * @param location 
-	 * @param location 
+	 * @param locationParam
+	 * @param locationValue
 	 * @return
 	 */
 	@Override
 	public List<User> listUsers(String locationParam, String locationValue) {
 
 		return getList(User.class, locationParam, locationValue);
+	}
+
+	/**
+	 * Overridden Method
+	 * @param locationParam
+	 * @param locationValue
+	 * @param subOrgParam
+	 * @param subOrgValue
+	 * @return
+	 */
+	@Override
+	public List<User> listUsers(String locationParam, String locationValue, String subOrgParam, String subOrgValue) {
+
+		return getList(User.class, locationParam, locationValue, subOrgParam, subOrgValue);
 	}
 
 	/**
@@ -72,14 +86,41 @@ public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 		try {
 
 			pm.currentTransaction().begin();
-			// We don't have a reference to the selected Product.
-			// So we have to look it up first,
 			userDB = pm.getObjectById(User.class, user.getUserId());
 			userDB.setGroup(user.getGroup());
+			userDB.setOrganization(user.getOrganization());
+			userDB.setSubOrganization(user.getSubOrganization());
 			userDB.setLocation(user.getLocation());
 			userDB.setManagersId(user.getManagersId());
 			userDB.setRole(user.getRole());
 			userDB.setCampaign(user.getCampaign());
+			userDB.setCredential(user.getCredential());
+
+			pm.makePersistent(userDB);
+			pm.currentTransaction().commit();
+
+		} catch (Exception ex) {
+			pm.currentTransaction().rollback();
+			throw new RuntimeException(ex);
+		} finally {
+			pm.close();
+		}
+		return userDB;
+	}
+
+	/**
+	 * Overridden Method
+	 * @param user
+	 */
+	@Override
+	public User updateUserCredential(User user) {
+
+		User userDB = null;
+		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
+		try {
+
+			pm.currentTransaction().begin();
+			userDB = pm.getObjectById(User.class, user.getUserId());
 			userDB.setCredential(user.getCredential());
 
 			pm.makePersistent(userDB);

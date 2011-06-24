@@ -43,6 +43,10 @@ public class FormCSVData {
 			stringBuilder.append(",");
 			stringBuilder.append(user.getGroup());
 			stringBuilder.append(",");
+			stringBuilder.append(user.getOrganization());
+			stringBuilder.append(",");
+			stringBuilder.append(user.getSubOrganization());
+			stringBuilder.append(",");
 			stringBuilder.append(user.getLocation());
 			stringBuilder.append(",");
 			stringBuilder.append(user.getManagersId());

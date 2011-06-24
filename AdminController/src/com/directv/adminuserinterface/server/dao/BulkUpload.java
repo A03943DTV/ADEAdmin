@@ -65,10 +65,6 @@ public class BulkUpload implements Serializable {
 	@Persistent
 	private String processStatus;
 
-	/** The result status. */
-	@Persistent
-	private String resultStatus;
-
 	/** The submitted time. */
 	@Persistent
 	private String submittedTime;
@@ -208,24 +204,6 @@ public class BulkUpload implements Serializable {
 	 */
 	public void setProcessStatus(String processStatus) {
 		this.processStatus = processStatus;
-	}
-
-	/**
-	 * Gets the result status.
-	 *
-	 * @return the result status
-	 */
-	public String getResultStatus() {
-		return resultStatus;
-	}
-
-	/**
-	 * Sets the result status.
-	 *
-	 * @param resultStatus the new result status
-	 */
-	public void setResultStatus(String resultStatus) {
-		this.resultStatus = resultStatus;
 	}
 
 	/**

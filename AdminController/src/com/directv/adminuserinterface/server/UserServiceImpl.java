@@ -9,11 +9,13 @@ import java.util.List;
 import com.directv.adminuserinterface.client.user.UserService;
 import com.directv.adminuserinterface.rest.UserDao;
 import com.directv.adminuserinterface.rest.UserDaoImpl;
+import com.directv.adminuserinterface.server.domain.GoogleOrgManager;
 import com.directv.adminuserinterface.server.domain.GoogleUserManager;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
+import com.directv.adminuserinterface.shared.SubOrganization;
 import com.directv.adminuserinterface.shared.User;
 import com.directv.adminuserinterface.shared.validator.UserValidator;
 import com.directv.adminuserinterface.util.AdminConstants;
@@ -65,10 +67,36 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		if (user.getCredential() == null || user.getCredential().equals("")) {
 			user.setCredential(AdminConstants.CREDENTIAL_USER);//By default newly created user will have user credential
 		}
+
+		//Managing user into organization
+		manageOrganizationPath(user, true);
+
 		user = getUserDao().addUser(user);
 
 		verifyIfRoleIsManager(true, user);
 		return user;
+	}
+
+	/**
+	 * Manage organization path.
+	 *
+	 * @param user the user
+	 * @param isInsert the is insert
+	 * @throws AdminException the admin exception
+	 */
+	private void manageOrganizationPath(User user, boolean isInsert) throws AdminException {
+
+		GoogleOrgManager googleOrgManager = new GoogleOrgManager();
+		String oldPath = "/";//By default created users will be here in base "/" while newly created
+		String newPath = googleOrgManager.createOrgPathFromOrgUnits(user.getOrganization(), user.getSubOrganization(), user.getLocation(), user
+				.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER));
+
+		if (!isInsert) {
+			User dbUser = getUserDao().getUser(user.getUserId());
+			oldPath = googleOrgManager.createOrgPathFromOrgUnits(dbUser.getOrganization(), dbUser.getSubOrganization(), dbUser.getLocation(), dbUser
+					.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER));
+		}
+		googleOrgManager.updateOrganizationUser(user.getUserId(), oldPath, newPath);
 	}
 
 	/**
@@ -95,9 +123,13 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 		CodeTableServiceImpl codeTableService = getCodeTableServiceImpl();
 
-		if (userToBeCreated.getLocation() != null && !userToBeCreated.getLocation().equals("")
-				&& !(codeTableService.getLocationsList(Location.DESCRIPTION_PARAM, userToBeCreated.getLocation()).size() > 0)) {
-			throw new AdminException("Invalid Location");
+		if (userToBeCreated.getOrganization() != null && !userToBeCreated.getOrganization().equals("")
+				&& !(AdminConstants.ORGANIZATION_NAME.equals(userToBeCreated.getOrganization()))) {
+			throw new AdminException("Invalid Organization");
+		}
+		if (userToBeCreated.getSubOrganization() != null && !userToBeCreated.getSubOrganization().equals("")
+				&& !(codeTableService.getSubOrganizationsList(SubOrganization.DESCRIPTION_PARAM, userToBeCreated.getSubOrganization()).size() > 0)) {
+			throw new AdminException("Invalid SubOrganization");
 		}
 		if (userToBeCreated.getGroup() != null && !userToBeCreated.getGroup().equals("")
 				&& !(codeTableService.getGroupsList(Group.DESCRIPTION_PARAM, userToBeCreated.getGroup()).size() > 0)) {
@@ -108,12 +140,35 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 			throw new AdminException("Invalid Role");
 		}
 
+		List<Location> locationsList = codeTableService.getLocationsList(Location.DESCRIPTION_PARAM, userToBeCreated.getLocation());
+		if (userToBeCreated.getLocation() != null && !userToBeCreated.getLocation().equals("")) {
+			if (!(locationsList.size() > 0)) {
+				throw new AdminException("Invalid Location");
+			} else {
+				boolean isAvailable = false;
+				for (Location location : locationsList) {
+					if (location.getSubOrganization() != null && location.getSubOrganization().equals(userToBeCreated.getSubOrganization())) {
+						isAvailable = true;
+					}
+				}
+				if (!isAvailable) {
+					throw new AdminException("Invalid SubOrganization/Location combination");
+				}
+			}
+		}
+
 		List<ManagersId> managersIdList = codeTableService.getManagersIdsList(ManagersId.DESCRIPTION_PARAM, userToBeCreated.getManagersId());
 		if (userToBeCreated.getManagersId() != null && !userToBeCreated.getManagersId().equals("")) {
 			if (!(managersIdList.size() > 0)) {
 				throw new AdminException("Invalid ManagersId");
 			} else {
-				if (!managersIdList.get(0).getLocation().equals(userToBeCreated.getLocation())) {
+				boolean isAvailable = false;
+				for (ManagersId managerId : managersIdList) {
+					if (managerId.getLocation() != null && managerId.getLocation().equals(userToBeCreated.getLocation())) {
+						isAvailable = true;
+					}
+				}
+				if (!isAvailable) {
 					throw new AdminException("Invalid Location/ManagersId combination");
 				}
 			}
@@ -133,6 +188,10 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 		User userLoggedIn = new LoginServiceImpl().getUserForBulkUpload();
 		if (userLoggedIn.getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
+
+			if (!userLoggedIn.getSubOrganization().equals(userToBeCreated.getSubOrganization())) {
+				throw new AdminException("You don't have privilege to add user to other suborganization");
+			}
 
 			if (!userLoggedIn.getLocation().equals(userToBeCreated.getLocation())) {
 				throw new AdminException("You don't have privilege to add user to other location");
@@ -214,6 +273,9 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		//Updating an existing user in the domain
 		user = new GoogleUserManager().updateDomainUser(user);
 
+		//Managing user into organization
+		manageOrganizationPath(user, false);
+
 		//Updating an existing user in the DB
 		user = getUserDao().updateUser(user);
 
@@ -229,9 +291,9 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	 * @throws AdminException
 	 */
 	@Override
-	public List<User> listUsers(String location, String hostPageBaseURL) throws AdminException {
+	public List<User> listUsers(String location, String subOrganization, String hostPageBaseURL) throws AdminException {
 
 		//Retrieving all the users in a particular location from the DB/Domain[DB Domain both count will be the same]
-		return new UserDaoImpl().listUsers(User.LOCATION_PARAM, location);
+		return new UserDaoImpl().listUsers(User.LOCATION_PARAM, location, User.SUB_ORG_PARAM, subOrganization);
 	}
 }

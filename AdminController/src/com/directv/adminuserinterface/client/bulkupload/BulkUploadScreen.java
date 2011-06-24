@@ -177,7 +177,6 @@ public class BulkUploadScreen extends Composite {
 
 				clearFormFields();
 				listBuInfo();
-				submitButton.setEnabled(false);
 
 				bulkUploadService.processBulkUpload(new AsyncCallback<Void>() {
 
@@ -228,15 +227,10 @@ public class BulkUploadScreen extends Composite {
 				listBuMainFromWebService = result;
 				dataProvider.getList().clear();
 				List<BulkUploadDto> dataProviderList = dataProvider.getList();
-				boolean enableSubmitButton = true;
 				for (BulkUploadDto buDto : listBuMainFromWebService) {
 					dataProviderList.add(buDto);
-					if (!buDto.getProcessStatus().equals(BulkUploadDto.PROCESS_STATUS_COMPLETED)) {
-						enableSubmitButton = false;
-					}
 				}
 				dataProvider.refresh();
-				submitButton.setEnabled(enableSubmitButton);
 			}
 		});
 	}

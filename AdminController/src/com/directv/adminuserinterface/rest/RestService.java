@@ -39,7 +39,7 @@ public class RestService {
 			@QueryParam("managerid") String managerid, @QueryParam("role") String role, @QueryParam("campaign") String campaign) {
 
 		//TODO : firstName/lastName/credential Param null to be changed
-		User user = new User(null, null, userid, group, location, managerid, role, campaign, null);
+		User user = new User(null, null, userid, group, null, null, location, managerid, role, campaign, null);
 		UserDao userDao = new UserDaoImpl();
 		return userDao.addUser(user);
 	}
@@ -61,7 +61,7 @@ public class RestService {
 			@QueryParam("managerid") String managerid, @QueryParam("role") String role, @QueryParam("campaign") String campaign) {
 
 		//TODO : firstName/lastName/credential Param null to be changed
-		User user = new User(null, null, userid, group, location, managerid, role, campaign, null);
+		User user = new User(null, null, userid, group, null, null, location, managerid, role, campaign, null);
 		UserDao userDao = new UserDaoImpl();
 		userDao.removeUser(user);
 		return "User Deleted Successfully";

@@ -10,6 +10,7 @@ import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
+import com.directv.adminuserinterface.shared.SubOrganization;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -77,12 +78,28 @@ public interface CodeTableService extends RemoteService {
 	/**
 	 * Gets the locations list.
 	 *
+	 * @param subOrganization the sub organization
 	 * @return the locations list
 	 */
-	List<Location> getLocationsList();
+	List<Location> getLocationsList(String subOrganization);
 
 	/**
 	 * Delete code table values.
 	 */
 	void deleteCodeTableValues();
+
+	/**
+	 * Adds the sub organization.
+	 *
+	 * @param subOrganization the sub organization
+	 * @return the sub organization
+	 */
+	SubOrganization addSubOrganization(SubOrganization subOrganization);
+
+	/**
+	 * Gets the sub organizations list.
+	 *
+	 * @return the sub organizations list
+	 */
+	List<SubOrganization> getSubOrganizationsList();
 }

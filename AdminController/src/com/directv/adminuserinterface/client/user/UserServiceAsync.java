@@ -46,8 +46,9 @@ public interface UserServiceAsync {
 	 * List users.
 	 *
 	 * @param location the location
+	 * @param subOrganization the sub organization
 	 * @param hostPageBaseURL the host page base url
 	 * @param callback the callback
 	 */
-	void listUsers(String location, String hostPageBaseURL, AsyncCallback<List<User>> callback);
+	void listUsers(String location, String subOrganization, String hostPageBaseURL, AsyncCallback<List<User>> callback);
 }

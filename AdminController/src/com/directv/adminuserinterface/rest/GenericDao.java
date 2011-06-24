@@ -60,4 +60,17 @@ public interface GenericDao {
 	 */
 	<T> T get(Class<T> clazz, Object id);
 
+	/**
+	 * Gets the list.
+	 *
+	 * @param <T> the generic type
+	 * @param clazz the clazz
+	 * @param param1 the param1
+	 * @param value1 the value1
+	 * @param param2 the param2
+	 * @param value2 the value2
+	 * @return the list
+	 */
+	<T> List<T> getList(Class<T> clazz, String param1, String value1, String param2, String value2);
+
 }

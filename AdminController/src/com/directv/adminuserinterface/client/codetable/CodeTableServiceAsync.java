@@ -10,6 +10,7 @@ import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
+import com.directv.adminuserinterface.shared.SubOrganization;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 // TODO: Auto-generated Javadoc
@@ -29,10 +30,11 @@ public interface CodeTableServiceAsync {
 	/**
 	 * Gets the locations list.
 	 *
+	 * @param subOrganization the sub organization
 	 * @param callback the callback
 	 * @return the locations list
 	 */
-	void getLocationsList(AsyncCallback<List<Location>> callback);
+	void getLocationsList(String subOrganization, AsyncCallback<List<Location>> callback);
 
 	/**
 	 * Adds the group.
@@ -89,5 +91,21 @@ public interface CodeTableServiceAsync {
 	 * @param asyncCallback the async callback
 	 */
 	void deleteCodeTableValues(AsyncCallback<Void> asyncCallback);
+
+	/**
+	 * Adds the sub organization.
+	 *
+	 * @param subOrganization the sub organization
+	 * @param asyncCallback the async callback
+	 */
+	void addSubOrganization(SubOrganization subOrganization, AsyncCallback<SubOrganization> asyncCallback);
+
+	/**
+	 * Gets the sub organizations list.
+	 *
+	 * @param callback the callback
+	 * @return the sub organizations list
+	 */
+	void getSubOrganizationsList(AsyncCallback<List<SubOrganization>> callback);
 
 }

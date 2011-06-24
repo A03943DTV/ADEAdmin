@@ -1,12 +1,14 @@
 com.directv.adminuserinterface.client.codetable.CodeTableService, false, false, false, false, _, 3991690358
 com.directv.adminuserinterface.shared.Group, true, true, true, true, com.directv.adminuserinterface.shared.Group/1087133682, 1087133682
 [Lcom.directv.adminuserinterface.shared.Group;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Group;/2551104846, 2551104846
-com.directv.adminuserinterface.shared.Location, true, true, true, true, com.directv.adminuserinterface.shared.Location/1704743769, 1704743769
-[Lcom.directv.adminuserinterface.shared.Location;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Location;/38512942, 38512942
+com.directv.adminuserinterface.shared.Location, true, true, true, true, com.directv.adminuserinterface.shared.Location/4188600391, 4188600391
+[Lcom.directv.adminuserinterface.shared.Location;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Location;/2139135357, 2139135357
 com.directv.adminuserinterface.shared.ManagersId, true, true, true, true, com.directv.adminuserinterface.shared.ManagersId/2988087825, 2988087825
 [Lcom.directv.adminuserinterface.shared.ManagersId;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.ManagersId;/2422091514, 2422091514
 com.directv.adminuserinterface.shared.Role, true, true, true, true, com.directv.adminuserinterface.shared.Role/866394886, 866394886
 [Lcom.directv.adminuserinterface.shared.Role;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Role;/4088530020, 4088530020
+com.directv.adminuserinterface.shared.SubOrganization, true, true, true, true, com.directv.adminuserinterface.shared.SubOrganization/1316191944, 1316191944
+[Lcom.directv.adminuserinterface.shared.SubOrganization;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.SubOrganization;/1383478505, 1383478505
 com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException, true, true, true, true, com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException/3936916533, 3936916533
 com.google.gwt.user.client.rpc.RpcTokenException, true, true, false, false, com.google.gwt.user.client.rpc.RpcTokenException/2345075298, 2345075298
 com.google.gwt.user.client.rpc.XsrfToken, false, false, true, true, com.google.gwt.user.client.rpc.XsrfToken/4254043109, 4254043109

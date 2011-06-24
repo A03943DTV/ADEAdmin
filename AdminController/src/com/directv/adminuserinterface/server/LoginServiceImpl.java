@@ -48,19 +48,29 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
 		}
 
-		//Super Admin's are only created in the Domain
-		//If a SuperAdmin user is been created in Domain and it won't be in the DB
-		//So while login verify is it super admin if so put an entry in the user table
-		if (!(new UserDaoImpl().listUsers(com.directv.adminuserinterface.shared.User.USERID_PARAM, user.getEmail()).size() > 0)) {
-			try {
-				com.directv.adminuserinterface.shared.User userGoogle = new GoogleUserManager().retrieveUser(user.getEmail());
+		List<com.directv.adminuserinterface.shared.User> loginUserDBList = new UserDaoImpl().listUsers(
+				com.directv.adminuserinterface.shared.User.USERID_PARAM, user.getEmail());
+		try {
+			com.directv.adminuserinterface.shared.User userGoogle = new GoogleUserManager().retrieveUser(user.getEmail());
+			//Super Admin's are only created in the Domain
+			//If a SuperAdmin user is been created in Domain and it won't be in the DB
+			//So while login verify is it super admin if so put an entry in the user table
+			if (!(loginUserDBList.size() > 0)) {
 				if (userGoogle.getAdmin()) {
 					userGoogle.setCredential(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER);
 					new UserDaoImpl().addUser(userGoogle);
 				}
-			} catch (AdminException e) {
-				e.printStackTrace();
+			} else {
+				//If an existing user in domain is changed to super admin through domain then it has to be reflected in DB
+				if (userGoogle.getAdmin()) {
+					if (!loginUserDBList.get(0).getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+						loginUserDBList.get(0).setCredential(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER);
+						new UserDaoImpl().updateUserCredential(loginUserDBList.get(0));
+					}
+				}
 			}
+		} catch (AdminException e) {
+			e.printStackTrace();
 		}
 
 		loginInfo.setUser(new UserDaoImpl().getUser(user.getEmail()));

@@ -29,6 +29,9 @@ public class User implements Serializable {
 	/** The Constant LOCATION_PARAM. */
 	public static final String LOCATION_PARAM = "location";
 
+	/** The Constant SUB_ORG_PARAM. */
+	public static final String SUB_ORG_PARAM = "subOrganization";
+
 	/** The Constant USERID_PARAM. */
 	public static final String USERID_PARAM = "userId";
 
@@ -54,6 +57,14 @@ public class User implements Serializable {
 	/** The group. */
 	@Persistent
 	private String group;
+
+	/** The organization. */
+	@Persistent
+	private String organization;
+
+	/** The sub organization. */
+	@Persistent
+	private String subOrganization;
 
 	/** The location. */
 	@Persistent
@@ -102,19 +113,23 @@ public class User implements Serializable {
 	 * @param lastName the last name
 	 * @param userId the user id
 	 * @param group the group
+	 * @param organization the organization
+	 * @param subOrganization the sub organization
 	 * @param location the location
 	 * @param managersId the managers id
 	 * @param role the role
 	 * @param campaign the campaign
 	 * @param credential the credential
 	 */
-	public User(String firstName, String lastName, String userId, String group, String location, String managersId, String role, String campaign,
-			String credential) {
+	public User(String firstName, String lastName, String userId, String group, String organization, String subOrganization, String location,
+			String managersId, String role, String campaign, String credential) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userId = userId;
 		this.group = group;
+		this.organization = organization;
+		this.subOrganization = subOrganization;
 		this.location = location;
 		this.managersId = managersId;
 		this.role = role;
@@ -222,6 +237,44 @@ public class User implements Serializable {
 	 */
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	/**
+	 * Gets the organization.
+	 *
+	 * @return the organization
+	 */
+	@XmlElement
+	public String getOrganization() {
+		return organization == null ? "" : organization.trim();
+	}
+
+	/**
+	 * Sets the organization.
+	 *
+	 * @param organization the new organization
+	 */
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
+	/**
+	 * Gets the sub organization.
+	 *
+	 * @return the sub organization
+	 */
+	@XmlElement
+	public String getSubOrganization() {
+		return subOrganization == null ? "" : subOrganization.trim();
+	}
+
+	/**
+	 * Sets the sub organization.
+	 *
+	 * @param subOrganization the new sub organization
+	 */
+	public void setSubOrganization(String subOrganization) {
+		this.subOrganization = subOrganization;
 	}
 
 	/**
@@ -396,5 +449,4 @@ public class User implements Serializable {
 	public void setAdmin(Boolean admin) {
 		this.admin = admin;
 	}
-
 }

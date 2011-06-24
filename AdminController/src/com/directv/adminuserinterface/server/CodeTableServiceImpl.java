@@ -12,6 +12,7 @@ import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
+import com.directv.adminuserinterface.shared.SubOrganization;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 // TODO: Auto-generated Javadoc
@@ -104,9 +105,9 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	 * @return
 	 */
 	@Override
-	public List<Location> getLocationsList() {
+	public List<Location> getLocationsList(String subOrganization) {
 
-		return getLocationsList(null, null);
+		return getLocationsList(Location.SUB_ORG_PARAM, subOrganization);
 	}
 
 	/**
@@ -189,4 +190,37 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 			getGenericDaoImpl().remove(ManagersId.class, managersIdObject.getId());
 		}
 	}
+
+	/**
+	 * Overridden Method
+	 * @param subOrganization
+	 * @return
+	 */
+	@Override
+	public SubOrganization addSubOrganization(SubOrganization subOrganization) {
+
+		return (SubOrganization) getGenericDaoImpl().add(subOrganization);
+	}
+
+	/**
+	 * Overridden Method
+	 * @return
+	 */
+	@Override
+	public List<SubOrganization> getSubOrganizationsList() {
+		return getSubOrganizationsList(null, null);
+	}
+
+	/**
+	 * Gets the sub organizations list.
+	 *
+	 * @param param the param
+	 * @param value the value
+	 * @return the sub organizations list
+	 */
+	public List<SubOrganization> getSubOrganizationsList(String param, String value) {
+
+		return getGenericDaoImpl().getList(SubOrganization.class, param, value);
+	}
+
 }

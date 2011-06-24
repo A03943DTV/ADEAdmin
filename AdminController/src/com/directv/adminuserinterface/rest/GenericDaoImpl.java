@@ -16,10 +16,9 @@ import javax.jdo.PersistenceManager;
 public class GenericDaoImpl implements GenericDao {
 
 	/**
-	 * Adds the.
-	 *
-	 * @param object the object
-	 * @return the object
+	 * Overridden Method
+	 * @param object
+	 * @return
 	 */
 	@Override
 	public Object add(Object object) {
@@ -36,12 +35,11 @@ public class GenericDaoImpl implements GenericDao {
 	}
 
 	/**
-	 * Gets the.
-	 *
-	 * @param <T> the generic type
-	 * @param clazz the clazz
-	 * @param id the id
-	 * @return the t
+	 * Overridden Method
+	 * @param <T>
+	 * @param clazz
+	 * @param id
+	 * @return
 	 */
 	@Override
 	public <T> T get(Class<T> clazz, Object id) {
@@ -63,23 +61,41 @@ public class GenericDaoImpl implements GenericDao {
 	}
 
 	/**
-	 * Gets the list.
-	 *
-	 * @param <T> the generic type
-	 * @param clazz the clazz
-	 * @param param the param
-	 * @param value the value
-	 * @return the list
+	 * Overridden Method
+	 * @param <T>
+	 * @param clazz
+	 * @param param
+	 * @param value
+	 * @return
+	 */
+	@Override
+	public <T> List<T> getList(Class<T> clazz, String param, String value) {
+
+		return getList(clazz, param, value, null, null);
+	}
+
+	/**
+	 * Overridden Method
+	 * @param <T>
+	 * @param clazz
+	 * @param param1
+	 * @param value1
+	 * @param param2
+	 * @param value2
+	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> List<T> getList(Class<T> clazz, String param, String value) {
+	public <T> List<T> getList(Class<T> clazz, String param1, String value1, String param2, String value2) {
 
 		List<T> listNew = new ArrayList<T>();
 		PersistenceManager pm = PMF.getPersistenceManagerFactory().getPersistenceManager();
 		String query = "select from " + clazz.getName();
-		if (param != null && value != null) {
-			query = query + " where " + param + " == '" + value + "'";
+		if (param1 != null && value1 != null) {
+			query = query + " where " + param1 + " == '" + value1 + "'";
+		}
+		if (param2 != null && value2 != null) {
+			query = query + " && " + param2 + " == '" + value2 + "'";
 		}
 		List<T> list = (List<T>) pm.newQuery(query).execute();
 		if (list != null && list.size() > 0) {
@@ -89,13 +105,12 @@ public class GenericDaoImpl implements GenericDao {
 	}
 
 	/**
-	 * Gets the not equal list.
-	 *
-	 * @param <T> the generic type
-	 * @param clazz the clazz
-	 * @param param the param
-	 * @param value the value
-	 * @return the not equal list
+	 * Overridden Method
+	 * @param <T>
+	 * @param clazz
+	 * @param param
+	 * @param value
+	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -115,10 +130,9 @@ public class GenericDaoImpl implements GenericDao {
 	}
 
 	/**
-	 * Delete code table.
-	 *
-	 * @param <T> the generic type
-	 * @param clazz the clazz
+	 * Overridden Method
+	 * @param <T>
+	 * @param clazz
 	 */
 	@SuppressWarnings("unchecked")
 	@Override

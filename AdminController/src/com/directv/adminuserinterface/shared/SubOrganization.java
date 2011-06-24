@@ -14,13 +14,16 @@ import javax.jdo.annotations.PrimaryKey;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class Organization.
+ * The Class SubOrganization.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class Organization implements Serializable {
+public class SubOrganization implements Serializable {
 
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 223303696389657866L;
+	private static final long serialVersionUID = -4593057493406171615L;
+
+	/** The Constant DESCRIPTION_PARAM. */
+	public static final String DESCRIPTION_PARAM = "description";
 
 	/** The id. */
 	@PrimaryKey
@@ -31,29 +34,22 @@ public class Organization implements Serializable {
 	@Persistent
 	private String description;
 
-	/** The location. */
-	@Persistent
-	private String location;
-
 	/**
-	 * Instantiates a new organization.
-	 *
-	 * @param id the id
-	 * @param description the description
-	 * @param location the location
+	 * Instantiates a new sub organization.
 	 */
-	public Organization(Long id, String description, String location) {
-		super();
-		this.id = id;
-		this.description = description;
-		this.location = location;
+	public SubOrganization() {
+
 	}
 
 	/**
-	 * Instantiates a new organization.
+	 * Instantiates a new sub organization.
+	 *
+	 * @param id the id
+	 * @param description the description
 	 */
-	public Organization() {
-		super();
+	public SubOrganization(Long id, String description) {
+		this.id = id;
+		this.description = description;
 	}
 
 	/**
@@ -91,23 +87,4 @@ public class Organization implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	/**
-	 * Gets the location.
-	 *
-	 * @return the location
-	 */
-	public String getLocation() {
-		return location;
-	}
-
-	/**
-	 * Sets the location.
-	 *
-	 * @param location the new location
-	 */
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
 }

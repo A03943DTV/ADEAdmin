@@ -35,8 +35,8 @@ public class UserDownloadServlet extends HttpServlet {
 	private static final String FILE_NAME = "UsersInfo";
 
 	/** The Constant HEADER_DATA. */
-	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Location", "Manager's Id", "Role",
-			"Campaign", "Privilege", "Created Date", "LastLogin Date" };
+	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Organization", "Sub Organization",
+			"Location", "Manager's Id", "Role", "Campaign", "Privilege", "Created Date", "LastLogin Date" };
 
 	/**
 	 * Overridden Method

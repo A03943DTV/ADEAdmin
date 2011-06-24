@@ -87,7 +87,6 @@ public class BulkUploadDaoImpl extends GenericDaoImpl {
 			bulkUploadDB.setBlob(bulkUpload.getBlob());
 			bulkUploadDB.setDescription(bulkUpload.getDescription());
 			bulkUploadDB.setProcessStatus(bulkUpload.getProcessStatus());
-			bulkUploadDB.setResultStatus(bulkUpload.getResultStatus());
 			bulkUploadDB.setSubmittedTime(bulkUpload.getSubmittedTime());
 			bulkUploadDB.setProcessStratTime(bulkUpload.getProcessStratTime());
 			bulkUploadDB.setProcessEndTime(bulkUpload.getProcessEndTime());

@@ -25,6 +25,9 @@ public class Location implements Serializable {
 	/** The Constant DESCRIPTION_PARAM. */
 	public static final String DESCRIPTION_PARAM = "description";
 
+	/** The Constant SUB_ORG_PARAM. */
+	public static final String SUB_ORG_PARAM = "subOrganization";
+
 	/** The id. */
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -33,6 +36,9 @@ public class Location implements Serializable {
 	/** The description. */
 	@Persistent
 	private String description;
+
+	/** The sub organization. */
+	private String subOrganization;
 
 	/**
 	 * Instantiates a new location.
@@ -46,10 +52,12 @@ public class Location implements Serializable {
 	 *
 	 * @param id the id
 	 * @param description the description
+	 * @param subOrganization the sub organization
 	 */
-	public Location(Long id, String description) {
+	public Location(Long id, String description, String subOrganization) {
 		this.id = id;
 		this.description = description;
+		this.subOrganization = subOrganization;
 	}
 
 	/**
@@ -86,6 +94,24 @@ public class Location implements Serializable {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/**
+	 * Gets the sub organization.
+	 *
+	 * @return the sub organization
+	 */
+	public String getSubOrganization() {
+		return subOrganization;
+	}
+
+	/**
+	 * Sets the sub organization.
+	 *
+	 * @param subOrganization the new sub organization
+	 */
+	public void setSubOrganization(String subOrganization) {
+		this.subOrganization = subOrganization;
 	}
 
 }

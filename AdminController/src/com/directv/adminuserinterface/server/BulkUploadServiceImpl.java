@@ -33,8 +33,8 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	private static final long serialVersionUID = 6014641590287705576L;
 
 	/** The Constant HEADER_DATA. */
-	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Location", "Manager's Id", "Role",
-			"Campaign", "Privilege", "Status", "ErrorMessage" };
+	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Organization", "Sub Organization",
+			"Location", "Manager's Id", "Role", "Campaign", "Privilege", "Status", "ErrorMessage" };
 
 	/** The Constant COLUMN_COUNT. */
 	private static final int COLUMN_COUNT = (HEADER_DATA.length - 2);//Excluding {"Status", "ErrorMessage"}
@@ -137,7 +137,7 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 		}
 
 		return new User(userInfoArray[0], userInfoArray[1], userInfoArray[2], userInfoArray[3], userInfoArray[4], userInfoArray[5], userInfoArray[6],
-				userInfoArray[7], userInfoArray[8]);
+				userInfoArray[7], userInfoArray[8], userInfoArray[9], userInfoArray[10]);
 	}
 
 	/**
@@ -152,8 +152,8 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 
 			byte[] byteArray = bulkUpload.getBlob().getBytes();
 			bulkuploadDtoList.add(new BulkUploadDto(bulkUpload.getId(), bulkUpload.getDescription(), bulkUpload.getUserId(), byteArray, bulkUpload
-					.getProcessStatus(), bulkUpload.getResultStatus(), bulkUpload.getSubmittedTime(), bulkUpload.getProcessStratTime(), bulkUpload
-					.getProcessEndTime(), bulkUpload.getNoOfSuccessRecords(), bulkUpload.getNoOfFailureRecords(), bulkUpload.getStatus()));
+					.getProcessStatus(), bulkUpload.getSubmittedTime(), bulkUpload.getProcessStratTime(), bulkUpload.getProcessEndTime(), bulkUpload
+					.getNoOfSuccessRecords(), bulkUpload.getNoOfFailureRecords(), bulkUpload.getStatus()));
 		}
 		return bulkuploadDtoList;
 	}
