@@ -16,7 +16,7 @@ import com.directv.adminuserinterface.shared.User;
 public class UserSearchHelper {
 
 	/** The Constant NO_OF_SEARCH_FIELDS. */
-	private static final int NO_OF_SEARCH_FIELDS = 9;
+	private static final int NO_OF_SEARCH_FIELDS = 11;
 
 	/**
 	 * Search user.
@@ -56,6 +56,20 @@ public class UserSearchHelper {
 			}
 			if (userSearch.getGroup() != null && userSearch.getGroup() != "") {
 				if (((User) gridUser).getGroup().equals(userSearch.getGroup())) {
+					count++;
+				}
+			} else {
+				count++;
+			}
+			if (userSearch.getOrganization() != null && userSearch.getOrganization() != "") {
+				if (((User) gridUser).getOrganization().equals(userSearch.getOrganization())) {
+					count++;
+				}
+			} else {
+				count++;
+			}
+			if (userSearch.getSubOrganization() != null && userSearch.getSubOrganization() != "") {
+				if (((User) gridUser).getSubOrganization().equals(userSearch.getSubOrganization())) {
 					count++;
 				}
 			} else {

@@ -324,15 +324,7 @@ public class UserAdminScreen extends Composite {
 					@Override
 					public void onSuccess(List<User> listUsers) {
 						System.out.println("Scheduler User List Successfull : " + listUsers.size());
-						List<User> listUsersNew = new ArrayList<User>();
-						for (User user : listUsers) {
-							//Preventing logged in user info to be displayed in grid/table
-							//Preventing superadmin t be displayed in grid/table
-							if (!user.getUserId().equals(loginInfo.getUser().getUserId())
-									&& !user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
-								listUsersNew.add(user);
-							}
-						}
+						List<User> listUsersNew = getFilteredUsers(listUsers);
 						loginService.storeUserListInSession(listUsersNew, new AsyncCallback() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -351,6 +343,25 @@ public class UserAdminScreen extends Composite {
 		};
 		t.schedule(1000); // Schedule the timer delay.
 		t.scheduleRepeating(5000);// Schedule the timer repeat interval.
+	}
+
+	/**
+	 * Gets the filtered users.
+	 *
+	 * @param listUsers the list users
+	 * @return the filtered users
+	 */
+	protected List<User> getFilteredUsers(List<User> listUsers) {
+
+		List<User> listUsersNew = new ArrayList<User>();
+		for (User user : listUsers) {
+			//Preventing logged in user info to be displayed in grid/table
+			//Preventing superadmin t be displayed in grid/table
+			if (!user.getUserId().equals(loginInfo.getUser().getUserId()) && !user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+				listUsersNew.add(user);
+			}
+		}
+		return listUsersNew;
 	}
 
 	/**
@@ -427,7 +438,8 @@ public class UserAdminScreen extends Composite {
 					@Override
 					public void onSuccess(List<User> result) {
 						dataProvider.getList().clear();
-						dataProvider.getList().addAll(UserSearchHelper.searchUser(result, user));//Adding only the search matched values
+						List<User> listUsersNew = getFilteredUsers(result);
+						dataProvider.getList().addAll(UserSearchHelper.searchUser(listUsersNew, user));//Adding only the search matched values
 						dataProvider.refresh();//To replicate the change in table
 						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
 					}
