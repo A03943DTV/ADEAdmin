@@ -106,7 +106,7 @@ public class UserAdminScreen extends Composite {
 	private TextBox organizationTextField = new TextBox();
 
 	/** The sub organization label. */
-	private Label subOrganizationLabel = new Label("Sub Organization");
+	private Label subOrganizationLabel = new Label("Vendor");
 
 	/** The sub organization drop box. */
 	private ListBox subOrganizationDropBox = new ListBox(false);
@@ -670,22 +670,22 @@ public class UserAdminScreen extends Composite {
 		Column<User, String> credentialColumn = generateCredentialColumn();
 
 		// Set the width of the userTable and put the userTable in fixed width mode.
-		userTable.setWidth("1640px", true);
+		userTable.setWidth("1600px", true);
 
 		// Set the width of each column.
-		userTable.setColumnWidth(editColumn, 4.0, Unit.PCT);
-		userTable.setColumnWidth(removecolumn, 5.0, Unit.PCT);
+		userTable.setColumnWidth(editColumn, 3.0, Unit.PCT);
+		userTable.setColumnWidth(removecolumn, 4.0, Unit.PCT);
 		userTable.setColumnWidth(userIdColumn, 11, Unit.PCT);
 		userTable.setColumnWidth(firstNameColumn, 8.0, Unit.PCT);
 		userTable.setColumnWidth(lastNameColumn, 8.0, Unit.PCT);
 		userTable.setColumnWidth(groupColumn, 5.0, Unit.PCT);
-		userTable.setColumnWidth(organizationColumn, 7.0, Unit.PCT);
-		userTable.setColumnWidth(subOrganizationColumn, 10.0, Unit.PCT);
-		userTable.setColumnWidth(locationColumn, 7.0, Unit.PCT);
+		userTable.setColumnWidth(organizationColumn, 8.0, Unit.PCT);
+		userTable.setColumnWidth(subOrganizationColumn, 6.0, Unit.PCT);
+		userTable.setColumnWidth(locationColumn, 9.0, Unit.PCT);
 		userTable.setColumnWidth(managersIdColumn, 11.0, Unit.PCT);
-		userTable.setColumnWidth(roleColumn, 12.0, Unit.PCT);
-		userTable.setColumnWidth(campaignColumn, 6.0, Unit.PCT);
-		userTable.setColumnWidth(credentialColumn, 6.0, Unit.PCT);
+		userTable.setColumnWidth(roleColumn, 13.0, Unit.PCT);
+		userTable.setColumnWidth(campaignColumn, 7.0, Unit.PCT);
+		userTable.setColumnWidth(credentialColumn, 7.0, Unit.PCT);
 
 		dataProvider.addDataDisplay(userTable);
 		List<User> dataProviderList = dataProvider.getList();
@@ -1096,7 +1096,7 @@ public class UserAdminScreen extends Composite {
 			}
 		};
 		subOrganizationColumn.setSortable(true);//For sorting
-		userTable.addColumn(subOrganizationColumn, "Sub Organization");
+		userTable.addColumn(subOrganizationColumn, "Vendor");
 		return subOrganizationColumn;
 	}
 

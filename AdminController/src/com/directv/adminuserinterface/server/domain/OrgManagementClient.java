@@ -58,6 +58,7 @@ public class OrgManagementClient {
 	}
 
 	private AppsPropertyService service;
+	@SuppressWarnings("unused")
 	private String domain = null;
 
 	public static Logger LOGGER = Logger.getLogger(OrgManagementClient.class.getName());
@@ -441,6 +442,7 @@ public class OrgManagementClient {
 			OrgManagementClient client = new OrgManagementClient(adminEmail, adminPassword, domain, "org-api-sample-" + domain);
 
 			GenericEntry entry = null;
+			@SuppressWarnings("unused")
 			GenericFeed feed = null;
 
 			entry = client.retrieveCustomerId(customerId);

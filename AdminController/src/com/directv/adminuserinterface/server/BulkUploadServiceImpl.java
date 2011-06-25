@@ -33,7 +33,7 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	private static final long serialVersionUID = 6014641590287705576L;
 
 	/** The Constant HEADER_DATA. */
-	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Organization", "Sub Organization",
+	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Organization", "Vendor",
 			"Location", "Manager's Id", "Role", "Campaign", "Privilege", "Status", "ErrorMessage" };
 
 	/** The Constant COLUMN_COUNT. */

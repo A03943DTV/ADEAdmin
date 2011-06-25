@@ -129,7 +129,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		}
 		if (userToBeCreated.getSubOrganization() != null && !userToBeCreated.getSubOrganization().equals("")
 				&& !(codeTableService.getSubOrganizationsList(SubOrganization.DESCRIPTION_PARAM, userToBeCreated.getSubOrganization()).size() > 0)) {
-			throw new AdminException("Invalid SubOrganization");
+			throw new AdminException("Invalid Vendor");
 		}
 		if (userToBeCreated.getGroup() != null && !userToBeCreated.getGroup().equals("")
 				&& !(codeTableService.getGroupsList(Group.DESCRIPTION_PARAM, userToBeCreated.getGroup()).size() > 0)) {
@@ -152,7 +152,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 					}
 				}
 				if (!isAvailable) {
-					throw new AdminException("Invalid SubOrganization/Location combination");
+					throw new AdminException("Invalid Vendor/Location combination");
 				}
 			}
 		}
@@ -190,16 +190,16 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		if (userLoggedIn.getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
 
 			if (!userLoggedIn.getSubOrganization().equals(userToBeCreated.getSubOrganization())) {
-				throw new AdminException("You don't have privilege to add user to other suborganization");
+				throw new AdminException("You don't have privilege to add user to other Vendor");
 			}
 
 			if (!userLoggedIn.getLocation().equals(userToBeCreated.getLocation())) {
-				throw new AdminException("You don't have privilege to add user to other location");
+				throw new AdminException("You don't have privilege to add user to other Location");
 			}
 
 			if (userToBeCreated.getCredential() != null && userToBeCreated.getCredential() != "") {
 				if (userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)) {
-					throw new AdminException("You don't have privilege to create an admin user");
+					throw new AdminException("You don't have privilege to create an Admin user");
 				}
 			}
 		}

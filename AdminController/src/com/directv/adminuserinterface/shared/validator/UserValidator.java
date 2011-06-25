@@ -34,7 +34,7 @@ public class UserValidator {
 			throw new AdminException("Organization is required");
 		}
 		if (user.getSubOrganization() == null || user.getSubOrganization().equals("")) {
-			throw new AdminException("Sub Organization is required");
+			throw new AdminException("Vendor is required");
 		}
 		if (user.getLocation() == null || user.getLocation().equals("")) {
 			throw new AdminException("Location is required");
