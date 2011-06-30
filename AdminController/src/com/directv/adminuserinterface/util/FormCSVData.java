@@ -35,6 +35,12 @@ public class FormCSVData {
 
 		for (User user : userList) {
 
+			if (isBulkUploadResultData) {
+
+				stringBuilder.append(user.getBuAction());
+				stringBuilder.append(",");
+			}
+
 			stringBuilder.append(user.getFirstName());
 			stringBuilder.append(",");
 			stringBuilder.append(user.getLastName());

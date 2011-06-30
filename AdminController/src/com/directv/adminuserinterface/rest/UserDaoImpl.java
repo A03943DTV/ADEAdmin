@@ -39,28 +39,28 @@ public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 
 	/**
 	 * Overridden Method
-	 * @param locationParam
-	 * @param locationValue
+	 * @param param1
+	 * @param value1
 	 * @return
 	 */
 	@Override
-	public List<User> listUsers(String locationParam, String locationValue) {
+	public List<User> listUsers(String param1, String value1) {
 
-		return getList(User.class, locationParam, locationValue);
+		return getList(User.class, param1, value1);
 	}
 
 	/**
 	 * Overridden Method
-	 * @param locationParam
-	 * @param locationValue
-	 * @param subOrgParam
-	 * @param subOrgValue
+	 * @param param1
+	 * @param value1
+	 * @param param2
+	 * @param value2
 	 * @return
 	 */
 	@Override
-	public List<User> listUsers(String locationParam, String locationValue, String subOrgParam, String subOrgValue) {
+	public List<User> listUsers(String param1, String value1, String param2, String value2) {
 
-		return getList(User.class, locationParam, locationValue, subOrgParam, subOrgValue);
+		return getList(User.class, param1, value1, param2, value2);
 	}
 
 	/**

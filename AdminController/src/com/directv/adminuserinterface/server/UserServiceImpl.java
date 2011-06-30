@@ -109,17 +109,17 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	public User addBulkUploadUser(User user) throws AdminException {
 
 		UserValidator.validate(user);
-		doValidations(user);
+		doBUInsertValidations(user);
 		return addUser(null, user);
 	}
 
 	/**
-	 * Do validations.
+	 * Do bu insert validations.
 	 *
 	 * @param userToBeCreated the user to be created
 	 * @throws AdminException the admin exception
 	 */
-	private void doValidations(User userToBeCreated) throws AdminException {
+	private void doBUInsertValidations(User userToBeCreated) throws AdminException {
 
 		CodeTableServiceImpl codeTableService = getCodeTableServiceImpl();
 
@@ -295,5 +295,50 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 		//Retrieving all the users in a particular location from the DB/Domain[DB Domain both count will be the same]
 		return new UserDaoImpl().listUsers(User.LOCATION_PARAM, location, User.SUB_ORG_PARAM, subOrganization);
+	}
+
+	/**
+	 * Delete bulk upload user.
+	 *
+	 * @param user the user
+	 * @throws AdminException the admin exception
+	 */
+	public void deleteBulkUploadUser(User user) throws AdminException {
+
+		doBUDeleteValidations(user);
+		removeUser(null, user);
+	}
+
+	/**
+	 * Do bu delete validations.
+	 *
+	 * @param user the user
+	 * @throws AdminException the admin exception
+	 */
+	private void doBUDeleteValidations(User user) throws AdminException {
+
+		List<User> userList = new UserDaoImpl().listUsers(User.USERID_PARAM, user.getUserId());
+
+		if (userList == null || !(userList.size() > 0)) {
+			throw new AdminException("Invalid UserId/UserId not exists");
+		}
+		if (userList.get(0).getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+			throw new AdminException("SuperAdmin user can't be deleted through ADELite application");
+		}
+
+		User userLoggedIn = new LoginServiceImpl().getUserForBulkUpload();
+
+		if (userList.get(0).getUserId().equals(userLoggedIn.getUserId())) {
+			throw new AdminException("You don't have privilege to delete your account");
+		}
+		if (userLoggedIn.getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_ADMIN_USER)) {
+
+			if (!userLoggedIn.getSubOrganization().equals(userList.get(0).getSubOrganization())) {
+				throw new AdminException("You don't have privilege to delete user who belongs to another Vendor");
+			}
+			if (!userLoggedIn.getLocation().equals(userList.get(0).getLocation())) {
+				throw new AdminException("You don't have privilege to delete user who belongs to another Location");
+			}
+		}
 	}
 }

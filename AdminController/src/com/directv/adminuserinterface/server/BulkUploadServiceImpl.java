@@ -33,11 +33,17 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	private static final long serialVersionUID = 6014641590287705576L;
 
 	/** The Constant HEADER_DATA. */
-	private static final String HEADER_DATA[] = new String[] { "First Name", "Last Name", "User Id", "Group", "Organization", "Vendor",
-			"Location", "Manager's Id", "Role", "Campaign", "Privilege", "Status", "ErrorMessage" };
+	private static final String HEADER_DATA[] = new String[] { "Action[I/D]", "First Name", "Last Name", "User Id", "Group", "Organization",
+			"Vendor", "Location", "Manager's Id", "Role", "Campaign", "Privilege", "Status", "ErrorMessage" };
 
 	/** The Constant COLUMN_COUNT. */
 	private static final int COLUMN_COUNT = (HEADER_DATA.length - 2);//Excluding {"Status", "ErrorMessage"}
+
+	/** The Constant INSERT. */
+	private static final String INSERT = "I";
+
+	/** The Constant DELETE. */
+	private static final String DELETE = "D";
 
 	/**
 	 * Overridden Method
@@ -89,7 +95,12 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 					User user = getSingleUserData(line);
 					try {
 
-						new UserServiceImpl().addBulkUploadUser(user);
+						validateBUAction(user);
+						if (user.getBuAction().equals(INSERT)) {
+							new UserServiceImpl().addBulkUploadUser(user);
+						} else if (user.getBuAction().equals(DELETE)) {
+							new UserServiceImpl().deleteBulkUploadUser(user);
+						}
 						user.setStatus(User.STATUS_SUCCESS);
 						noOfSuccessfullRecords++;
 					} catch (AdminException e) {
@@ -123,6 +134,23 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	}
 
 	/**
+	 * Validate bu action.
+	 *
+	 * @param user the user
+	 * @throws AdminException the admin exception
+	 */
+	private void validateBUAction(User user) throws AdminException {
+
+		if (user.getBuAction() == null || user.getBuAction().equals("")) {
+
+			throw new AdminException("Action[I/D] field is required");
+		} else if (!(user.getBuAction().equals(INSERT) || user.getBuAction().equals(DELETE))) {
+
+			throw new AdminException("Action[I/D] field is value can be either I or D");
+		}
+	}
+
+	/**
 	 * Gets the single user data.
 	 *
 	 * @param line the line
@@ -136,8 +164,10 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 			userInfoArray[idx] = userInfoTempArray[idx];
 		}
 
-		return new User(userInfoArray[0], userInfoArray[1], userInfoArray[2], userInfoArray[3], userInfoArray[4], userInfoArray[5], userInfoArray[6],
-				userInfoArray[7], userInfoArray[8], userInfoArray[9], userInfoArray[10]);
+		User user = new User(userInfoArray[1], userInfoArray[2], userInfoArray[3], userInfoArray[4], userInfoArray[5], userInfoArray[6],
+				userInfoArray[7], userInfoArray[8], userInfoArray[9], userInfoArray[10], userInfoArray[11]);
+		user.setBuAction(userInfoArray[0]);
+		return user;
 	}
 
 	/**

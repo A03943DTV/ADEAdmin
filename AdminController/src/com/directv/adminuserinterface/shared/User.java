@@ -46,6 +46,10 @@ public class User implements Serializable {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private String userId;
 
+	/** The bu action. */
+	@NotPersistent
+	private String buAction;
+
 	/** The first name. */
 	@Persistent
 	private String firstName;
@@ -180,6 +184,25 @@ public class User implements Serializable {
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	/**
+	 * Gets the bu action.
+	 *
+	 * @return the bu action
+	 */
+	@XmlElement
+	public String getBuAction() {
+		return buAction == null ? "" : buAction.trim();
+	}
+
+	/**
+	 * Sets the bu action.
+	 *
+	 * @param buAction the new bu action
+	 */
+	public void setBuAction(String buAction) {
+		this.buAction = buAction;
 	}
 
 	/**
