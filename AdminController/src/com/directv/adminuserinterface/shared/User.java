@@ -46,6 +46,10 @@ public class User implements Serializable {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private String userId;
 
+	/** The old user id. */
+	@NotPersistent
+	private String oldUserId;
+
 	/** The bu action. */
 	@NotPersistent
 	private String buAction;
@@ -184,6 +188,25 @@ public class User implements Serializable {
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	/**
+	 * Gets the old user id.
+	 *
+	 * @return the old user id
+	 */
+	@XmlElement
+	public String getOldUserId() {
+		return oldUserId == null ? "" : oldUserId.trim();
+	}
+
+	/**
+	 * Sets the old user id.
+	 *
+	 * @param oldUserId the new old user id
+	 */
+	public void setOldUserId(String oldUserId) {
+		this.oldUserId = oldUserId;
 	}
 
 	/**

@@ -186,6 +186,9 @@ public class UserAdminScreen extends Composite {
 	/** The edit user index. */
 	private Integer editUserIndex;
 
+	/** The old user id for edit processing. */
+	private String oldUserIdForEditProcessing;
+
 	/** The loading dialog box. */
 	private LoadingDialogBox loadingDialogBox;
 
@@ -536,6 +539,7 @@ public class UserAdminScreen extends Composite {
 							dataProvider.getList().get(editUserIndex).setRole(userUpdated.getRole());
 							dataProvider.getList().get(editUserIndex).setCampaign(userUpdated.getCampaign());
 							dataProvider.getList().get(editUserIndex).setCredential(userUpdated.getCredential());
+							dataProvider.getList().get(editUserIndex).setOldUserId(userUpdated.getOldUserId());//For update user userId update management
 							dataProvider.refresh();//To replicate the change in table
 							userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
 							clearFormFields();
@@ -582,11 +586,14 @@ public class UserAdminScreen extends Composite {
 	 */
 	protected User getUserFromForm() {
 
-		return new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), groupDropdownArray[groupDropBox
+		User user = new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), groupDropdownArray[groupDropBox
 				.getSelectedIndex()], organizationTextField.getValue(), subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()],
 				locationDropDownArray != null ? locationDropDownArray[locationDropBox.getSelectedIndex()] : "",
 				managersIdDropDownArray != null ? managersIdDropDownArray[managersIdDropBox.getSelectedIndex()] : "", roleDropDownArray[roleDropBox
 						.getSelectedIndex()], campaignTextField.getValue(), credentialDropDownArray[credentialDropBox.getSelectedIndex()]);
+		user.setOldUserId(oldUserIdForEditProcessing); //For update user userId update management
+		return user;
+
 	}
 
 	/**
@@ -880,7 +887,8 @@ public class UserAdminScreen extends Composite {
 		}
 		campaignTextField.setText(user.getCampaign());
 
-		userIdTextField.setEnabled(false);//Making the user not to edit the userId
+		oldUserIdForEditProcessing = user.getOldUserId();
+
 		editUserIndex = new Integer(index);//To identify which item in list to be updated
 	}
 
@@ -901,7 +909,7 @@ public class UserAdminScreen extends Composite {
 		roleDropBox.setSelectedIndex(0);
 		campaignTextField.setText("");
 		credentialDropBox.setSelectedIndex(0);
-		userIdTextField.setEnabled(true);//Making the userId field enabled
+		oldUserIdForEditProcessing = null;
 		editUserIndex = null;//For safety purpose clear editUserIndex
 	}
 

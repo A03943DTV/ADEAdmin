@@ -17,7 +17,10 @@ public class EMailIdUtil {
 	 * @return the email id from name
 	 */
 	public static String getEmailIdFromName(String name) {
-		return name + "@" + AdminConstants.DOMAIN_NAME;
+		if (name != null) {
+			return name + "@" + AdminConstants.DOMAIN_NAME;
+		}
+		return null;
 	}
 
 	/**
@@ -27,6 +30,9 @@ public class EMailIdUtil {
 	 * @return the name from email id
 	 */
 	public static String getNameFromEmailId(String emailId) {
-		return emailId.substring(0, emailId.indexOf("@" + AdminConstants.DOMAIN_NAME));
+		if (emailId != null) {
+			return emailId.substring(0, emailId.indexOf("@" + AdminConstants.DOMAIN_NAME));
+		}
+		return null;
 	}
 }

@@ -20,6 +20,7 @@ import com.directv.adminuserinterface.shared.User;
 import com.directv.adminuserinterface.shared.validator.UserValidator;
 import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.AdminException;
+import com.directv.adminuserinterface.util.EMailIdUtil;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 // TODO: Auto-generated Javadoc
@@ -74,6 +75,9 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		user = getUserDao().addUser(user);
 
 		verifyIfRoleIsManager(true, user);
+
+		user.setOldUserId(EMailIdUtil.getNameFromEmailId(user.getUserId()));//For update user userId update management
+
 		return user;
 	}
 
@@ -270,16 +274,32 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	@Override
 	public User updateUser(String hostPageBaseURL, User user) throws AdminException {
 
-		//Updating an existing user in the domain
-		user = new GoogleUserManager().updateDomainUser(user);
+		//If the user is updating the userId the old userId data has to be deleted and 
+		//new userId data has to be created
+		//UserId update management
+		if (!user.getOldUserId().equals(user.getUserId())) {
 
-		//Managing user into organization
-		manageOrganizationPath(user, false);
+			String oldUserIdToBeDeleted = user.getOldUserId();
+			addUser(hostPageBaseURL, user);//Adding the new userId data
 
-		//Updating an existing user in the DB
-		user = getUserDao().updateUser(user);
+			User userObjectToBeDeleted = getUserDao().get(User.class, EMailIdUtil.getEmailIdFromName(oldUserIdToBeDeleted));
+			removeUser(hostPageBaseURL, userObjectToBeDeleted); //Deleting the old userId data
 
-		verifyIfRoleIsManager(false, user);
+		} else {
+
+			//Updating an existing user in the domain
+			user = new GoogleUserManager().updateDomainUser(user);
+
+			//Managing user into organization
+			manageOrganizationPath(user, false);
+
+			//Updating an existing user in the DB
+			user = getUserDao().updateUser(user);
+
+			verifyIfRoleIsManager(false, user);
+
+			user.setOldUserId(EMailIdUtil.getNameFromEmailId(user.getUserId()));
+		}
 		return user;
 	}
 
@@ -294,7 +314,11 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	public List<User> listUsers(String location, String subOrganization, String hostPageBaseURL) throws AdminException {
 
 		//Retrieving all the users in a particular location from the DB/Domain[DB Domain both count will be the same]
-		return new UserDaoImpl().listUsers(User.LOCATION_PARAM, location, User.SUB_ORG_PARAM, subOrganization);
+		List<User> userList = new UserDaoImpl().listUsers(User.LOCATION_PARAM, location, User.SUB_ORG_PARAM, subOrganization);
+		for (User user : userList) {
+			user.setOldUserId(EMailIdUtil.getNameFromEmailId(user.getUserId()));
+		}
+		return userList;
 	}
 
 	/**
