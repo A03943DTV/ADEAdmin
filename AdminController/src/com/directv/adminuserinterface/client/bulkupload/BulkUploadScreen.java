@@ -257,19 +257,19 @@ public class BulkUploadScreen extends Composite {
 		Column<BulkUploadDto, String> statusColumn = generateStatusColumn();
 
 		// Set the width of the buTable and put the buTable in fixed width mode.
-		buTable.setWidth("1385px", true);
+		buTable.setWidth("1520px", true);
 
 		// Set the width of each column.
 		buTable.setColumnWidth(downloadColumn, 7.0, Unit.PCT);
 		buTable.setColumnWidth(processStatusColumn, 11.0, Unit.PCT);
 		buTable.setColumnWidth(idColumn, 4.0, Unit.PCT);
-		buTable.setColumnWidth(descriptionColumn, 9.0, Unit.PCT);
+		buTable.setColumnWidth(descriptionColumn, 12.0, Unit.PCT);
 		buTable.setColumnWidth(submittedTimeColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(processStartTimeColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(processEndTimeColumn, 13.0, Unit.PCT);
-		buTable.setColumnWidth(noOfFailureRecordsColumn, 11.0, Unit.PCT);
-		buTable.setColumnWidth(noOfSuccessRecordsColumn, 11.0, Unit.PCT);
-		buTable.setColumnWidth(statusColumn, 8.0, Unit.PCT);
+		buTable.setColumnWidth(noOfFailureRecordsColumn, 10.0, Unit.PCT);
+		buTable.setColumnWidth(noOfSuccessRecordsColumn, 10.0, Unit.PCT);
+		buTable.setColumnWidth(statusColumn, 7.0, Unit.PCT);
 
 		dataProvider.addDataDisplay(buTable);
 		List<BulkUploadDto> dataProviderList = dataProvider.getList();

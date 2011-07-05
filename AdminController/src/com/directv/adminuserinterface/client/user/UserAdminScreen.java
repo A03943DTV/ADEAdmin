@@ -663,7 +663,8 @@ public class UserAdminScreen extends Composite {
 
 		//Adding the columns to userTable
 		Column<User, String> editColumn = generateEditColumn();
-		Column<User, String> removecolumn = generateRemoveColumn();
+		Column<User, String> resetPasswordColumn = generateResetPasswordColumn();
+		Column<User, String> removeColumn = generateRemoveColumn();
 		Column<User, String> userIdColumn = generateUserIdColumn();
 		Column<User, String> firstNameColumn = generateFirstNameColumn();
 		Column<User, String> lastNameColumn = generateLastNameColumn();
@@ -677,19 +678,20 @@ public class UserAdminScreen extends Composite {
 		Column<User, String> credentialColumn = generateCredentialColumn();
 
 		// Set the width of the userTable and put the userTable in fixed width mode.
-		userTable.setWidth("1600px", true);
+		userTable.setWidth("1675px", true);
 
 		// Set the width of each column.
 		userTable.setColumnWidth(editColumn, 3.0, Unit.PCT);
-		userTable.setColumnWidth(removecolumn, 4.0, Unit.PCT);
-		userTable.setColumnWidth(userIdColumn, 11, Unit.PCT);
-		userTable.setColumnWidth(firstNameColumn, 8.0, Unit.PCT);
-		userTable.setColumnWidth(lastNameColumn, 8.0, Unit.PCT);
+		userTable.setColumnWidth(resetPasswordColumn, 4.0, Unit.PCT);
+		userTable.setColumnWidth(removeColumn, 4.0, Unit.PCT);
+		userTable.setColumnWidth(userIdColumn, 10, Unit.PCT);
+		userTable.setColumnWidth(firstNameColumn, 7.0, Unit.PCT);
+		userTable.setColumnWidth(lastNameColumn, 7.0, Unit.PCT);
 		userTable.setColumnWidth(groupColumn, 5.0, Unit.PCT);
 		userTable.setColumnWidth(organizationColumn, 8.0, Unit.PCT);
 		userTable.setColumnWidth(subOrganizationColumn, 6.0, Unit.PCT);
 		userTable.setColumnWidth(locationColumn, 9.0, Unit.PCT);
-		userTable.setColumnWidth(managersIdColumn, 11.0, Unit.PCT);
+		userTable.setColumnWidth(managersIdColumn, 10.0, Unit.PCT);
 		userTable.setColumnWidth(roleColumn, 13.0, Unit.PCT);
 		userTable.setColumnWidth(campaignColumn, 7.0, Unit.PCT);
 		userTable.setColumnWidth(credentialColumn, 7.0, Unit.PCT);
@@ -840,6 +842,58 @@ public class UserAdminScreen extends Composite {
 						clearFormFields();
 						reflectDeletedUserInSession(user);
 						loadingDialogBox.hideLoaderDialog();
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	 * Reset password.
+	 *
+	 * @param index the index
+	 * @param user the user
+	 */
+	protected void resetPassword(final int index, final User user) {
+
+		final ConfirmDialogBox confirmDialog = new ConfirmDialogBox();
+		Button yesButton = confirmDialog.initializeConfirmDialog("Confirm", "Are you sure you want to reset password for user : " + user.getUserId());
+		yesButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				confirmDialog.hideDialogBox();
+
+				loadingDialogBox = new LoadingDialogBox("Processing.....", "Processing password reset..... Please wait for few seconds.....");
+
+				user.setUserId(EMailIdUtil.getNameFromEmailId(user.getUserId()));
+				user.setResetPassword(true);
+
+				userService.updateUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
+
+					public void onFailure(Throwable caught) {
+
+						dataProvider.getList().get(index).setResetPassword(false);
+						dataProvider.refresh();//To replicate the change in table
+						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+
+						loadingDialogBox.hideLoaderDialog();
+
+						System.out.println("User Update Password Reset Error : " + caught.getMessage());
+						logger.log(Level.SEVERE, "User Update Password Reset Error : " + caught.getStackTrace());
+						new NormalDialogBox("Error", "User Update Password Reset Error : " + caught.getMessage());
+					}
+
+					public void onSuccess(User userUpdated) {
+
+						System.out.println("User Updated Password Reset Successfully : " + userUpdated.getUserId());
+						logger.log(Level.INFO, "User Updated Password Reset Successfully : " + userUpdated.getUserId());
+
+						dataProvider.getList().get(index).setResetPassword(false);
+						dataProvider.refresh();//To replicate the change in table
+						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+
+						clearFormFields();
+						loadingDialogBox.hideLoaderDialog();
+						new NormalDialogBox("Success", userUpdated.getUserId() + " user password resetted sucessfully");
 					}
 				});
 			}
@@ -1165,6 +1219,29 @@ public class UserAdminScreen extends Composite {
 		});
 		userTable.addColumn(removeButtonColumn, "Delete");
 		return removeButtonColumn;
+	}
+
+	/**
+	 * Generate reset password column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateResetPasswordColumn() {
+
+		Column<User, String> resetPasswordButtonColumn = new Column<User, String>(new CustomizedImageCell()) {
+			@Override
+			public String getValue(User object) {
+				return "images/password.png";
+			}
+		};
+		resetPasswordButtonColumn.setFieldUpdater(new FieldUpdater<User, String>() {
+			@Override
+			public void update(int index, User object, String value) {
+				resetPassword(index, object);
+			}
+		});
+		userTable.addColumn(resetPasswordButtonColumn, "Reset");
+		return resetPasswordButtonColumn;
 	}
 
 	/**

@@ -114,6 +114,10 @@ public class User implements Serializable {
 	@NotPersistent
 	private Boolean admin;
 
+	/** The reset password. */
+	@NotPersistent
+	private Boolean resetPassword;
+
 	/**
 	 * Instantiates a new user.
 	 *
@@ -495,4 +499,24 @@ public class User implements Serializable {
 	public void setAdmin(Boolean admin) {
 		this.admin = admin;
 	}
+
+	/**
+	 * Gets the reset password.
+	 *
+	 * @return the reset password
+	 */
+	@XmlElement
+	public Boolean getResetPassword() {
+		return resetPassword;
+	}
+
+	/**
+	 * Sets the reset password.
+	 *
+	 * @param resetPassword the new reset password
+	 */
+	public void setResetPassword(Boolean resetPassword) {
+		this.resetPassword = resetPassword;
+	}
+
 }

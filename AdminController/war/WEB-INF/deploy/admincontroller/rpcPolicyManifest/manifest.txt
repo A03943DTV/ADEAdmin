@@ -2,5 +2,5 @@
 # RPC service class, partial path of RPC policy file
 com.directv.adminuserinterface.client.codetable.CodeTableService, FDA81CEA38832DCF89306CB7C3FE9F56.gwt.rpc
 com.directv.adminuserinterface.client.bulkupload.BulkUploadService, C3538F41A4C49B7A0DBC00CF53859378.gwt.rpc
-com.directv.adminuserinterface.client.user.UserService, BCF35595DE4952879B8D02A0672FFC82.gwt.rpc
-com.directv.adminuserinterface.login.LoginService, C050C8547B23A44AEECB97BF44BA0115.gwt.rpc
+com.directv.adminuserinterface.login.LoginService, 559EE7C1010C9A3319CA56551AF3D0FB.gwt.rpc
+com.directv.adminuserinterface.client.user.UserService, 1B17423C5858B8F14CD83E3D45477626.gwt.rpc

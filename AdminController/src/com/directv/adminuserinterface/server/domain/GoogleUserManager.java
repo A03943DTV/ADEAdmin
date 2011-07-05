@@ -105,6 +105,9 @@ public class GoogleUserManager {
 			userEntry = client.retrieveUser(user.getUserId());
 			userEntry.getName().setGivenName(user.getFirstName());
 			userEntry.getName().setFamilyName(user.getLastName());
+			if (user.getResetPassword() != null && user.getResetPassword()) {
+				userEntry.getLogin().setPassword(AdminConstants.NEW_USER_DEFAULT_PASSWORD);
+			}
 		} catch (AppsForYourDomainException e) {
 			processAppsForYourDomainException(e);
 		} catch (ServiceException e) {

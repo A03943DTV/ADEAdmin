@@ -50,6 +50,6 @@ public class AdminConstants {
 	public static final String MANAGER_ROLE_CONSTANT = "Manager";
 
 	/** The Constant ORGANIZATION_NAME. */
-	public static final String ORGANIZATION_NAME = "CustomerCare";
+	public static final String ORGANIZATION_NAME = "Customer Care";
 
 }
