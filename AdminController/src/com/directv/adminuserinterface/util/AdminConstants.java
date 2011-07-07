@@ -23,10 +23,10 @@ public class AdminConstants {
 	public static final int NO_OF_DATA_PER_PAGE = 10;
 
 	/** The Constant DOMAIN_NAME. */
-	public static final String DOMAIN_NAME = "dtv.com";
+	public static final String DOMAIN_NAME = "dtv1.com";
 
 	/** The Constant DOMAIN_ADMIN_USER_ID. */
-	public static final String DOMAIN_ADMIN_USER_ID = "meiyazhagan@dtv.com";
+	public static final String DOMAIN_ADMIN_USER_ID = "directv@dtv1.com";
 
 	/** The Constant DOMAIN_ADMIN_USER_PASSWORD. */
 	public static final String DOMAIN_ADMIN_USER_PASSWORD = "directv123";
