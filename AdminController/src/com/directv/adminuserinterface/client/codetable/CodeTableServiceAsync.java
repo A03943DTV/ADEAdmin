@@ -63,11 +63,12 @@ public interface CodeTableServiceAsync {
 	/**
 	 * Gets the managers ids list.
 	 *
+	 * @param subOrganization the sub organization
 	 * @param location the location
 	 * @param callback the callback
 	 * @return the managers ids list
 	 */
-	void getManagersIdsList(String location, AsyncCallback<List<ManagersId>> callback);
+	void getManagersIdsList(String subOrganization, String location, AsyncCallback<List<ManagersId>> callback);
 
 	/**
 	 * Adds the role.

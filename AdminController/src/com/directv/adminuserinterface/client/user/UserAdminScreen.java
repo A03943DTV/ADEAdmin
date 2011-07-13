@@ -252,7 +252,8 @@ public class UserAdminScreen extends Composite {
 			public void onChange(ChangeEvent event) {
 
 				//Since location and managerId are depended dropdown
-				getManagersIdFromServiceAndFillDropDown(locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
+				getManagersIdFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()],
+						locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
 			}
 		});
 
@@ -927,7 +928,7 @@ public class UserAdminScreen extends Composite {
 		getLocationsFromServiceAndFillDropDown(user.getSubOrganization(), true, user);
 
 		//Since location and managerId are depended dropdown
-		getManagersIdFromServiceAndFillDropDown(user.getLocation(), true, user);
+		getManagersIdFromServiceAndFillDropDown(user.getSubOrganization(), user.getLocation(), true, user);
 
 		if (Arrays.asList(roleDropDownArray).contains(user.getRole())) {
 			roleDropBox.setSelectedIndex(Arrays.asList(roleDropDownArray).indexOf(user.getRole()));
@@ -1699,16 +1700,17 @@ public class UserAdminScreen extends Composite {
 	/**
 	 * Gets the managers id from service and fill drop down.
 	 *
+	 * @param subOrganization the sub organization
 	 * @param location the location
 	 * @param isEditClicked the is edit clicked
 	 * @param user the user
 	 * @return the managers id from service and fill drop down
 	 */
-	private void getManagersIdFromServiceAndFillDropDown(String location, final boolean isEditClicked, final User user) {
+	private void getManagersIdFromServiceAndFillDropDown(String subOrganization, String location, final boolean isEditClicked, final User user) {
 
 		final LoadingDialogBox loadingDialogBox = new LoadingDialogBox("Loading.....", "Loading managerid's..... Please wait for few seconds.....");
 
-		codeTableService.getManagersIdsList(location, new AsyncCallback<List<ManagersId>>() {
+		codeTableService.getManagersIdsList(subOrganization, location, new AsyncCallback<List<ManagersId>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

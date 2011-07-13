@@ -4,13 +4,13 @@
  */
 package com.directv.adminuserinterface.shared;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class BulkUploadDto.
  */
-public class BulkUploadDto implements IsSerializable {
+public class BulkUploadDto implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 8438043394383476179L;

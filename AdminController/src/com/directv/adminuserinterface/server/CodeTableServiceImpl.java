@@ -127,21 +127,23 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	 * @return
 	 */
 	@Override
-	public List<ManagersId> getManagersIdsList(String location) {
+	public List<ManagersId> getManagersIdsList(String subOrganization, String location) {
 
-		return getManagersIdsList(ManagersId.LOCATION_PARAM, location);
+		return getManagersIdsList(ManagersId.SUBORG_PARAM, subOrganization, ManagersId.LOCATION_PARAM, location);
 	}
 
 	/**
 	 * Gets the managers ids list.
 	 *
-	 * @param param the param
-	 * @param value the value
+	 * @param param1 the param1
+	 * @param value1 the value1
+	 * @param param2 the param2
+	 * @param value2 the value2
 	 * @return the managers ids list
 	 */
-	public List<ManagersId> getManagersIdsList(String param, String value) {
+	public List<ManagersId> getManagersIdsList(String param1, String value1, String param2, String value2) {
 
-		return getGenericDaoImpl().getList(ManagersId.class, param, value);
+		return getGenericDaoImpl().getList(ManagersId.class, param1, value1, param2, value2);
 	}
 
 	/**

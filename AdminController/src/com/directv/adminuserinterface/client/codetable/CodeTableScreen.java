@@ -13,6 +13,7 @@ import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
 import com.directv.adminuserinterface.shared.SubOrganization;
+import com.directv.adminuserinterface.util.AdminConstants;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -163,12 +164,12 @@ public class CodeTableScreen extends Composite {
 	private void insertManagersIds() {
 
 		List<ManagersId> managersIdList = new ArrayList<ManagersId>();
-		managersIdList.add(new ManagersId(1L, "manager1@dtv.com", "Boise"));
-		managersIdList.add(new ManagersId(2L, "manager2@dtv.com", "Huntsville"));
-		managersIdList.add(new ManagersId(3L, "manager3@dtv.com", "Huntsville"));
-		managersIdList.add(new ManagersId(4L, "manager4@dtv.com", "Huntsville"));
-		managersIdList.add(new ManagersId(5L, "manager5@dtv.com", "Chattanoga"));
-		managersIdList.add(new ManagersId(6L, "manager6@dtv.com", "Chattanoga"));
+		managersIdList.add(new ManagersId(1L, "manager1@" + AdminConstants.DOMAIN_NAME, "Convergys", "Boise"));
+		managersIdList.add(new ManagersId(2L, "manager2@" + AdminConstants.DOMAIN_NAME, "AT&T", "Huntsville"));
+		managersIdList.add(new ManagersId(3L, "manager3@" + AdminConstants.DOMAIN_NAME, "Directv", "Huntsville"));
+		managersIdList.add(new ManagersId(4L, "manager4@" + AdminConstants.DOMAIN_NAME, "Directv", "Huntsville"));
+		managersIdList.add(new ManagersId(5L, "manager5@" + AdminConstants.DOMAIN_NAME, "Sitel", "Chattanoga"));
+		managersIdList.add(new ManagersId(6L, "manager6@" + AdminConstants.DOMAIN_NAME, "AT&T", "Chattanoga"));
 
 		for (ManagersId managersId : managersIdList) {
 

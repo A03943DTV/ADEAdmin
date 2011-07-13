@@ -161,19 +161,21 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 			}
 		}
 
-		List<ManagersId> managersIdList = codeTableService.getManagersIdsList(ManagersId.DESCRIPTION_PARAM, userToBeCreated.getManagersId());
+		List<ManagersId> managersIdList = codeTableService.getManagersIdsList(ManagersId.DESCRIPTION_PARAM, userToBeCreated.getManagersId(), null,
+				null);
 		if (userToBeCreated.getManagersId() != null && !userToBeCreated.getManagersId().equals("")) {
 			if (!(managersIdList.size() > 0)) {
 				throw new AdminException("Invalid ManagersId");
 			} else {
 				boolean isAvailable = false;
 				for (ManagersId managerId : managersIdList) {
-					if (managerId.getLocation() != null && managerId.getLocation().equals(userToBeCreated.getLocation())) {
+					if (managerId.getSubOrganization() != null && managerId.getSubOrganization().equals(userToBeCreated.getSubOrganization())
+							&& managerId.getLocation() != null && managerId.getLocation().equals(userToBeCreated.getLocation())) {
 						isAvailable = true;
 					}
 				}
 				if (!isAvailable) {
-					throw new AdminException("Invalid Location/ManagersId combination");
+					throw new AdminException("Invalid Vendor/Location/ManagersId combination");
 				}
 			}
 		}
@@ -221,21 +223,24 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		if (user.getRole().equals(AdminConstants.MANAGER_ROLE_CONSTANT)) {
 
 			CodeTableServiceImpl codeTableService = getCodeTableServiceImpl();
-			List<ManagersId> managersIdList = codeTableService.getManagersIdsList(null);
+			List<ManagersId> managersIdList = codeTableService.getManagersIdsList(null, null);
 			if (isAddUser) {//New user add so it won't be in the code table
 
-				codeTableService.addManagersId(new ManagersId(new Long((managersIdList.size() + 1)), user.getUserId(), user.getLocation()));
+				codeTableService.addManagersId(new ManagersId(new Long((managersIdList.size() + 1)), user.getUserId(), user.getSubOrganization(),
+						user.getLocation()));
 			} else {//Editing existing user so there might be a possibility
 
 				boolean managerIsIdInLocationNotExist = true;
 				for (ManagersId managersId : managersIdList) {
-					if (managersId.getLocation() != null && managersId.getDescription() != null
+					if (managersId.getSubOrganization() != null && managersId.getLocation() != null && managersId.getDescription() != null
+							&& managersId.getSubOrganization().equals(user.getSubOrganization())
 							&& managersId.getLocation().equals(user.getLocation()) && managersId.getDescription().equals(user.getUserId())) {
 						managerIsIdInLocationNotExist = false;
 					}
 				}
 				if (managerIsIdInLocationNotExist) {
-					codeTableService.addManagersId(new ManagersId(new Long((managersIdList.size() + 1)), user.getUserId(), user.getLocation()));
+					codeTableService.addManagersId(new ManagersId(new Long((managersIdList.size() + 1)), user.getUserId(), user.getSubOrganization(),
+							user.getLocation()));
 				}
 			}
 		}

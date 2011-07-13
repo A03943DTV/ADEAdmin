@@ -22,6 +22,9 @@ public class ManagersId implements Serializable {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 312440159207568949L;
 
+	/** The Constant SUBORG_PARAM. */
+	public static final String SUBORG_PARAM = "subOrganization";
+
 	/** The Constant LOCATION_PARAM. */
 	public static final String LOCATION_PARAM = "location";
 
@@ -41,6 +44,10 @@ public class ManagersId implements Serializable {
 	@Persistent
 	private String location;
 
+	/** The sub organization. */
+	@Persistent
+	private String subOrganization;
+
 	/**
 	 * Instantiates a new managers id.
 	 */
@@ -53,11 +60,13 @@ public class ManagersId implements Serializable {
 	 *
 	 * @param id the id
 	 * @param description the description
+	 * @param subOrganization the sub organization
 	 * @param location the location
 	 */
-	public ManagersId(Long id, String description, String location) {
+	public ManagersId(Long id, String description, String subOrganization, String location) {
 		this.id = id;
 		this.description = description;
+		this.subOrganization = subOrganization;
 		this.location = location;
 	}
 
@@ -95,6 +104,24 @@ public class ManagersId implements Serializable {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/**
+	 * Gets the sub organization.
+	 *
+	 * @return the sub organization
+	 */
+	public String getSubOrganization() {
+		return subOrganization;
+	}
+
+	/**
+	 * Sets the sub organization.
+	 *
+	 * @param subOrganization the new sub organization
+	 */
+	public void setSubOrganization(String subOrganization) {
+		this.subOrganization = subOrganization;
 	}
 
 	/**

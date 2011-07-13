@@ -3,8 +3,8 @@ com.directv.adminuserinterface.shared.Group, true, true, true, true, com.directv
 [Lcom.directv.adminuserinterface.shared.Group;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Group;/2551104846, 2551104846
 com.directv.adminuserinterface.shared.Location, true, true, true, true, com.directv.adminuserinterface.shared.Location/4188600391, 4188600391
 [Lcom.directv.adminuserinterface.shared.Location;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Location;/2139135357, 2139135357
-com.directv.adminuserinterface.shared.ManagersId, true, true, true, true, com.directv.adminuserinterface.shared.ManagersId/2988087825, 2988087825
-[Lcom.directv.adminuserinterface.shared.ManagersId;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.ManagersId;/2422091514, 2422091514
+com.directv.adminuserinterface.shared.ManagersId, true, true, true, true, com.directv.adminuserinterface.shared.ManagersId/2014259115, 2014259115
+[Lcom.directv.adminuserinterface.shared.ManagersId;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.ManagersId;/1333996639, 1333996639
 com.directv.adminuserinterface.shared.Role, true, true, true, true, com.directv.adminuserinterface.shared.Role/866394886, 866394886
 [Lcom.directv.adminuserinterface.shared.Role;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Role;/4088530020, 4088530020
 com.directv.adminuserinterface.shared.SubOrganization, true, true, true, true, com.directv.adminuserinterface.shared.SubOrganization/1316191944, 1316191944
