@@ -290,7 +290,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		user = getUserDao().removeUser(user);
 
 		//While deleting the user deleting the managersId from code table
-		if (user.getRole().equals(AdminConstants.MANAGER_ROLE_CONSTANT)) {
+		if (user.getRole().equals(AdminConstants.MANAGER_ROLE_CONSTANT) || user.getRole().equals(AdminConstants.TEAMLEAD_ROLE_CONSTANT)) {
 			getCodeTableServiceImpl().deleteManagersIdData(user.getUserId());
 		}
 	}
