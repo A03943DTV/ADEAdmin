@@ -2071,8 +2071,9 @@ public class UserAdminScreen extends Composite {
 						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(0));
 					}
 				}
-				verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray);
 				if (!isEditClicked) {
+					//While editing user however each user will have some managerId so default selection is not necessary
+					verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray);
 					//If loggedin user's role is Manager/TeamLead select that loggedin users managers'Id by default.
 					if (managersIdDropBox.getItemCount() == managersIdDropDownArray.length) {
 						for (int j = 0; j < managersIdDropDownArray.length; j++) {
