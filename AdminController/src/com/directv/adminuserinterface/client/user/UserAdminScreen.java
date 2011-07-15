@@ -258,14 +258,14 @@ public class UserAdminScreen extends Composite {
 		subOrganizationDropBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				processSubOrganizationChange();
+				processSubOrganizationChange(false);
 			}
 		});
 
 		locationDropBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				processLocationChange();
+				processLocationChange(false);
 			}
 		});
 
@@ -325,24 +325,28 @@ public class UserAdminScreen extends Composite {
 
 	/**
 	 * Process location change.
+	 *
+	 * @param isEditClicked the is edit clicked
 	 */
-	protected void processLocationChange() {
+	protected void processLocationChange(boolean isEditClicked) {
 
 		//Since location and managerId are depended dropdown
 		getManagersIdFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()],
-				locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
+				locationDropDownArray[locationDropBox.getSelectedIndex()], isEditClicked, null);
 	}
 
 	/**
 	 * Process sub organization change.
+	 *
+	 * @param isEditClicked the is edit clicked
 	 */
-	protected void processSubOrganizationChange() {
+	protected void processSubOrganizationChange(boolean isEditClicked) {
 
 		//Since location and managerIds are dependent dropdown
 		//Emptyout managerIds drop down when sub organization changed
 		emptyOutManagerIds();
 		//Since suborganization and location are depended dropdown
-		getLocationsFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()], false, null);
+		getLocationsFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()], isEditClicked, null);
 	}
 
 	/**
@@ -1200,12 +1204,12 @@ public class UserAdminScreen extends Composite {
 		firstNameTextField.setText("");
 		lastNameTextField.setText("");
 		userIdTextField.setText("");
-		verifyLengthAndSetSelelectedValue(groupDropBox, groupDropDownArray);
-		verifyLengthAndSetSelelectedValue(subOrganizationDropBox, subOrganizationDropDownArray);
-		verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray);
-		verifyLengthAndSetSelelectedValue(roleDropBox, roleDropDownArray);
-		verifyLengthAndSetSelelectedValue(campaignDropBox, campaignDropDownArray);
-		verifyLengthAndSetSelelectedValue(credentialDropBox, credentialDropDownArray);
+		verifyLengthAndSetSelelectedValue(groupDropBox, groupDropDownArray, false);
+		verifyLengthAndSetSelelectedValue(subOrganizationDropBox, subOrganizationDropDownArray, false);
+		verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray, false);
+		verifyLengthAndSetSelelectedValue(roleDropBox, roleDropDownArray, false);
+		verifyLengthAndSetSelelectedValue(campaignDropBox, campaignDropDownArray, false);
+		verifyLengthAndSetSelelectedValue(credentialDropBox, credentialDropDownArray, false);
 		oldUserIdForEditProcessing = null;
 		indexesOfUsersToBeRemoved = new ArrayList<Integer>();
 		addNewUser = false;
@@ -1772,7 +1776,7 @@ public class UserAdminScreen extends Composite {
 				for (int i = 0; i < campaignDropDownArray.length; i++) {
 					campaignDropBox.addItem(campaignDropDownArray[i]);
 				}
-				verifyLengthAndSetSelelectedValue(campaignDropBox, campaignDropDownArray);
+				verifyLengthAndSetSelelectedValue(campaignDropBox, campaignDropDownArray, false);
 			}
 		});
 	}
@@ -1782,15 +1786,16 @@ public class UserAdminScreen extends Composite {
 	 *
 	 * @param dropBox the drop box
 	 * @param dropDownArray the drop down array
+	 * @param isEditClicked the is edit clicked
 	 */
-	protected void verifyLengthAndSetSelelectedValue(ListBox dropBox, String[] dropDownArray) {
+	protected void verifyLengthAndSetSelelectedValue(ListBox dropBox, String[] dropDownArray, boolean isEditClicked) {
 
 		if (dropDownArray != null && dropDownArray.length == 2) {
 			dropBox.setSelectedIndex(1);
 			if (dropBox.getElement().getId().equals("SubOrganizationDropBox")) {
-				processSubOrganizationChange();
+				processSubOrganizationChange(isEditClicked);
 			} else if (dropBox.getElement().getId().equals("LocationDropBox")) {
-				processLocationChange();
+				processLocationChange(isEditClicked);
 			} else if (dropBox.getElement().getId().equals("RoleDropBox")) {
 				processRoleChange();
 			}
@@ -1851,7 +1856,7 @@ public class UserAdminScreen extends Composite {
 		for (int i = 0; i < subOrganizationDropDownArray.length; i++) {
 			subOrganizationDropBox.addItem(subOrganizationDropDownArray[i]);
 		}
-		verifyLengthAndSetSelelectedValue(subOrganizationDropBox, subOrganizationDropDownArray);
+		verifyLengthAndSetSelelectedValue(subOrganizationDropBox, subOrganizationDropDownArray, false);
 	}
 
 	/**
@@ -1863,7 +1868,7 @@ public class UserAdminScreen extends Composite {
 		for (int i = 0; i < credentialDropDownArray.length; i++) {
 			credentialDropBox.addItem(credentialDropDownArray[i]);
 		}
-		verifyLengthAndSetSelelectedValue(credentialDropBox, credentialDropDownArray);
+		verifyLengthAndSetSelelectedValue(credentialDropBox, credentialDropDownArray, false);
 	}
 
 	/**
@@ -1897,7 +1902,7 @@ public class UserAdminScreen extends Composite {
 				for (int i = 0; i < roleDropDownArray.length; i++) {
 					roleDropBox.addItem(roleDropDownArray[i]);
 				}
-				verifyLengthAndSetSelelectedValue(roleDropBox, roleDropDownArray);
+				verifyLengthAndSetSelelectedValue(roleDropBox, roleDropDownArray, false);
 			}
 		});
 	}
@@ -1933,7 +1938,7 @@ public class UserAdminScreen extends Composite {
 				for (int i = 0; i < groupDropDownArray.length; i++) {
 					groupDropBox.addItem(groupDropDownArray[i]);
 				}
-				verifyLengthAndSetSelelectedValue(groupDropBox, groupDropDownArray);
+				verifyLengthAndSetSelelectedValue(groupDropBox, groupDropDownArray, false);
 			}
 		});
 	}
@@ -1955,6 +1960,9 @@ public class UserAdminScreen extends Composite {
 			locationDropDownArray[0] = "";
 			locationDropDownArray[1] = loginInfo.getUser().getLocation();
 			addlocDropDownValues();
+			if (!isEditClicked) {
+				verifyLengthAndSetSelelectedValue(locationDropBox, locationDropDownArray, isEditClicked);
+			}
 
 		} else {//If logged in user is SuperAdmin then allow that user to create users in all location
 
@@ -1993,6 +2001,9 @@ public class UserAdminScreen extends Composite {
 							locationDropBox.setSelectedIndex(Arrays.asList(locationDropDownArray).indexOf(0));
 						}
 					}
+					if (!isEditClicked) {
+						verifyLengthAndSetSelelectedValue(locationDropBox, locationDropDownArray, isEditClicked);
+					}
 					loadingDialogBox.hideLoaderDialog();
 				}
 			});
@@ -2008,7 +2019,6 @@ public class UserAdminScreen extends Composite {
 		for (int i = 0; i < locationDropDownArray.length; i++) {
 			locationDropBox.addItem(locationDropDownArray[i]);
 		}
-		verifyLengthAndSetSelelectedValue(locationDropBox, locationDropDownArray);
 	}
 
 	/**
@@ -2048,6 +2058,7 @@ public class UserAdminScreen extends Composite {
 					}
 				}
 				managersIdDropBox.clear();
+				String elementToBeRemoved = null;
 				for (int i = 0; i < managersIdDropDownArray.length; i++) {
 					//If the SuperAdmin is creating a new user with manager role the user will be added in the grid
 					//And userId/Location will be added in the ManagersId code table
@@ -2057,10 +2068,16 @@ public class UserAdminScreen extends Composite {
 					if (isEditClicked) {
 						if (!managersIdDropDownArray[i].equals(user.getUserId())) {
 							managersIdDropBox.addItem(managersIdDropDownArray[i]);
+						} else {
+							elementToBeRemoved = managersIdDropDownArray[i];
 						}
 					} else {
 						managersIdDropBox.addItem(managersIdDropDownArray[i]);
 					}
+				}
+				if (elementToBeRemoved != null) {
+					managersIdDropDownArray = new String[managersIdDropDownArray.length - 1];//Since we are going to remove one element
+					managersIdDropDownArray = removeElement(managersIdDropDownArray, elementToBeRemoved);
 				}
 				//If user clicked on edit icon in table then for a location then loading managersIds for that location
 				//And making corresponding managersId selected
@@ -2073,7 +2090,7 @@ public class UserAdminScreen extends Composite {
 				}
 				if (!isEditClicked) {
 					//While editing user however each user will have some managerId so default selection is not necessary
-					verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray);
+					verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray, isEditClicked);
 					//If loggedin user's role is Manager/TeamLead select that loggedin users managers'Id by default.
 					if (managersIdDropBox.getItemCount() == managersIdDropDownArray.length) {
 						for (int j = 0; j < managersIdDropDownArray.length; j++) {
@@ -2087,4 +2104,23 @@ public class UserAdminScreen extends Composite {
 			}
 		});
 	}
+
+	/**
+	 * Removes the element.
+	 *
+	 * @param input the input
+	 * @param deleteMe the delete me
+	 * @return the string[]
+	 */
+	private String[] removeElement(String[] input, String deleteMe) {
+
+		List<String> result = new ArrayList<String>();
+		for (String item : input) {
+			if (!deleteMe.equals(item)) {
+				result.add(item);
+			}
+		}
+		return result.toArray(input);
+	}
+
 }

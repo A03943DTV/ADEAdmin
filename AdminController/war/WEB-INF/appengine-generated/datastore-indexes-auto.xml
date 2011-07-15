@@ -1,4 +1,10 @@
-<!-- Indices written at Fri, 15 Jul 2011 13:54:46 UTC -->
+<!-- Indices written at Fri, 15 Jul 2011 15:30:56 UTC -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 2 times in query history -->
+    <datastore-index kind="ManagersId" ancestor="false" source="auto">
+        <property name="__key__" direction="desc"/>
+    </datastore-index>
+
+</datastore-indexes>
