@@ -5,8 +5,10 @@
 package com.directv.adminuserinterface.client.user;
 
 import java.util.List;
+import java.util.Map;
 
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.shared.UserRemovalDto;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 // TODO: Auto-generated Javadoc
@@ -34,13 +36,13 @@ public interface UserServiceAsync {
 	void updateUser(String hostPageBaseURL, User user, AsyncCallback<User> callback);
 
 	/**
-	 * Removes the user.
+	 * Removes the users.
 	 *
 	 * @param hostPageBaseURL the host page base url
-	 * @param user the user
+	 * @param usersToBeDeletedMap the users to be deleted map
 	 * @param callback the callback
 	 */
-	void removeUser(String hostPageBaseURL, User user, AsyncCallback<User> callback);
+	void removeUsers(String hostPageBaseURL, Map<Integer, User> usersToBeDeletedMap, AsyncCallback<UserRemovalDto> callback);
 
 	/**
 	 * List users.
@@ -51,4 +53,13 @@ public interface UserServiceAsync {
 	 * @param callback the callback
 	 */
 	void listUsers(String location, String subOrganization, String hostPageBaseURL, AsyncCallback<List<User>> callback);
+
+	/**
+	 * Update user id by creating new user.
+	 *
+	 * @param hostPageBaseURL the host page base url
+	 * @param user the user
+	 * @param callback the callback
+	 */
+	void updateUserIdByCreatingNewUser(String hostPageBaseURL, User user, AsyncCallback<User> callback);
 }

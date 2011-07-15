@@ -6,6 +6,7 @@ package com.directv.adminuserinterface.client.codetable;
 
 import java.util.List;
 
+import com.directv.adminuserinterface.shared.Campaign;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
@@ -108,5 +109,21 @@ public interface CodeTableServiceAsync {
 	 * @return the sub organizations list
 	 */
 	void getSubOrganizationsList(AsyncCallback<List<SubOrganization>> callback);
+
+	/**
+	 * Adds the campaign.
+	 *
+	 * @param campaign the campaign
+	 * @param asyncCallback the async callback
+	 */
+	void addCampaign(Campaign campaign, AsyncCallback<Campaign> asyncCallback);
+
+	/**
+	 * Gets the campaigns list.
+	 *
+	 * @param asyncCallback the async callback
+	 * @return the campaigns list
+	 */
+	void getCampaignsList(AsyncCallback<List<Campaign>> asyncCallback);
 
 }

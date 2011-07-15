@@ -6,6 +6,7 @@ package com.directv.adminuserinterface.client.codetable;
 
 import java.util.List;
 
+import com.directv.adminuserinterface.shared.Campaign;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
@@ -103,4 +104,19 @@ public interface CodeTableService extends RemoteService {
 	 * @return the sub organizations list
 	 */
 	List<SubOrganization> getSubOrganizationsList();
+
+	/**
+	 * Adds the campaign.
+	 *
+	 * @param campaign the campaign
+	 * @return the campaign
+	 */
+	Campaign addCampaign(Campaign campaign);
+
+	/**
+	 * Gets the campaigns list.
+	 *
+	 * @return the campaigns list
+	 */
+	List<Campaign> getCampaignsList();
 }

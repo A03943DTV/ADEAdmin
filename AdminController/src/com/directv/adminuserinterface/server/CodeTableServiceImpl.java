@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.directv.adminuserinterface.client.codetable.CodeTableService;
 import com.directv.adminuserinterface.rest.GenericDaoImpl;
+import com.directv.adminuserinterface.shared.Campaign;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
@@ -223,6 +224,36 @@ public class CodeTableServiceImpl extends RemoteServiceServlet implements CodeTa
 	public List<SubOrganization> getSubOrganizationsList(String param, String value) {
 
 		return getGenericDaoImpl().getList(SubOrganization.class, param, value);
+	}
+
+	/**
+	 * Overridden Method
+	 * @param campaign
+	 * @return
+	 */
+	@Override
+	public Campaign addCampaign(Campaign campaign) {
+		return (Campaign) getGenericDaoImpl().add(campaign);
+	}
+
+	/**
+	 * Overridden Method
+	 * @return
+	 */
+	@Override
+	public List<Campaign> getCampaignsList() {
+		return getCampaignsList(null, null);
+	}
+
+	/**
+	 * Gets the campaigns list.
+	 *
+	 * @param param the param
+	 * @param value the value
+	 * @return the campaigns list
+	 */
+	public List<Campaign> getCampaignsList(String param, String value) {
+		return getGenericDaoImpl().getList(Campaign.class, param, value);
 	}
 
 }

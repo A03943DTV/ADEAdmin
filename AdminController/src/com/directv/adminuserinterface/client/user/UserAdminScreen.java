@@ -6,20 +6,26 @@ package com.directv.adminuserinterface.client.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.directv.adminuserinterface.client.StatusBarCreator;
 import com.directv.adminuserinterface.client.codetable.CodeTableService;
 import com.directv.adminuserinterface.client.codetable.CodeTableServiceAsync;
+import com.directv.adminuserinterface.client.dialog.ChooseDialogBox;
 import com.directv.adminuserinterface.client.dialog.ConfirmDialogBox;
 import com.directv.adminuserinterface.client.dialog.LoadingDialogBox;
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
 import com.directv.adminuserinterface.client.table.CustomizedImageCell;
 import com.directv.adminuserinterface.login.LoginService;
 import com.directv.adminuserinterface.login.LoginServiceAsync;
+import com.directv.adminuserinterface.shared.Campaign;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.LoginInfo;
@@ -27,10 +33,12 @@ import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
 import com.directv.adminuserinterface.shared.SubOrganization;
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.shared.UserRemovalDto;
 import com.directv.adminuserinterface.shared.validator.UserValidator;
 import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.AdminException;
 import com.directv.adminuserinterface.util.EMailIdUtil;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
@@ -84,8 +92,8 @@ public class UserAdminScreen extends Composite {
 	/** The login info. */
 	private LoginInfo loginInfo;
 
-	/** The group dropdown array. */
-	private String groupDropdownArray[];
+	/** The group drop down array. */
+	private String groupDropDownArray[];
 
 	/** The role drop down array. */
 	private String roleDropDownArray[];
@@ -98,6 +106,9 @@ public class UserAdminScreen extends Composite {
 
 	/** The sub organization drop down array. */
 	private String subOrganizationDropDownArray[];
+
+	/** The campaign drop down array. */
+	private String campaignDropDownArray[];
 
 	/** The organization label. */
 	private Label organizationLabel = new Label("Organization");
@@ -112,7 +123,8 @@ public class UserAdminScreen extends Composite {
 	private ListBox subOrganizationDropBox = new ListBox(false);
 
 	/** The credential drop down array. */
-	private String credentialDropDownArray[] = { "", AdminConstants.CREDENTIAL_USER, AdminConstants.CREDENTIAL_ADMIN_USER };
+	private String credentialDropDownArray[] = { "", AdminConstants.CREDENTIAL_USER, AdminConstants.CREDENTIAL_ADMIN_USER,
+			AdminConstants.CREDENTIAL_SUPER_ADMIN_USER };
 
 	/** The first name label. */
 	private Label firstNameLabel = new Label("First Name");
@@ -159,8 +171,8 @@ public class UserAdminScreen extends Composite {
 	/** The campaign label. */
 	private Label campaignLabel = new Label("Campaign");
 
-	/** The campaign text field. */
-	private TextBox campaignTextField = new TextBox();
+	/** The campaign drop box. */
+	private ListBox campaignDropBox = new ListBox(false);
 
 	/** The search button. */
 	private Button searchButton = new Button("Search");
@@ -173,6 +185,9 @@ public class UserAdminScreen extends Composite {
 
 	/** The list all users button. */
 	private Button listAllUsersButton = new Button("List All Users");
+
+	/** The delete users button. */
+	private Button deleteUsersButton = new Button("Delete Users");
 
 	/** The user table. */
 	private CellTable<User> userTable = new CellTable<User>();
@@ -204,6 +219,12 @@ public class UserAdminScreen extends Composite {
 	/** The credential drop box. */
 	private ListBox credentialDropBox = new ListBox();
 
+	/** The indexes of users to be removed. */
+	private List<Integer> indexesOfUsersToBeRemoved = new ArrayList<Integer>();
+
+	/** The add new user. */
+	protected boolean addNewUser;
+
 	/**
 	 * Instantiates a new user admin screen.
 	 */
@@ -229,31 +250,29 @@ public class UserAdminScreen extends Composite {
 		clearButtonManagement();
 		searchButtonManagement();
 		listAllUserButtonManagement();
+		deleteUsersButtonManagement();
 		csvDownloadImageManagement();
 
 		scheduleTimerForUserListSessionUpdate();
 
 		subOrganizationDropBox.addChangeHandler(new ChangeHandler() {
-
 			@Override
 			public void onChange(ChangeEvent event) {
-
-				//Since location and managerIds are dependent dropdown
-				//Emptyout managerIds drop down when sub organization changed
-				emptyOutManagerIds();
-				//Since suborganization and location are depended dropdown
-				getLocationsFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()], false, null);
+				processSubOrganizationChange();
 			}
 		});
 
 		locationDropBox.addChangeHandler(new ChangeHandler() {
-
 			@Override
 			public void onChange(ChangeEvent event) {
+				processLocationChange();
+			}
+		});
 
-				//Since location and managerId are depended dropdown
-				getManagersIdFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()],
-						locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
+		roleDropBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				processRoleChange();
 			}
 		});
 
@@ -269,6 +288,7 @@ public class UserAdminScreen extends Composite {
 		hPanel.add(saveOrUpdateButton);
 		hPanel.add(clearButton);
 		hPanel.add(listAllUsersButton);
+		hPanel.add(deleteUsersButton);
 
 		//Export Data Fields
 		HorizontalPanel hDownloadPanel = new HorizontalPanel();
@@ -289,8 +309,59 @@ public class UserAdminScreen extends Composite {
 		vPanel.add(formGrid);
 		vPanel.add(dockPanel);
 		vPanel.add(vTablePanel);
+		vPanel.add(StatusBarCreator.createStatusBar(loginInfo));
 
 		initWidget(vPanel);
+	}
+
+	/**
+	 * Process role change.
+	 */
+	protected void processRoleChange() {
+
+		//TeamLead and Manager role's must be tied to the admin privilege
+		managePrivilegeBasedOnRole(roleDropDownArray[roleDropBox.getSelectedIndex()]);
+	}
+
+	/**
+	 * Process location change.
+	 */
+	protected void processLocationChange() {
+
+		//Since location and managerId are depended dropdown
+		getManagersIdFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()],
+				locationDropDownArray[locationDropBox.getSelectedIndex()], false, null);
+	}
+
+	/**
+	 * Process sub organization change.
+	 */
+	protected void processSubOrganizationChange() {
+
+		//Since location and managerIds are dependent dropdown
+		//Emptyout managerIds drop down when sub organization changed
+		emptyOutManagerIds();
+		//Since suborganization and location are depended dropdown
+		getLocationsFromServiceAndFillDropDown(subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()], false, null);
+	}
+
+	/**
+	 * Manage privilege based on role.
+	 *
+	 * @param selectedRole the selected role
+	 */
+	protected void managePrivilegeBasedOnRole(String selectedRole) {
+
+		if (selectedRole != null
+				&& (selectedRole.equals(AdminConstants.MANAGER_ROLE_CONSTANT) || selectedRole.equals(AdminConstants.TEAMLEAD_ROLE_CONSTANT))) {
+			if (credentialDropBox != null && credentialDropBox.isAttached()) {
+				credentialDropBox.setSelectedIndex(2);
+			}
+		} else {
+			if (credentialDropBox != null && credentialDropBox.isAttached()) {
+				credentialDropBox.setSelectedIndex(0);
+			}
+		}
 	}
 
 	/**
@@ -360,9 +431,17 @@ public class UserAdminScreen extends Composite {
 		List<User> listUsersNew = new ArrayList<User>();
 		for (User user : listUsers) {
 			//Preventing logged in user info to be displayed in grid/table
-			//Preventing superadmin t be displayed in grid/table
-			if (!user.getUserId().equals(loginInfo.getUser().getUserId()) && !user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
-				listUsersNew.add(user);
+			if (!user.getUserId().equals(loginInfo.getUser().getUserId())) {
+				boolean add = true;
+				if (loginInfo.getUser().getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)
+						&& user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+					add = false;//Preventing SuperAdmin to be displayed in grid/table for Admin users
+				} else if (loginInfo.getUser().getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+					add = true;//SuperAdmin to be displayed in grid/table for SuperAdmin users
+				}
+				if (add) {
+					listUsersNew.add(user);
+				}
 			}
 		}
 		return listUsersNew;
@@ -411,6 +490,36 @@ public class UserAdminScreen extends Composite {
 						dataProvider.refresh();//To replicate the change in table
 						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
 						clearFormFields();
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	 * Delete users button management.
+	 */
+	private void deleteUsersButtonManagement() {
+
+		deleteUsersButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+
+				if (indexesOfUsersToBeRemoved.size() <= 0) {
+					new NormalDialogBox("Validation Error", "Please select atlease one user to delete.....");
+					return;
+				}
+
+				final ConfirmDialogBox confirmDialog = new ConfirmDialogBox();
+				Button yesButton = confirmDialog.initializeConfirmDialog("Confirm", "Are you sure you want to delete selected users.....");
+				yesButton.addClickHandler(new ClickHandler() {
+					public void onClick(ClickEvent event) {
+						confirmDialog.hideDialogBox();
+						Map<Integer, User> usersToBeDeletedMap = new HashMap<Integer, User>();
+						for (Integer index : indexesOfUsersToBeRemoved) {
+							usersToBeDeletedMap.put(index, dataProvider.getList().get(index));
+						}
+						removeSelectedData(usersToBeDeletedMap);
 					}
 				});
 			}
@@ -487,68 +596,175 @@ public class UserAdminScreen extends Composite {
 
 				loadingDialogBox = new LoadingDialogBox("Processing.....", "Processing save/update..... Please wait for few seconds.....");
 
-				if (editUserIndex == null) {//Adding new user
-
-					userService.addUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
-
-						public void onFailure(Throwable caught) {
-							loadingDialogBox.hideLoaderDialog();
-							System.out.println("User Add Error : " + caught.getMessage());
-							logger.log(Level.SEVERE, "User Add Error : " + caught.getStackTrace());
-							new NormalDialogBox("Error", "User Add Error : " + caught.getMessage());
-						}
-
-						public void onSuccess(User userAdded) {
-
-							//Adding new user
-							//So add that user to the starting of the table
-							System.out.println("User Added Successfully : " + userAdded.getUserId());
-							logger.log(Level.INFO, "User Added Successfully : " + userAdded.getUserId());
-							dataProvider.getList().add(0, userAdded);
-							dataProvider.refresh();//To replicate the change in table
-							userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
-							clearFormFields();
-							reflectAddedUserInSession(userAdded);
-							loadingDialogBox.hideLoaderDialog();
-						}
-					});
-				} else {//Updating existing user
-
-					userService.updateUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
-
-						public void onFailure(Throwable caught) {
-							loadingDialogBox.hideLoaderDialog();
-							System.out.println("User Update Error : " + caught.getMessage());
-							logger.log(Level.SEVERE, "User Update Error : " + caught.getStackTrace());
-							new NormalDialogBox("Error", "User Update Error : " + caught.getMessage());
-						}
-
-						public void onSuccess(User userUpdated) {
-
-							//Updating existing user
-							//So update existing user record in the grid
-							System.out.println("User Updated Successfully : " + userUpdated.getUserId());
-							logger.log(Level.INFO, "User Updated Successfully : " + userUpdated.getUserId());
-							dataProvider.getList().get(editUserIndex).setFirstName(userUpdated.getFirstName());
-							dataProvider.getList().get(editUserIndex).setLastName(userUpdated.getLastName());
-							dataProvider.getList().get(editUserIndex).setUserId(userUpdated.getUserId());
-							dataProvider.getList().get(editUserIndex).setGroup(userUpdated.getGroup());
-							dataProvider.getList().get(editUserIndex).setOrganization(userUpdated.getOrganization());
-							dataProvider.getList().get(editUserIndex).setSubOrganization(userUpdated.getSubOrganization());
-							dataProvider.getList().get(editUserIndex).setLocation(userUpdated.getLocation());
-							dataProvider.getList().get(editUserIndex).setManagersId(userUpdated.getManagersId());
-							dataProvider.getList().get(editUserIndex).setRole(userUpdated.getRole());
-							dataProvider.getList().get(editUserIndex).setCampaign(userUpdated.getCampaign());
-							dataProvider.getList().get(editUserIndex).setCredential(userUpdated.getCredential());
-							dataProvider.getList().get(editUserIndex).setOldUserId(userUpdated.getOldUserId());//For update user userId update management
-							dataProvider.refresh();//To replicate the change in table
-							userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
-							clearFormFields();
-							reflectUpdatedUserInSession(userUpdated);
-							loadingDialogBox.hideLoaderDialog();
-						}
-					});
+				addNewUser = false;
+				if (editUserIndex != null) {
+					//User Info save/update with userId modification/updation
+					if (!user.getOldUserId().equals(user.getUserId())) {
+						getConfirmationAboutUserIdUpdate(user);
+						return;//So that no proceedings after this. Based on their confirmation save/update will be processed.....
+					}
+				} else {
+					addNewUser = true;
 				}
+
+				//Normal User Info save/update without userId modification/updation
+				if (addNewUser) {//Adding new user
+					addNewUserServiceCaller(user);
+				} else {//Updating existing user
+					updateUserServiceCaller(user);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Update user service caller.
+	 *
+	 * @param user the user
+	 */
+	protected void updateUserServiceCaller(User user) {
+
+		userService.updateUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
+
+			public void onFailure(Throwable caught) {
+
+				loadingDialogBox.hideLoaderDialog();
+				System.out.println("User Update Error : " + caught.getMessage());
+				logger.log(Level.SEVERE, "User Update Error : " + caught.getStackTrace());
+				new NormalDialogBox("Error", "User Update Error : " + caught.getMessage());
+			}
+
+			public void onSuccess(User userUpdated) {
+				updateGridUserData(userUpdated);
+			}
+		});
+
+	}
+
+	/**
+	 * Update user id by creating new user service caller.
+	 *
+	 * @param user the user
+	 */
+	protected void updateUserIdByCreatingNewUserServiceCaller(User user) {
+
+		userService.updateUserIdByCreatingNewUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
+
+			public void onFailure(Throwable caught) {
+
+				loadingDialogBox.hideLoaderDialog();
+				System.out.println("User's UserId Update Error : " + caught.getMessage());
+				logger.log(Level.SEVERE, "User's UserId Update Error : " + caught.getStackTrace());
+				new NormalDialogBox("Error", "User's UserId Update Error : " + caught.getMessage());
+			}
+
+			public void onSuccess(User userUpdated) {
+				updateGridUserData(userUpdated);
+			}
+		});
+
+	}
+
+	/**
+	 * Update grid user data.
+	 *
+	 * @param userUpdated the user updated
+	 */
+	protected void updateGridUserData(User userUpdated) {
+
+		//Updating existing user
+		//So update existing user record in the grid
+		System.out.println("User Updated Successfully : " + userUpdated.getUserId());
+		logger.log(Level.INFO, "User Updated Successfully : " + userUpdated.getUserId());
+		dataProvider.getList().get(editUserIndex).setFirstName(userUpdated.getFirstName());
+		dataProvider.getList().get(editUserIndex).setLastName(userUpdated.getLastName());
+		dataProvider.getList().get(editUserIndex).setUserId(userUpdated.getUserId());
+		dataProvider.getList().get(editUserIndex).setGroup(userUpdated.getGroup());
+		dataProvider.getList().get(editUserIndex).setOrganization(userUpdated.getOrganization());
+		dataProvider.getList().get(editUserIndex).setSubOrganization(userUpdated.getSubOrganization());
+		dataProvider.getList().get(editUserIndex).setLocation(userUpdated.getLocation());
+		dataProvider.getList().get(editUserIndex).setManagersId(userUpdated.getManagersId());
+		dataProvider.getList().get(editUserIndex).setRole(userUpdated.getRole());
+		dataProvider.getList().get(editUserIndex).setCampaign(userUpdated.getCampaign());
+		dataProvider.getList().get(editUserIndex).setCredential(userUpdated.getCredential());
+		dataProvider.getList().get(editUserIndex).setOldUserId(userUpdated.getOldUserId());//For update user userId update management
+		dataProvider.refresh();//To replicate the change in table
+		userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+		clearFormFields();
+		reflectUpdatedUserInSession(userUpdated);
+		loadingDialogBox.hideLoaderDialog();
+
+	}
+
+	/**
+	 * Adds the new user service caller.
+	 *
+	 * @param user the user
+	 */
+	protected void addNewUserServiceCaller(User user) {
+
+		userService.addUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
+
+			public void onFailure(Throwable caught) {
+				loadingDialogBox.hideLoaderDialog();
+				System.out.println("User Add Error : " + caught.getMessage());
+				logger.log(Level.SEVERE, "User Add Error : " + caught.getStackTrace());
+				new NormalDialogBox("Error", "User Add Error : " + caught.getMessage());
+			}
+
+			public void onSuccess(User userAdded) {
+				addGridUserData(userAdded);
+			}
+		});
+	}
+
+	/**
+	 * Adds the grid user data.
+	 *
+	 * @param userAdded the user added
+	 */
+	protected void addGridUserData(User userAdded) {
+
+		//Adding new user
+		//So add that user to the starting of the table
+		System.out.println("User Added Successfully : " + userAdded.getUserId());
+		logger.log(Level.INFO, "User Added Successfully : " + userAdded.getUserId());
+		dataProvider.getList().add(0, userAdded);
+		dataProvider.refresh();//To replicate the change in table
+		userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+		clearFormFields();
+		reflectAddedUserInSession(userAdded);
+		loadingDialogBox.hideLoaderDialog();
+	}
+
+	/**
+	 * Gets the confirmation about user id update.
+	 *
+	 * @param user the user
+	 * @return the confirmation about user id update
+	 */
+	protected void getConfirmationAboutUserIdUpdate(final User user) {
+
+		final ChooseDialogBox chooseDialogBox = new ChooseDialogBox("Create New User", "Update Existing User");
+		chooseDialogBox.initializeConfirmDialog("Confirm", "You are trying to update the UserId from "
+				+ EMailIdUtil.getEmailIdFromName(user.getOldUserId()) + " to " + EMailIdUtil.getEmailIdFromName(user.getUserId())
+				+ " Confirm weather you need to create new user with the entered UserId or update existing user with the entered UserId ?");
+		chooseDialogBox.getButton1().addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				chooseDialogBox.hideDialogBox();
+				addNewUserServiceCaller(user);
+			}
+		});
+		chooseDialogBox.getButton2().addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				chooseDialogBox.hideDialogBox();
+				updateUserIdByCreatingNewUserServiceCaller(user);
+			}
+		});
+		chooseDialogBox.getCancelButton().addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				chooseDialogBox.hideDialogBox();
+				loadingDialogBox.hideLoaderDialog();
 			}
 		});
 	}
@@ -587,11 +803,18 @@ public class UserAdminScreen extends Composite {
 	 */
 	protected User getUserFromForm() {
 
-		User user = new User(firstNameTextField.getValue(), lastNameTextField.getValue(), userIdTextField.getValue(), groupDropdownArray[groupDropBox
-				.getSelectedIndex()], organizationTextField.getValue(), subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()],
-				locationDropDownArray != null ? locationDropDownArray[locationDropBox.getSelectedIndex()] : "",
-				managersIdDropDownArray != null ? managersIdDropDownArray[managersIdDropBox.getSelectedIndex()] : "", roleDropDownArray[roleDropBox
-						.getSelectedIndex()], campaignTextField.getValue(), credentialDropDownArray[credentialDropBox.getSelectedIndex()]);
+		User user = new User(
+				firstNameTextField.getValue(),
+				lastNameTextField.getValue(),
+				userIdTextField.getValue(),
+				groupDropDownArray[groupDropBox.getSelectedIndex()],
+				organizationTextField.getValue(),
+				subOrganizationDropDownArray[subOrganizationDropBox.getSelectedIndex()],
+				(locationDropDownArray != null && locationDropBox.getSelectedIndex() >= 0) ? locationDropDownArray[locationDropBox.getSelectedIndex()]
+						: "",
+				(managersIdDropDownArray != null && managersIdDropBox.getSelectedIndex() >= 0) ? managersIdDropDownArray[managersIdDropBox
+						.getSelectedIndex()] : "", roleDropDownArray[roleDropBox.getSelectedIndex()], campaignDropDownArray[campaignDropBox
+						.getSelectedIndex()], credentialDropDownArray[credentialDropBox.getSelectedIndex()]);
 		user.setOldUserId(oldUserIdForEditProcessing); //For update user userId update management
 		return user;
 
@@ -638,15 +861,13 @@ public class UserAdminScreen extends Composite {
 				System.out.println("User List Successfull : " + listUsers.size());
 				logger.log(Level.INFO, "User List Successfull : " + listUsers.size());
 				listUsersMainFromWebService = listUsers;
-				List<User> dataProviderList = dataProvider.getList();
-				for (User user : listUsersMainFromWebService) {
-					//Preventing logged in user info to be displayed in grid/table
-					//Preventing superadmin t be displayed in grid/table
-					if (!user.getUserId().equals(loginInfo.getUser().getUserId())
-							&& !user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
-						dataProviderList.add(user);
-					}
-				}
+
+				List<User> listUsersNew = getFilteredUsers(listUsers);
+				dataProvider.getList().clear();
+				dataProvider.getList().addAll(listUsersNew);
+				dataProvider.refresh();//To replicate the change in table
+				userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+
 				loadingDialogBox.hideLoaderDialog();
 				storeUsersListInSession();
 			}
@@ -665,7 +886,7 @@ public class UserAdminScreen extends Composite {
 		//Adding the columns to userTable
 		Column<User, String> editColumn = generateEditColumn();
 		Column<User, String> resetPasswordColumn = generateResetPasswordColumn();
-		Column<User, String> removeColumn = generateRemoveColumn();
+		Column<User, Boolean> removeColumn = generateRemoveColumn();
 		Column<User, String> userIdColumn = generateUserIdColumn();
 		Column<User, String> firstNameColumn = generateFirstNameColumn();
 		Column<User, String> lastNameColumn = generateLastNameColumn();
@@ -736,6 +957,15 @@ public class UserAdminScreen extends Composite {
 	 */
 	private Grid getFormGrid() {
 
+		campaignDropBox.getElement().setId("CampaignDropBox");
+		groupDropBox.getElement().setId("GroupDropBox");
+		locationDropBox.getElement().setId("LocationDropBox");
+		managersIdDropBox.getElement().setId("ManagersIdDropBox");
+		roleDropBox.getElement().setId("RoleDropBox");
+		credentialDropBox.getElement().setId("CredentialDropBox");
+		subOrganizationDropBox.getElement().setId("SubOrganizationDropBox");
+
+		//After setting the Element Id's to the DropDown boxes DropDown values has to be loaded
 		//Filling up the drop down values from code table
 		loadAndFillDropDownValues();
 
@@ -743,7 +973,7 @@ public class UserAdminScreen extends Composite {
 		lastNameTextField.setWidth("205px");
 		userIdTextField.setWidth("140px");
 		organizationTextField.setWidth("205px");
-		campaignTextField.setWidth("205px");
+		campaignDropBox.setWidth("210px");
 		groupDropBox.setWidth("210px");
 		locationDropBox.setWidth("210px");
 		managersIdDropBox.setWidth("210px");
@@ -785,7 +1015,7 @@ public class UserAdminScreen extends Composite {
 		formGrid.setWidget(4, 0, roleLabel);
 		formGrid.setWidget(4, 1, roleDropBox);
 		formGrid.setWidget(4, 2, campaignLabel);
-		formGrid.setWidget(4, 3, campaignTextField);
+		formGrid.setWidget(4, 3, campaignDropBox);
 
 		if (loginInfo.getUser().getCredential().equalsIgnoreCase(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
 			formGrid.setWidget(5, 0, credentialLable);
@@ -812,39 +1042,47 @@ public class UserAdminScreen extends Composite {
 	/**
 	 * Removes the selected data.
 	 *
-	 * @param index the index
-	 * @param user the user
+	 * @param usersToBeDeletedMap the users to be deleted map
 	 */
-	protected void removeSelectedData(final int index, final User user) {
+	protected void removeSelectedData(final Map<Integer, User> usersToBeDeletedMap) {
 
-		final ConfirmDialogBox confirmDialog = new ConfirmDialogBox();
-		Button yesButton = confirmDialog.initializeConfirmDialog("Confirm", "Are you sure you want to delete user : " + user.getUserId());
-		yesButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				confirmDialog.hideDialogBox();
+		loadingDialogBox = new LoadingDialogBox("Processing.....", "Deleting " + usersToBeDeletedMap.keySet().size()
+				+ " user(s)..... Please wait for few seconds.....");
 
-				loadingDialogBox = new LoadingDialogBox("Processing.....", "Processing delete..... Please wait for few seconds.....");
+		userService.removeUsers(hostPageBaseURL, usersToBeDeletedMap, new AsyncCallback<UserRemovalDto>() {
 
-				userService.removeUser(hostPageBaseURL, user, new AsyncCallback<User>() {
+			public void onFailure(Throwable caught) {
+				logger.log(Level.SEVERE, "User Removal Error : " + caught.getStackTrace());
+				System.out.println("User Removal Error : " + caught.getMessage());
+				loadingDialogBox.hideLoaderDialog();
+				new NormalDialogBox("Error", "User Removal Error : " + caught.getMessage());
+			}
 
-					public void onFailure(Throwable caught) {
-						loadingDialogBox.hideLoaderDialog();
-						logger.log(Level.SEVERE, "User Removal Error : " + caught.getStackTrace());
-						System.out.println("User Removal Error : " + caught.getMessage());
-						new NormalDialogBox("Error", "User Removal Error : " + caught.getMessage());
+			public void onSuccess(UserRemovalDto result) {
+
+				System.out.println("User Removed Successfully");
+				logger.log(Level.INFO, "User Removed Successfully");
+
+				//To prevent arrayIndexOutOfBound exception while removing objects
+				//So remove objects index from Max to Min
+				Collections.sort(result.getRemovedUserIndex(), Collections.reverseOrder());
+				for (Integer index : result.getRemovedUserIndex()) {
+					dataProvider.getList().remove(index.intValue());
+					reflectDeletedUserInSession(usersToBeDeletedMap.get(index));
+				}
+
+				dataProvider.refresh();//To replicate the change in table
+				userTable.setRowCount(dataProvider.getList().size(), true);
+				clearFormFields();
+				loadingDialogBox.hideLoaderDialog();
+
+				if (result.getErrorMessageList().size() > 0) {
+					String errorMessage = "";
+					for (String error : result.getErrorMessageList()) {
+						errorMessage = errorMessage + error + " / ";
 					}
-
-					public void onSuccess(User userRemoved) {
-						System.out.println("User Removed Successfully");
-						logger.log(Level.INFO, "User Removed Successfully");
-						dataProvider.getList().remove(index);
-						dataProvider.refresh();//To replicate the change in table
-						userTable.setRowCount(dataProvider.getList().size(), true);
-						clearFormFields();
-						reflectDeletedUserInSession(user);
-						loadingDialogBox.hideLoaderDialog();
-					}
-				});
+					new NormalDialogBox("Error", "User Removal Errors : " + errorMessage.substring(0, errorMessage.length() - 2));
+				}
 			}
 		});
 	}
@@ -913,10 +1151,10 @@ public class UserAdminScreen extends Composite {
 		lastNameTextField.setText(user.getLastName());
 		userIdTextField.setText(EMailIdUtil.getNameFromEmailId(user.getUserId()));
 
-		if (Arrays.asList(groupDropdownArray).contains(user.getGroup())) {
-			groupDropBox.setSelectedIndex(Arrays.asList(groupDropdownArray).indexOf(user.getGroup()));
+		if (Arrays.asList(groupDropDownArray).contains(user.getGroup())) {
+			groupDropBox.setSelectedIndex(Arrays.asList(groupDropDownArray).indexOf(user.getGroup()));
 		} else {
-			groupDropBox.setSelectedIndex(Arrays.asList(groupDropdownArray).indexOf(0));
+			groupDropBox.setSelectedIndex(Arrays.asList(groupDropDownArray).indexOf(0));
 		}
 		if (Arrays.asList(subOrganizationDropDownArray).contains(user.getSubOrganization())) {
 			subOrganizationDropBox.setSelectedIndex(Arrays.asList(subOrganizationDropDownArray).indexOf(user.getSubOrganization()));
@@ -940,7 +1178,11 @@ public class UserAdminScreen extends Composite {
 		} else {
 			credentialDropBox.setSelectedIndex(Arrays.asList(credentialDropDownArray).indexOf(0));
 		}
-		campaignTextField.setText(user.getCampaign());
+		if (Arrays.asList(campaignDropDownArray).contains(user.getCampaign())) {
+			campaignDropBox.setSelectedIndex(Arrays.asList(campaignDropDownArray).indexOf(user.getCampaign()));
+		} else {
+			campaignDropBox.setSelectedIndex(Arrays.asList(campaignDropDownArray).indexOf(0));
+		}
 
 		oldUserIdForEditProcessing = user.getOldUserId();
 
@@ -958,13 +1200,15 @@ public class UserAdminScreen extends Composite {
 		firstNameTextField.setText("");
 		lastNameTextField.setText("");
 		userIdTextField.setText("");
-		groupDropBox.setSelectedIndex(0);
-		subOrganizationDropBox.setSelectedIndex(0);
-		managersIdDropBox.setSelectedIndex(0);
-		roleDropBox.setSelectedIndex(0);
-		campaignTextField.setText("");
-		credentialDropBox.setSelectedIndex(0);
+		verifyLengthAndSetSelelectedValue(groupDropBox, groupDropDownArray);
+		verifyLengthAndSetSelelectedValue(subOrganizationDropBox, subOrganizationDropDownArray);
+		verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray);
+		verifyLengthAndSetSelelectedValue(roleDropBox, roleDropDownArray);
+		verifyLengthAndSetSelelectedValue(campaignDropBox, campaignDropDownArray);
+		verifyLengthAndSetSelelectedValue(credentialDropBox, credentialDropDownArray);
 		oldUserIdForEditProcessing = null;
+		indexesOfUsersToBeRemoved = new ArrayList<Integer>();
+		addNewUser = false;
 		editUserIndex = null;//For safety purpose clear editUserIndex
 	}
 
@@ -1204,18 +1448,24 @@ public class UserAdminScreen extends Composite {
 	 *
 	 * @return the column
 	 */
-	private Column<User, String> generateRemoveColumn() {
+	private Column<User, Boolean> generateRemoveColumn() {
 
-		Column<User, String> removeButtonColumn = new Column<User, String>(new CustomizedImageCell()) {
+		Column<User, Boolean> removeButtonColumn = new Column<User, Boolean>(new CheckboxCell()) {
 			@Override
-			public String getValue(User object) {
-				return "images/remove.png";
+			public Boolean getValue(User object) {
+				return false;
 			}
 		};
-		removeButtonColumn.setFieldUpdater(new FieldUpdater<User, String>() {
+		removeButtonColumn.setFieldUpdater(new FieldUpdater<User, Boolean>() {
 			@Override
-			public void update(int index, User object, String value) {
-				removeSelectedData(index, object);
+			public void update(int index, User object, Boolean value) {
+				if (value) {
+					indexesOfUsersToBeRemoved.add(new Integer(index));
+				} else {
+					if (indexesOfUsersToBeRemoved.contains(new Integer(index))) {
+						indexesOfUsersToBeRemoved.remove(new Integer(index));
+					}
+				}
 			}
 		});
 		userTable.addColumn(removeButtonColumn, "Delete");
@@ -1488,6 +1738,65 @@ public class UserAdminScreen extends Composite {
 		loadRoles();
 		loadCredentials();
 		loadSubOrganizations();
+		loadCampaigns();
+	}
+
+	/**
+	 * Load campaigns.
+	 */
+	private void loadCampaigns() {
+
+		codeTableService.getCampaignsList(new AsyncCallback<List<com.directv.adminuserinterface.shared.Campaign>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+				logger.log(Level.SEVERE, "Error retreving campaign list : " + caught.getStackTrace());
+				new NormalDialogBox("Error", "Error retreving campaign list : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<Campaign> result) {
+
+				logger.log(Level.INFO, "Campaign list : " + result.size());
+				int idx = 1;
+				campaignDropDownArray = new String[result.size() + 1];
+				campaignDropDownArray[0] = "";
+				if (result.size() > 0) {
+					for (Campaign campaign : result) {
+						campaignDropDownArray[idx] = campaign.getDescription();
+						idx++;
+					}
+				}
+				campaignDropBox.clear();
+				for (int i = 0; i < campaignDropDownArray.length; i++) {
+					campaignDropBox.addItem(campaignDropDownArray[i]);
+				}
+				verifyLengthAndSetSelelectedValue(campaignDropBox, campaignDropDownArray);
+			}
+		});
+	}
+
+	/**
+	 * Verify length and set selelected value.
+	 *
+	 * @param dropBox the drop box
+	 * @param dropDownArray the drop down array
+	 */
+	protected void verifyLengthAndSetSelelectedValue(ListBox dropBox, String[] dropDownArray) {
+
+		if (dropDownArray != null && dropDownArray.length == 2) {
+			dropBox.setSelectedIndex(1);
+			if (dropBox.getElement().getId().equals("SubOrganizationDropBox")) {
+				processSubOrganizationChange();
+			} else if (dropBox.getElement().getId().equals("LocationDropBox")) {
+				processLocationChange();
+			} else if (dropBox.getElement().getId().equals("RoleDropBox")) {
+				processRoleChange();
+			}
+		} else {
+			dropBox.setSelectedIndex(0);
+		}
 	}
 
 	/**
@@ -1542,6 +1851,7 @@ public class UserAdminScreen extends Composite {
 		for (int i = 0; i < subOrganizationDropDownArray.length; i++) {
 			subOrganizationDropBox.addItem(subOrganizationDropDownArray[i]);
 		}
+		verifyLengthAndSetSelelectedValue(subOrganizationDropBox, subOrganizationDropDownArray);
 	}
 
 	/**
@@ -1553,6 +1863,7 @@ public class UserAdminScreen extends Composite {
 		for (int i = 0; i < credentialDropDownArray.length; i++) {
 			credentialDropBox.addItem(credentialDropDownArray[i]);
 		}
+		verifyLengthAndSetSelelectedValue(credentialDropBox, credentialDropDownArray);
 	}
 
 	/**
@@ -1586,6 +1897,7 @@ public class UserAdminScreen extends Composite {
 				for (int i = 0; i < roleDropDownArray.length; i++) {
 					roleDropBox.addItem(roleDropDownArray[i]);
 				}
+				verifyLengthAndSetSelelectedValue(roleDropBox, roleDropDownArray);
 			}
 		});
 	}
@@ -1609,18 +1921,19 @@ public class UserAdminScreen extends Composite {
 
 				logger.log(Level.INFO, "Group list : " + result.size());
 				int idx = 1;
-				groupDropdownArray = new String[result.size() + 1];
-				groupDropdownArray[0] = "";
+				groupDropDownArray = new String[result.size() + 1];
+				groupDropDownArray[0] = "";
 				if (result.size() > 0) {
 					for (Group group : result) {
-						groupDropdownArray[idx] = group.getDescription();
+						groupDropDownArray[idx] = group.getDescription();
 						idx++;
 					}
 				}
 				groupDropBox.clear();
-				for (int i = 0; i < groupDropdownArray.length; i++) {
-					groupDropBox.addItem(groupDropdownArray[i]);
+				for (int i = 0; i < groupDropDownArray.length; i++) {
+					groupDropBox.addItem(groupDropDownArray[i]);
 				}
+				verifyLengthAndSetSelelectedValue(groupDropBox, groupDropDownArray);
 			}
 		});
 	}
@@ -1695,6 +2008,7 @@ public class UserAdminScreen extends Composite {
 		for (int i = 0; i < locationDropDownArray.length; i++) {
 			locationDropBox.addItem(locationDropDownArray[i]);
 		}
+		verifyLengthAndSetSelelectedValue(locationDropBox, locationDropDownArray);
 	}
 
 	/**
@@ -1755,6 +2069,17 @@ public class UserAdminScreen extends Composite {
 						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(user.getManagersId()));
 					} else {
 						managersIdDropBox.setSelectedIndex(Arrays.asList(managersIdDropDownArray).indexOf(0));
+					}
+				}
+				verifyLengthAndSetSelelectedValue(managersIdDropBox, managersIdDropDownArray);
+				if (!isEditClicked) {
+					//If loggedin user's role is Manager/TeamLead select that loggedin users managers'Id by default.
+					if (managersIdDropBox.getItemCount() == managersIdDropDownArray.length) {
+						for (int j = 0; j < managersIdDropDownArray.length; j++) {
+							if (managersIdDropDownArray[j].equals(loginInfo.getEmailAddress())) {
+								managersIdDropBox.setSelectedIndex(j);
+							}
+						}
 					}
 				}
 				loadingDialogBox.hideLoaderDialog();

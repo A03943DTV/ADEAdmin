@@ -5,18 +5,22 @@
 package com.directv.adminuserinterface.server;
 
 import java.util.List;
+import java.util.Map;
 
 import com.directv.adminuserinterface.client.user.UserService;
+import com.directv.adminuserinterface.rest.CodeTableDaoImpl;
 import com.directv.adminuserinterface.rest.UserDao;
 import com.directv.adminuserinterface.rest.UserDaoImpl;
 import com.directv.adminuserinterface.server.domain.GoogleOrgManager;
 import com.directv.adminuserinterface.server.domain.GoogleUserManager;
+import com.directv.adminuserinterface.shared.Campaign;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
 import com.directv.adminuserinterface.shared.Role;
 import com.directv.adminuserinterface.shared.SubOrganization;
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.shared.UserRemovalDto;
 import com.directv.adminuserinterface.shared.validator.UserValidator;
 import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.AdminException;
@@ -74,7 +78,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 		user = getUserDao().addUser(user);
 
-		verifyIfRoleIsManager(true, user);
+		verifyIfRoleIsManagerOrTeamLead(true, user);
 
 		user.setOldUserId(EMailIdUtil.getNameFromEmailId(user.getUserId()));//For update user userId update management
 
@@ -143,6 +147,10 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 				&& !(codeTableService.getRolesList(Role.DESCRIPTION_PARAM, userToBeCreated.getRole()).size() > 0)) {
 			throw new AdminException("Invalid Role");
 		}
+		if (userToBeCreated.getCampaign() != null && !userToBeCreated.getCampaign().equals("")
+				&& !(codeTableService.getCampaignsList(Campaign.DESCRIPTION_PARAM, userToBeCreated.getCampaign()).size() > 0)) {
+			throw new AdminException("Invalid Campaign");
+		}
 
 		List<Location> locationsList = codeTableService.getLocationsList(Location.DESCRIPTION_PARAM, userToBeCreated.getLocation());
 		if (userToBeCreated.getLocation() != null && !userToBeCreated.getLocation().equals("")) {
@@ -187,9 +195,6 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 					&& !userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_USER)) {
 				throw new AdminException("Invalid Privilege");
 			}
-			if (userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
-				throw new AdminException("SuperAdmin user can't be created through ADELite application");
-			}
 		}
 
 		User userLoggedIn = new LoginServiceImpl().getUserForBulkUpload();
@@ -204,30 +209,31 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 			}
 
 			if (userToBeCreated.getCredential() != null && userToBeCreated.getCredential() != "") {
-				if (userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)) {
-					throw new AdminException("You don't have privilege to create an Admin user");
+				if (userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)
+						|| userToBeCreated.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+					throw new AdminException("You don't have privilege to create an Admin/SuperAdmin users");
 				}
 			}
 		}
 	}
 
 	/**
-	 * Verify if role is manager.
+	 * Verify if role is manager or team lead.
 	 *
 	 * @param isAddUser the is add user
 	 * @param user the user
 	 */
-	private void verifyIfRoleIsManager(boolean isAddUser, User user) {
+	private void verifyIfRoleIsManagerOrTeamLead(boolean isAddUser, User user) {
 
-		//If the role Manager has been assigned to user then the location and userId has to be entered in ManagersId code table
-		if (user.getRole().equals(AdminConstants.MANAGER_ROLE_CONSTANT)) {
+		//If the role Manager/TeamLead has been assigned to user then the location and userId has to be entered in ManagersId code table
+		if (user.getRole().equals(AdminConstants.MANAGER_ROLE_CONSTANT) || user.getRole().equals(AdminConstants.TEAMLEAD_ROLE_CONSTANT)) {
 
 			CodeTableServiceImpl codeTableService = getCodeTableServiceImpl();
 			List<ManagersId> managersIdList = codeTableService.getManagersIdsList(null, null);
 			if (isAddUser) {//New user add so it won't be in the code table
 
-				codeTableService.addManagersId(new ManagersId(new Long((managersIdList.size() + 1)), user.getUserId(), user.getSubOrganization(),
-						user.getLocation()));
+				codeTableService.addManagersId(new ManagersId(new Long((new CodeTableDaoImpl().getMaxManagersId() + 1)), user.getUserId(), user
+						.getSubOrganization(), user.getLocation()));
 			} else {//Editing existing user so there might be a possibility
 
 				boolean managerIsIdInLocationNotExist = true;
@@ -239,8 +245,8 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 					}
 				}
 				if (managerIsIdInLocationNotExist) {
-					codeTableService.addManagersId(new ManagersId(new Long((managersIdList.size() + 1)), user.getUserId(), user.getSubOrganization(),
-							user.getLocation()));
+					codeTableService.addManagersId(new ManagersId(new Long((new CodeTableDaoImpl().getMaxManagersId() + 1)), user.getUserId(), user
+							.getSubOrganization(), user.getLocation()));
 				}
 			}
 		}
@@ -253,7 +259,29 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	 * @throws AdminException 
 	 */
 	@Override
-	public User removeUser(String hostPageBaseURL, User user) throws AdminException {
+	public UserRemovalDto removeUsers(String hostPageBaseURL, Map<Integer, User> usersToBeDeletedMap) throws AdminException {
+
+		UserRemovalDto userRemovalDto = new UserRemovalDto();
+
+		for (Integer index : usersToBeDeletedMap.keySet()) {
+			try {
+				removeUser(hostPageBaseURL, usersToBeDeletedMap.get(index));
+				userRemovalDto.getRemovedUserIndex().add(index);
+			} catch (AdminException excep) {
+				userRemovalDto.getErrorMessageList().add(excep.getMessage() + " : " + usersToBeDeletedMap.get(index).getUserId());
+			}
+		}
+		return userRemovalDto;
+	}
+
+	/**
+	 * Removes the user.
+	 *
+	 * @param hostPageBaseURL the host page base url
+	 * @param user the user
+	 * @throws AdminException the admin exception
+	 */
+	public void removeUser(String hostPageBaseURL, User user) throws AdminException {
 
 		//Deleting the user from the domain
 		user = new GoogleUserManager().deleteDomainUser(user);
@@ -265,6 +293,27 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		if (user.getRole().equals(AdminConstants.MANAGER_ROLE_CONSTANT)) {
 			getCodeTableServiceImpl().deleteManagersIdData(user.getUserId());
 		}
+	}
+
+	/**
+	 * Overridden Method
+	 * @param hostPageBaseURL
+	 * @param user
+	 * @return
+	 * @throws AdminException
+	 */
+	@Override
+	public User updateUserIdByCreatingNewUser(String hostPageBaseURL, User user) throws AdminException {
+
+		//If the user is updating the userId the old userId data has to be deleted and 
+		//new userId data has to be created
+		//UserId update management
+
+		String oldUserIdToBeDeleted = user.getOldUserId();
+		addUser(hostPageBaseURL, user);//Adding the new userId data
+
+		User userObjectToBeDeleted = getUserDao().get(User.class, EMailIdUtil.getEmailIdFromName(oldUserIdToBeDeleted));
+		removeUser(hostPageBaseURL, userObjectToBeDeleted); //Deleting the old userId data
 
 		return user;
 	}
@@ -279,32 +328,18 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	@Override
 	public User updateUser(String hostPageBaseURL, User user) throws AdminException {
 
-		//If the user is updating the userId the old userId data has to be deleted and 
-		//new userId data has to be created
-		//UserId update management
-		if (!user.getOldUserId().equals(user.getUserId())) {
+		//Updating an existing user in the domain
+		user = new GoogleUserManager().updateDomainUser(user);
 
-			String oldUserIdToBeDeleted = user.getOldUserId();
-			addUser(hostPageBaseURL, user);//Adding the new userId data
+		//Managing user into organization
+		manageOrganizationPath(user, false);
 
-			User userObjectToBeDeleted = getUserDao().get(User.class, EMailIdUtil.getEmailIdFromName(oldUserIdToBeDeleted));
-			removeUser(hostPageBaseURL, userObjectToBeDeleted); //Deleting the old userId data
+		//Updating an existing user in the DB
+		user = getUserDao().updateUser(user);
 
-		} else {
+		verifyIfRoleIsManagerOrTeamLead(false, user);
 
-			//Updating an existing user in the domain
-			user = new GoogleUserManager().updateDomainUser(user);
-
-			//Managing user into organization
-			manageOrganizationPath(user, false);
-
-			//Updating an existing user in the DB
-			user = getUserDao().updateUser(user);
-
-			verifyIfRoleIsManager(false, user);
-
-			user.setOldUserId(EMailIdUtil.getNameFromEmailId(user.getUserId()));
-		}
+		user.setOldUserId(EMailIdUtil.getNameFromEmailId(user.getUserId()));
 		return user;
 	}
 

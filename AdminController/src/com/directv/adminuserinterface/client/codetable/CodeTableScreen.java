@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
+import com.directv.adminuserinterface.shared.Campaign;
 import com.directv.adminuserinterface.shared.Group;
 import com.directv.adminuserinterface.shared.Location;
 import com.directv.adminuserinterface.shared.ManagersId;
@@ -93,9 +94,37 @@ public class CodeTableScreen extends Composite {
 
 		insertGroups();
 		insertLocations();
-		insertManagersIds();
+		//insertManagersIds();
 		insertRoles();
 		insertSubOrganizations();
+		insertCampaigns();
+	}
+
+	/**
+	 * Insert campaigns.
+	 */
+	private void insertCampaigns() {
+
+		List<Campaign> campaignsList = new ArrayList<Campaign>();
+		campaignsList.add(new Campaign(1L, "test1"));
+		campaignsList.add(new Campaign(2L, "test2"));
+
+		for (Campaign campaign : campaignsList) {
+
+			codeTableService.addCampaign(campaign, new AsyncCallback<Campaign>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+					new NormalDialogBox("Error", "Campaign add error : " + caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(Campaign result) {
+					System.out.println("Campaign add success : " + result.getDescription());
+				}
+			});
+		}
 	}
 
 	/**
@@ -161,6 +190,7 @@ public class CodeTableScreen extends Composite {
 	/**
 	 * Insert managers ids.
 	 */
+	@SuppressWarnings("unused")
 	private void insertManagersIds() {
 
 		List<ManagersId> managersIdList = new ArrayList<ManagersId>();

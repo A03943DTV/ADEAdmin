@@ -26,7 +26,7 @@ public class AdminConstants {
 	public static final String DOMAIN_NAME = "dtv1.com";
 
 	/** The Constant DOMAIN_ADMIN_USER_ID. */
-	public static final String DOMAIN_ADMIN_USER_ID = "directv@dtv1.com";
+	public static final String DOMAIN_ADMIN_USER_ID = "meiyazhagan@dtv1.com";
 
 	/** The Constant DOMAIN_ADMIN_USER_PASSWORD. */
 	public static final String DOMAIN_ADMIN_USER_PASSWORD = "directv123";
@@ -48,6 +48,9 @@ public class AdminConstants {
 
 	/** The Constant MANAGER_ROLE_CONSTANT. */
 	public static final String MANAGER_ROLE_CONSTANT = "Manager";
+
+	/** The Constant TEAMLEAD_ROLE_CONSTANT. */
+	public static final String TEAMLEAD_ROLE_CONSTANT = "Team Lead";
 
 	/** The Constant ORGANIZATION_NAME. */
 	public static final String ORGANIZATION_NAME = "Customer Care";

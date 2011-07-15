@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.directv.adminuserinterface.client.StatusBarCreator;
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
 import com.directv.adminuserinterface.client.table.CustomizedImageCell;
 import com.directv.adminuserinterface.shared.BulkUploadDto;
@@ -137,6 +138,7 @@ public class BulkUploadScreen extends Composite {
 		vPanel.add(hDownloadPanel);
 		vPanel.add(hPanel);
 		vPanel.add(vTablePanel);
+		vPanel.add(StatusBarCreator.createStatusBar(loginInfo));
 
 		submitButton.addClickHandler(new ClickHandler() {
 			@Override

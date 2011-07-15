@@ -1,4 +1,6 @@
 com.directv.adminuserinterface.client.codetable.CodeTableService, false, false, false, false, _, 3991690358
+com.directv.adminuserinterface.shared.Campaign, true, true, true, true, com.directv.adminuserinterface.shared.Campaign/1847589461, 1847589461
+[Lcom.directv.adminuserinterface.shared.Campaign;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Campaign;/3414592136, 3414592136
 com.directv.adminuserinterface.shared.Group, true, true, true, true, com.directv.adminuserinterface.shared.Group/1087133682, 1087133682
 [Lcom.directv.adminuserinterface.shared.Group;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.Group;/2551104846, 2551104846
 com.directv.adminuserinterface.shared.Location, true, true, true, true, com.directv.adminuserinterface.shared.Location/4188600391, 4188600391
