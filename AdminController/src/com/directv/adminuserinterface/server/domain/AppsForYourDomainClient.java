@@ -816,4 +816,23 @@ public class AppsForYourDomainClient {
 		emailListRecipientService.delete(deleteUrl);
 	}
 
+	public UserEntry createUser(String username, String givenName, String familyName, String password, boolean isAdmin)
+			throws AppsForYourDomainException, ServiceException, IOException {
+
+		UserEntry entry = new UserEntry();
+		Login login = new Login();
+		login.setUserName(username);
+		login.setPassword(password);
+		login.setAdmin(isAdmin);
+		entry.addExtension(login);
+
+		Name name = new Name();
+		name.setGivenName(givenName);
+		name.setFamilyName(familyName);
+		entry.addExtension(name);
+
+		URL insertUrl = new URL(domainUrlBase + "user/" + SERVICE_VERSION);
+		return userService.insert(insertUrl, entry);
+	}
+
 }

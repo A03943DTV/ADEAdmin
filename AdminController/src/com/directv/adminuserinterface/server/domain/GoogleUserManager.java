@@ -55,7 +55,8 @@ public class GoogleUserManager {
 
 		try {
 			//Creating a new user in domain
-			client.createUser(user.getUserId(), user.getFirstName(), user.getLastName(), AdminConstants.NEW_USER_DEFAULT_PASSWORD);
+			client.createUser(user.getUserId(), user.getFirstName(), user.getLastName(), AdminConstants.NEW_USER_DEFAULT_PASSWORD,
+					getIsSuperAdmin(user));
 		} catch (AppsForYourDomainException e) {
 			processAppsForYourDomainException(e);
 		} catch (ServiceException e) {
@@ -88,6 +89,17 @@ public class GoogleUserManager {
 	}
 
 	/**
+	 * Gets the checks if is super admin.
+	 *
+	 * @param user the user
+	 * @return the checks if is super admin
+	 */
+	private boolean getIsSuperAdmin(User user) {
+
+		return (user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER));
+	}
+
+	/**
 	 * Update domain user.
 	 *
 	 * @param user the user
@@ -108,6 +120,7 @@ public class GoogleUserManager {
 			if (user.getResetPassword() != null && user.getResetPassword()) {
 				userEntry.getLogin().setPassword(AdminConstants.NEW_USER_DEFAULT_PASSWORD);
 			}
+			userEntry.getLogin().setAdmin(getIsSuperAdmin(user));
 		} catch (AppsForYourDomainException e) {
 			processAppsForYourDomainException(e);
 		} catch (ServiceException e) {

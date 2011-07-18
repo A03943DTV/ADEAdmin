@@ -26,10 +26,10 @@ public class AdminConstants {
 	public static final String DOMAIN_NAME = "dtv1.com";
 
 	/** The Constant DOMAIN_ADMIN_USER_ID. */
-	public static final String DOMAIN_ADMIN_USER_ID = "meiyazhagan@dtv1.com";
+	public static final String DOMAIN_ADMIN_USER_ID = "directv123@dtv1.com";
 
 	/** The Constant DOMAIN_ADMIN_USER_PASSWORD. */
-	public static final String DOMAIN_ADMIN_USER_PASSWORD = "directv123";
+	public static final String DOMAIN_ADMIN_USER_PASSWORD = "directv12345";
 
 	/** The Constant NEW_USER_DEFAULT_PASSWORD. */
 	public static final String NEW_USER_DEFAULT_PASSWORD = "directv1";//This will be changed by user on first time login

@@ -96,13 +96,15 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 		GoogleOrgManager googleOrgManager = new GoogleOrgManager();
 		String oldPath = "/";//By default created users will be here in base "/" while newly created
-		String newPath = googleOrgManager.createOrgPathFromOrgUnits(user.getOrganization(), user.getSubOrganization(), user.getLocation(), user
-				.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER));
+		String newPath = googleOrgManager.createOrgPathFromOrgUnits(user.getOrganization(), user.getSubOrganization(), user.getLocation(), (user
+				.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER) || user.getCredential().equals(
+				AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)));
 
 		if (!isInsert) {
 			User dbUser = getUserDao().getUser(user.getUserId());
-			oldPath = googleOrgManager.createOrgPathFromOrgUnits(dbUser.getOrganization(), dbUser.getSubOrganization(), dbUser.getLocation(), dbUser
-					.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER));
+			oldPath = googleOrgManager.createOrgPathFromOrgUnits(dbUser.getOrganization(), dbUser.getSubOrganization(), dbUser.getLocation(), (dbUser
+					.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER) || user.getCredential().equals(
+					AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)));
 		}
 		googleOrgManager.updateOrganizationUser(user.getUserId(), oldPath, newPath);
 	}
