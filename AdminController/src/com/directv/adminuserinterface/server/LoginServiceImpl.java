@@ -31,8 +31,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	 * Overridden Method
 	 * @param requestUri
 	 * @return
+	 * @throws AdminException 
 	 */
-	public LoginInfo login(String requestUri) {
+	public LoginInfo login(String requestUri) throws AdminException {
 
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
@@ -71,6 +72,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			}
 		} catch (AdminException e) {
 			e.printStackTrace();
+			throw e;
 		}
 
 		loginInfo.setUser(new UserDaoImpl().getUser(user.getEmail()));

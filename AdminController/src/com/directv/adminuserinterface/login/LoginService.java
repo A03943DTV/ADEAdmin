@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.directv.adminuserinterface.shared.LoginInfo;
 import com.directv.adminuserinterface.shared.User;
+import com.directv.adminuserinterface.util.AdminException;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -23,8 +24,9 @@ public interface LoginService extends RemoteService {
 	 *
 	 * @param requestUri the request uri
 	 * @return the login info
+	 * @throws AdminException the admin exception
 	 */
-	public LoginInfo login(String requestUri);
+	public LoginInfo login(String requestUri) throws AdminException;
 
 	/**
 	 * Store user list in session.

@@ -493,6 +493,7 @@ public class UserAdminScreen extends Composite {
 						dataProvider.getList().addAll(result);
 						dataProvider.refresh();//To replicate the change in table
 						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+						userTable.redraw();
 						clearFormFields();
 					}
 				});
@@ -558,7 +559,8 @@ public class UserAdminScreen extends Composite {
 						List<User> listUsersNew = getFilteredUsers(result);
 						dataProvider.getList().addAll(UserSearchHelper.searchUser(listUsersNew, user));//Adding only the search matched values
 						dataProvider.refresh();//To replicate the change in table
-						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination
+						userTable.redraw();
 					}
 				});
 			}
@@ -694,6 +696,7 @@ public class UserAdminScreen extends Composite {
 		dataProvider.getList().get(editUserIndex).setOldUserId(userUpdated.getOldUserId());//For update user userId update management
 		dataProvider.refresh();//To replicate the change in table
 		userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+		userTable.redraw();
 		clearFormFields();
 		reflectUpdatedUserInSession(userUpdated);
 		loadingDialogBox.hideLoaderDialog();
@@ -736,6 +739,7 @@ public class UserAdminScreen extends Composite {
 		dataProvider.getList().add(0, userAdded);
 		dataProvider.refresh();//To replicate the change in table
 		userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+		userTable.redraw();
 		clearFormFields();
 		reflectAddedUserInSession(userAdded);
 		loadingDialogBox.hideLoaderDialog();
@@ -871,6 +875,7 @@ public class UserAdminScreen extends Composite {
 				dataProvider.getList().addAll(listUsersNew);
 				dataProvider.refresh();//To replicate the change in table
 				userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+				userTable.redraw();
 
 				loadingDialogBox.hideLoaderDialog();
 				storeUsersListInSession();
@@ -1077,6 +1082,7 @@ public class UserAdminScreen extends Composite {
 
 				dataProvider.refresh();//To replicate the change in table
 				userTable.setRowCount(dataProvider.getList().size(), true);
+				userTable.redraw();
 				clearFormFields();
 				loadingDialogBox.hideLoaderDialog();
 
@@ -1117,6 +1123,7 @@ public class UserAdminScreen extends Composite {
 						dataProvider.getList().get(index).setResetPassword(false);
 						dataProvider.refresh();//To replicate the change in table
 						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+						userTable.redraw();
 
 						loadingDialogBox.hideLoaderDialog();
 
@@ -1133,6 +1140,7 @@ public class UserAdminScreen extends Composite {
 						dataProvider.getList().get(index).setResetPassword(false);
 						dataProvider.refresh();//To replicate the change in table
 						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+						userTable.redraw();
 
 						clearFormFields();
 						loadingDialogBox.hideLoaderDialog();
@@ -1457,7 +1465,7 @@ public class UserAdminScreen extends Composite {
 		Column<User, Boolean> removeButtonColumn = new Column<User, Boolean>(new CheckboxCell()) {
 			@Override
 			public Boolean getValue(User object) {
-				return false;
+				return object.getIsSelected();
 			}
 		};
 		removeButtonColumn.setFieldUpdater(new FieldUpdater<User, Boolean>() {
@@ -1960,6 +1968,13 @@ public class UserAdminScreen extends Composite {
 			locationDropDownArray[0] = "";
 			locationDropDownArray[1] = loginInfo.getUser().getLocation();
 			addlocDropDownValues();
+			if (isEditClicked) {
+				if (Arrays.asList(locationDropDownArray).contains(user.getLocation())) {
+					locationDropBox.setSelectedIndex(Arrays.asList(locationDropDownArray).indexOf(user.getLocation()));
+				} else {
+					locationDropBox.setSelectedIndex(Arrays.asList(locationDropDownArray).indexOf(0));
+				}
+			}
 			if (!isEditClicked) {
 				verifyLengthAndSetSelelectedValue(locationDropBox, locationDropDownArray, isEditClicked);
 			}
@@ -2076,7 +2091,6 @@ public class UserAdminScreen extends Composite {
 					}
 				}
 				if (elementToBeRemoved != null) {
-					managersIdDropDownArray = new String[managersIdDropDownArray.length - 1];//Since we are going to remove one element
 					managersIdDropDownArray = removeElement(managersIdDropDownArray, elementToBeRemoved);
 				}
 				//If user clicked on edit icon in table then for a location then loading managersIds for that location
