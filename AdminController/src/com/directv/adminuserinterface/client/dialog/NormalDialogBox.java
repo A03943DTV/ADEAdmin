@@ -44,7 +44,6 @@ public class NormalDialogBox {
 	 */
 	private void initializeNormalDialog(String title, String message) {
 
-		dialogBox.setAnimationEnabled(true);
 		closeButton.getElement().setId("closeButton");
 
 		VerticalPanel dialogVPanel = new VerticalPanel();

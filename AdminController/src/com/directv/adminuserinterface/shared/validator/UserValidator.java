@@ -39,5 +39,11 @@ public class UserValidator {
 		if (user.getLocation() == null || user.getLocation().equals("")) {
 			throw new AdminException("Location is required");
 		}
+		if (user.getRole() == null || user.getRole().equals("")) {
+			throw new AdminException("Role is required");
+		}
+		if (user.getCampaign() == null || user.getCampaign().equals("")) {
+			throw new AdminException("Campaign is required");
+		}
 	}
 }

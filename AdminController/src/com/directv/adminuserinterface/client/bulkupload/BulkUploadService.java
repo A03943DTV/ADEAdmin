@@ -37,4 +37,12 @@ public interface BulkUploadService extends RemoteService {
 	 */
 	public List<BulkUploadDto> getBulkUploadResults(String userId);
 
+	/**
+	 * Gets the bulk upload by id.
+	 *
+	 * @param id the id
+	 * @return the bulk upload by id
+	 */
+	public BulkUploadDto getBulkUploadById(Long id);
+
 }

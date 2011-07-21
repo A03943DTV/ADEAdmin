@@ -434,18 +434,15 @@ public class UserAdminScreen extends Composite {
 
 		List<User> listUsersNew = new ArrayList<User>();
 		for (User user : listUsers) {
-			//Preventing logged in user info to be displayed in grid/table
-			if (!user.getUserId().equals(loginInfo.getUser().getUserId())) {
-				boolean add = true;
-				if (loginInfo.getUser().getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)
-						&& user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
-					add = false;//Preventing SuperAdmin to be displayed in grid/table for Admin users
-				} else if (loginInfo.getUser().getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
-					add = true;//SuperAdmin to be displayed in grid/table for SuperAdmin users
-				}
-				if (add) {
-					listUsersNew.add(user);
-				}
+			boolean add = true;
+			if (loginInfo.getUser().getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)
+					&& user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+				add = false;//Preventing SuperAdmin to be displayed in grid/table for Admin users
+			} else if (loginInfo.getUser().getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+				add = true;//SuperAdmin to be displayed in grid/table for SuperAdmin users
+			}
+			if (add) {
+				listUsersNew.add(user);
 			}
 		}
 		return listUsersNew;
@@ -478,25 +475,35 @@ public class UserAdminScreen extends Composite {
 			@Override
 			public void onClick(ClickEvent event) {
 
-				loginService.getUserListFromSession(new AsyncCallback<List<User>>() {
+				loadingDialogBox = new LoadingDialogBox("Processing.....", "Listing users..... Please wait for few seconds.....");
+				fillGridWithUsersFromSession();
+			}
+		});
+	}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						System.out.println("Session Retreival Error : " + caught.getMessage());
-						logger.log(Level.SEVERE, "Session Retreival Error : " + caught.getStackTrace());
-						new NormalDialogBox("Error", "Session Retreival Error : " + caught.getMessage());
-					}
+	/**
+	 * Fill grid with users from session.
+	 */
+	protected void fillGridWithUsersFromSession() {
 
-					@Override
-					public void onSuccess(List<User> result) {
-						dataProvider.getList().clear();
-						dataProvider.getList().addAll(result);
-						dataProvider.refresh();//To replicate the change in table
-						userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
-						userTable.redraw();
-						clearFormFields();
-					}
-				});
+		loginService.getUserListFromSession(new AsyncCallback<List<User>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				System.out.println("Session Retreival Error : " + caught.getMessage());
+				logger.log(Level.SEVERE, "Session Retreival Error : " + caught.getStackTrace());
+				new NormalDialogBox("Error", "Session Retreival Error : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<User> result) {
+				dataProvider.getList().clear();
+				dataProvider.getList().addAll(result);
+				dataProvider.refresh();//To replicate the change in table
+				userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
+				userTable.redraw();
+				clearFormFields();
+				loadingDialogBox.hideLoaderDialog();
 			}
 		});
 	}
@@ -682,25 +689,9 @@ public class UserAdminScreen extends Composite {
 		//So update existing user record in the grid
 		System.out.println("User Updated Successfully : " + userUpdated.getUserId());
 		logger.log(Level.INFO, "User Updated Successfully : " + userUpdated.getUserId());
-		dataProvider.getList().get(editUserIndex).setFirstName(userUpdated.getFirstName());
-		dataProvider.getList().get(editUserIndex).setLastName(userUpdated.getLastName());
-		dataProvider.getList().get(editUserIndex).setUserId(userUpdated.getUserId());
-		dataProvider.getList().get(editUserIndex).setGroup(userUpdated.getGroup());
-		dataProvider.getList().get(editUserIndex).setOrganization(userUpdated.getOrganization());
-		dataProvider.getList().get(editUserIndex).setSubOrganization(userUpdated.getSubOrganization());
-		dataProvider.getList().get(editUserIndex).setLocation(userUpdated.getLocation());
-		dataProvider.getList().get(editUserIndex).setManagersId(userUpdated.getManagersId());
-		dataProvider.getList().get(editUserIndex).setRole(userUpdated.getRole());
-		dataProvider.getList().get(editUserIndex).setCampaign(userUpdated.getCampaign());
-		dataProvider.getList().get(editUserIndex).setCredential(userUpdated.getCredential());
-		dataProvider.getList().get(editUserIndex).setOldUserId(userUpdated.getOldUserId());//For update user userId update management
-		dataProvider.refresh();//To replicate the change in table
-		userTable.setRowCount(dataProvider.getList().size(), true);// For pagination 
-		userTable.redraw();
-		clearFormFields();
+		//While reflectUpdatedUserInSession is success it will fill the grid with new data from session
 		reflectUpdatedUserInSession(userUpdated);
-		loadingDialogBox.hideLoaderDialog();
-
+		clearFormFields();
 	}
 
 	/**
@@ -708,15 +699,22 @@ public class UserAdminScreen extends Composite {
 	 *
 	 * @param user the user
 	 */
-	protected void addNewUserServiceCaller(User user) {
+	protected void addNewUserServiceCaller(final User user) {
 
 		userService.addUser(UserAdminScreen.this.hostPageBaseURL, user, new AsyncCallback<User>() {
 
 			public void onFailure(Throwable caught) {
-				loadingDialogBox.hideLoaderDialog();
-				System.out.println("User Add Error : " + caught.getMessage());
-				logger.log(Level.SEVERE, "User Add Error : " + caught.getStackTrace());
-				new NormalDialogBox("Error", "User Add Error : " + caught.getMessage());
+
+				//While creating new user if existing user id has been given then we need to update user without throwing error
+				if (caught.getMessage().equals("The request instructs Google to create an entity that already exists.")) {
+					user.setOldUserId(user.getUserId());
+					updateUserServiceCaller(user);
+				} else {
+					loadingDialogBox.hideLoaderDialog();
+					System.out.println("User Add Error : " + caught.getMessage());
+					logger.log(Level.SEVERE, "User Add Error : " + caught.getStackTrace());
+					new NormalDialogBox("Error", "User Add Error : " + caught.getMessage());
+				}
 			}
 
 			public void onSuccess(User userAdded) {
@@ -1714,6 +1712,7 @@ public class UserAdminScreen extends Composite {
 			public void onSuccess(Void result) {
 				System.out.println("Reflect Update user in User List in session Success");
 				logger.log(Level.INFO, "Reflect Update user in User List in session Success");
+				fillGridWithUsersFromSession();//Filling the grid with the new data
 			}
 		});
 	}

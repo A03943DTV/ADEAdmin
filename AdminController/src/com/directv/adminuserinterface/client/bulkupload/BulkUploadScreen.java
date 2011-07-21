@@ -9,10 +9,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.directv.adminuserinterface.client.StatusBarCreator;
+import com.directv.adminuserinterface.client.dialog.BuInfoDialogBox;
+import com.directv.adminuserinterface.client.dialog.LoadingDialogBox;
 import com.directv.adminuserinterface.client.dialog.NormalDialogBox;
 import com.directv.adminuserinterface.client.table.CustomizedImageCell;
 import com.directv.adminuserinterface.shared.BulkUploadDto;
 import com.directv.adminuserinterface.shared.LoginInfo;
+import com.directv.adminuserinterface.shared.User;
 import com.directv.adminuserinterface.util.ErrorMessageUtil;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
@@ -91,10 +94,19 @@ public class BulkUploadScreen extends Composite {
 	private LoginInfo loginInfo;
 
 	/** The download lable. */
-	Label downloadLable = new Label("If you don't have the bulk upload template please");
+	private Label downloadLable = new Label("If you don't have the bulk upload template please");
 
 	/** The anchor template. */
 	private Anchor anchorTemplate = new Anchor("clickhere");
+
+	/** The user table. */
+	private CellTable<User> userTable = new CellTable<User>();
+
+	/** The user data provider. */
+	private ListDataProvider<User> userDataProvider = new ListDataProvider<User>();
+
+	/** The v table panel info. */
+	private VerticalPanel vTablePanelInfo = new VerticalPanel();
 
 	/**
 	 * Instantiates a new bulk upload screen.
@@ -133,6 +145,13 @@ public class BulkUploadScreen extends Composite {
 
 		//Loading DB data and Setting the Columns,Values and Pagination for BU Table
 		VerticalPanel vTablePanel = loadDataAndSetBuTableValues();
+
+		//Adding scroller to the user table
+		ScrollPanel scrollerPanel = new ScrollPanel(userTable);
+		scrollerPanel.setWidth("950px");
+		scrollerPanel.setHeight("260px");
+		vTablePanelInfo.add(scrollerPanel);
+		vTablePanelInfo.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 
 		vPanel.add(grid);
 		vPanel.add(hDownloadPanel);
@@ -205,10 +224,55 @@ public class BulkUploadScreen extends Composite {
 	 */
 	private VerticalPanel loadDataAndSetBuTableValues() {
 
+		initializeUserInfoContents();
+
 		//Load the BulkUpload data's from DB/WebService
 		listBuInfo();
 
 		return setBuTableValues();
+	}
+
+	/**
+	 * Initialize user info contents.
+	 */
+	private void initializeUserInfoContents() {
+
+		userTable.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
+
+		//Adding the columns to userTable
+		Column<User, String> userIdColumn = generateUserIdColumn();
+		Column<User, String> firstNameColumn = generateFirstNameColumn();
+		Column<User, String> lastNameColumn = generateLastNameColumn();
+		Column<User, String> groupColumn = generateGroupColumn();
+		Column<User, String> organizationColumn = generateOrganizationColumn();
+		Column<User, String> subOrganizationColumn = generateSubOrganizationColumn();
+		Column<User, String> locationColumn = generateLocationColumn();
+		Column<User, String> managersIdColumn = generateManagersIdColumn();
+		Column<User, String> roleColumn = generateRoleColumn();
+		Column<User, String> campaignColumn = generateCampaignColumn();
+		Column<User, String> credentialColumn = generateCredentialColumn();
+		Column<User, String> statusColumn = generateUserStatusColumn();
+		Column<User, String> errorMessageColumn = generateErrorMessageColumn();
+
+		// Set the width of the userTable and put the userTable in fixed width mode.
+		userTable.setWidth("2600px", true);
+
+		// Set the width of each column.
+		userTable.setColumnWidth(userIdColumn, 6.0, Unit.PCT);
+		userTable.setColumnWidth(firstNameColumn, 6.0, Unit.PCT);
+		userTable.setColumnWidth(lastNameColumn, 6.0, Unit.PCT);
+		userTable.setColumnWidth(groupColumn, 4.0, Unit.PCT);
+		userTable.setColumnWidth(organizationColumn, 5.0, Unit.PCT);
+		userTable.setColumnWidth(subOrganizationColumn, 5.0, Unit.PCT);
+		userTable.setColumnWidth(locationColumn, 5.0, Unit.PCT);
+		userTable.setColumnWidth(managersIdColumn, 8.0, Unit.PCT);
+		userTable.setColumnWidth(roleColumn, 10.0, Unit.PCT);
+		userTable.setColumnWidth(campaignColumn, 5.0, Unit.PCT);
+		userTable.setColumnWidth(credentialColumn, 5.0, Unit.PCT);
+		userTable.setColumnWidth(statusColumn, 4.0, Unit.PCT);
+		userTable.setColumnWidth(errorMessageColumn, 31.0, Unit.PCT);
+
+		userDataProvider.addDataDisplay(userTable);
 	}
 
 	/**
@@ -233,6 +297,7 @@ public class BulkUploadScreen extends Composite {
 					dataProviderList.add(buDto);
 				}
 				dataProvider.refresh();
+				buTable.redraw();
 			}
 		});
 	}
@@ -247,6 +312,7 @@ public class BulkUploadScreen extends Composite {
 		buTable.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 
 		//Adding the columns to buTable
+		Column<BulkUploadDto, String> infoColumn = generateInfoColumn();
 		Column<BulkUploadDto, String> downloadColumn = generateDownloadColumn();
 		Column<BulkUploadDto, String> processStatusColumn = generateProcessStatusColumn();
 		Column<BulkUploadDto, String> idColumn = generateIdColumn();
@@ -259,19 +325,20 @@ public class BulkUploadScreen extends Composite {
 		Column<BulkUploadDto, String> statusColumn = generateStatusColumn();
 
 		// Set the width of the buTable and put the buTable in fixed width mode.
-		buTable.setWidth("1520px", true);
+		buTable.setWidth("1540px", true);
 
 		// Set the width of each column.
-		buTable.setColumnWidth(downloadColumn, 7.0, Unit.PCT);
-		buTable.setColumnWidth(processStatusColumn, 11.0, Unit.PCT);
+		buTable.setColumnWidth(infoColumn, 4.0, Unit.PCT);
+		buTable.setColumnWidth(downloadColumn, 6.0, Unit.PCT);
+		buTable.setColumnWidth(processStatusColumn, 10.0, Unit.PCT);
 		buTable.setColumnWidth(idColumn, 4.0, Unit.PCT);
-		buTable.setColumnWidth(descriptionColumn, 12.0, Unit.PCT);
+		buTable.setColumnWidth(descriptionColumn, 11.0, Unit.PCT);
 		buTable.setColumnWidth(submittedTimeColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(processStartTimeColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(processEndTimeColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(noOfFailureRecordsColumn, 10.0, Unit.PCT);
 		buTable.setColumnWidth(noOfSuccessRecordsColumn, 10.0, Unit.PCT);
-		buTable.setColumnWidth(statusColumn, 7.0, Unit.PCT);
+		buTable.setColumnWidth(statusColumn, 6.0, Unit.PCT);
 
 		dataProvider.addDataDisplay(buTable);
 		List<BulkUploadDto> dataProviderList = dataProvider.getList();
@@ -658,5 +725,285 @@ public class BulkUploadScreen extends Composite {
 		});
 		buTable.addColumn(downloadButtonColumn, "Download");
 		return downloadButtonColumn;
+	}
+
+	/**
+	 * Generate info column.
+	 *
+	 * @return the column
+	 */
+	private Column<BulkUploadDto, String> generateInfoColumn() {
+
+		Column<BulkUploadDto, String> infoButtonColumn = new Column<BulkUploadDto, String>(new CustomizedImageCell()) {
+			@Override
+			public String getValue(BulkUploadDto object) {
+				return "images/info.png";
+			}
+		};
+		infoButtonColumn.setFieldUpdater(new FieldUpdater<BulkUploadDto, String>() {
+			@Override
+			public void update(int index, BulkUploadDto object, String value) {
+				if (object.getProcessStatus().equals(BulkUploadDto.PROCESS_STATUS_COMPLETED)) {
+					showInfo(index, object);
+				} else {
+					new NormalDialogBox("In Process",
+							"Your Template data in process. Click on Refresh Grid button to know the updated Process Status.");
+				}
+			}
+		});
+		buTable.addColumn(infoButtonColumn, "Info");
+		return infoButtonColumn;
+	}
+
+	/**
+	 * Show info.
+	 *
+	 * @param index the index
+	 * @param object the object
+	 */
+	protected void showInfo(int index, final BulkUploadDto object) {
+
+		bulkUploadService.getBulkUploadById(object.getId(), new AsyncCallback<BulkUploadDto>() {
+
+			LoadingDialogBox loadingDialogBox = new LoadingDialogBox("Loading.....", "Loading informations..... Please wait for few seconds.....");
+
+			@Override
+			public void onFailure(Throwable caught) {
+				System.out.println("Bulk Upload Info Displaying Error : " + caught.getMessage());
+				loadingDialogBox.hideLoaderDialog();
+				new NormalDialogBox("Error", "Exception occured while retreving user info from BulkUpload template for Id : " + object.getId());
+			}
+
+			@Override
+			public void onSuccess(BulkUploadDto result) {
+				System.out.println("Bulk Upload Info Displaying Successfull");
+				userDataProvider.getList().clear();
+				for (User user : result.getUserList()) {
+					userDataProvider.getList().add(user);
+				}
+				userDataProvider.refresh();
+				userTable.redraw();
+				loadingDialogBox.hideLoaderDialog();
+				String title = "Bulk Upload Id : " + object.getId() + " / Description : " + object.getDescription();
+				new BuInfoDialogBox(title, vTablePanelInfo);
+			}
+		});
+	}
+
+	/**
+	 * Generate sub organization column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateSubOrganizationColumn() {
+
+		Column<User, String> subOrganizationColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getSubOrganization();
+			}
+		};
+		userTable.addColumn(subOrganizationColumn, "Vendor");
+		return subOrganizationColumn;
+	}
+
+	/**
+	 * Generate organization column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateOrganizationColumn() {
+
+		Column<User, String> organizationColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getOrganization();
+			}
+		};
+		userTable.addColumn(organizationColumn, "Organization");
+		return organizationColumn;
+	}
+
+	/**
+	 * Generate credential column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateCredentialColumn() {
+
+		Column<User, String> credentialColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getCredential();
+			}
+		};
+		userTable.addColumn(credentialColumn, "Privilege");
+		return credentialColumn;
+	}
+
+	/**
+	 * Generate campaign column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateCampaignColumn() {
+
+		Column<User, String> campaignColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getCampaign();
+			}
+		};
+		userTable.addColumn(campaignColumn, "Campaign");
+		return campaignColumn;
+	}
+
+	/**
+	 * Generate role column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateRoleColumn() {
+
+		Column<User, String> roleColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getRole();
+			}
+		};
+		userTable.addColumn(roleColumn, "Role");
+		return roleColumn;
+	}
+
+	/**
+	 * Generate managers id column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateManagersIdColumn() {
+
+		Column<User, String> managersIdColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getManagersId();
+			}
+		};
+		userTable.addColumn(managersIdColumn, "Manager's Id");
+		return managersIdColumn;
+	}
+
+	/**
+	 * Generate location column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateLocationColumn() {
+
+		Column<User, String> locationColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getLocation();
+			}
+		};
+		userTable.addColumn(locationColumn, "Location");
+		return locationColumn;
+	}
+
+	/**
+	 * Generate group column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateGroupColumn() {
+
+		Column<User, String> groupColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getGroup();
+			}
+		};
+		userTable.addColumn(groupColumn, "Group");
+		return groupColumn;
+	}
+
+	/**
+	 * Generate user id column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateUserIdColumn() {
+
+		Column<User, String> userIdColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getUserId();
+			}
+		};
+		userTable.addColumn(userIdColumn, "User Id");
+		return userIdColumn;
+	}
+
+	/**
+	 * Generate last name column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateLastNameColumn() {
+		Column<User, String> lastNameColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getLastName();
+			}
+		};
+		userTable.addColumn(lastNameColumn, "Last Name");
+		return lastNameColumn;
+	}
+
+	/**
+	 * Generate first name column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateFirstNameColumn() {
+		Column<User, String> firstNameColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getFirstName();
+			}
+		};
+		userTable.addColumn(firstNameColumn, "First Name");
+		return firstNameColumn;
+	}
+
+	/**
+	 * Generate error message column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateErrorMessageColumn() {
+		Column<User, String> errorMessageColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getErrorMessage();
+			}
+		};
+		userTable.addColumn(errorMessageColumn, "Error Message");
+		return errorMessageColumn;
+	}
+
+	/**
+	 * Generate user status column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateUserStatusColumn() {
+		Column<User, String> statusColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getStatus();
+			}
+		};
+		userTable.addColumn(statusColumn, "Status");
+		return statusColumn;
 	}
 }

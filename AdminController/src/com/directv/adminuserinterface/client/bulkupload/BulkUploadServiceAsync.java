@@ -39,4 +39,13 @@ public interface BulkUploadServiceAsync {
 	 */
 	void getBulkUploadResults(String userId, AsyncCallback<List<BulkUploadDto>> callback);
 
+	/**
+	 * Gets the bulk upload by id.
+	 *
+	 * @param id the id
+	 * @param callback the callback
+	 * @return the bulk upload by id
+	 */
+	void getBulkUploadById(Long id, AsyncCallback<BulkUploadDto> callback);
+
 }

@@ -50,7 +50,6 @@ public class ChooseDialogBox {
 	 */
 	public void initializeConfirmDialog(String title, String message) {
 
-		dialogBox.setAnimationEnabled(true);
 		button1.getElement().setId("1Button");
 		button2.getElement().setId("2Button");
 		cancel.getElement().setId("12CancelButton");

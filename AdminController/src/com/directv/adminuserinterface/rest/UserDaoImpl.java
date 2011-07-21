@@ -87,16 +87,8 @@ public class UserDaoImpl extends GenericDaoImpl implements UserDao {
 
 			pm.currentTransaction().begin();
 			userDB = pm.getObjectById(User.class, user.getUserId());
-			userDB.setFirstName(user.getFirstName());
-			userDB.setLastName(user.getLastName());
-			userDB.setGroup(user.getGroup());
-			userDB.setOrganization(user.getOrganization());
-			userDB.setSubOrganization(user.getSubOrganization());
-			userDB.setLocation(user.getLocation());
-			userDB.setManagersId(user.getManagersId());
-			userDB.setRole(user.getRole());
-			userDB.setCampaign(user.getCampaign());
-			userDB.setCredential(user.getCredential());
+
+			userDB = user.copyData(userDB);
 
 			pm.makePersistent(userDB);
 			pm.currentTransaction().commit();

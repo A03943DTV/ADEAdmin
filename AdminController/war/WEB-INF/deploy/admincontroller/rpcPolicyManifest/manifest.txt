@@ -1,6 +1,2 @@
 # Module admincontroller
 # RPC service class, partial path of RPC policy file
-com.directv.adminuserinterface.client.bulkupload.BulkUploadService, C3538F41A4C49B7A0DBC00CF53859378.gwt.rpc
-com.directv.adminuserinterface.login.LoginService, FDCB471261DC56A6626EB44DEC845842.gwt.rpc
-com.directv.adminuserinterface.client.codetable.CodeTableService, 7916C7365ED4CCE21B9B26030481753E.gwt.rpc
-com.directv.adminuserinterface.client.user.UserService, B1EDD177AECD4F548F0F0B3B167EA444.gwt.rpc

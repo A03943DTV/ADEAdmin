@@ -139,13 +139,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 				.getThreadLocalRequest().getSession().getAttribute(AdminConstants.SESSION_DATA_STORE_ATTRIBUTE);
 		for (com.directv.adminuserinterface.shared.User userSession : userListSession) {
 			if (userSession.getUserId().equals(user.getUserId())) {
-				userSession.setFirstName(user.getFirstName());
-				userSession.setLastName(user.getLastName());
-				userSession.setGroup(user.getGroup());
-				userSession.setLocation(user.getLocation());
-				userSession.setManagersId(user.getManagersId());
-				userSession.setRole(user.getRole());
-				userSession.setCampaign(user.getCampaign());
+				userSession = user.copyData(userSession);
 			}
 		}
 		storeUserListInSession(userListSession);

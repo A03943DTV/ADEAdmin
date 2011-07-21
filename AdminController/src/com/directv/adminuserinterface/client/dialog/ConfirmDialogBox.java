@@ -45,7 +45,6 @@ public class ConfirmDialogBox {
 	 */
 	public Button initializeConfirmDialog(String title, String message) {
 
-		dialogBox.setAnimationEnabled(true);
 		yesButton.getElement().setId("yesButton");
 		noButton.getElement().setId("noButton");
 

@@ -103,7 +103,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		if (!isInsert) {
 			User dbUser = getUserDao().getUser(user.getUserId());
 			oldPath = googleOrgManager.createOrgPathFromOrgUnits(dbUser.getOrganization(), dbUser.getSubOrganization(), dbUser.getLocation(), (dbUser
-					.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER) || user.getCredential().equals(
+					.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER) || dbUser.getCredential().equals(
 					AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)));
 		}
 		googleOrgManager.updateOrganizationUser(user.getUserId(), oldPath, newPath);
@@ -285,6 +285,17 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	 */
 	public void removeUser(String hostPageBaseURL, User user) throws AdminException {
 
+		if (user.getUserId().equals(AdminConstants.DOMAIN_ADMIN_USER_ID)) {
+			throw new AdminException("You can't delete this user since it is the base for all super admin users");
+		}
+
+		List<User> userList = new UserDaoImpl().listUsers(User.USERID_PARAM, user.getUserId());
+
+		User userLoggedIn = new LoginServiceImpl().getUserForBulkUpload();
+		if (userList.get(0).getUserId().equals(userLoggedIn.getUserId())) {
+			throw new AdminException("You don't have privilege to delete your account");
+		}
+
 		//Deleting the user from the domain
 		user = new GoogleUserManager().deleteDomainUser(user);
 
@@ -306,6 +317,11 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	 */
 	@Override
 	public User updateUserIdByCreatingNewUser(String hostPageBaseURL, User user) throws AdminException {
+
+		if (EMailIdUtil.getEmailIdFromName(user.getOldUserId()).equals(AdminConstants.DOMAIN_ADMIN_USER_ID)) {
+			throw new AdminException("You can't update userid " + EMailIdUtil.getEmailIdFromName(user.getOldUserId())
+					+ " since it is the base for all super admin users");
+		}
 
 		//If the user is updating the userId the old userId data has to be deleted and 
 		//new userId data has to be created
@@ -329,6 +345,31 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 	 */
 	@Override
 	public User updateUser(String hostPageBaseURL, User user) throws AdminException {
+
+		if (EMailIdUtil.getEmailIdFromName(user.getUserId()).equals(AdminConstants.DOMAIN_ADMIN_USER_ID)) {
+			if (!user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+				throw new AdminException("You can't update the super admin privilege of the userid "
+						+ EMailIdUtil.getEmailIdFromName(user.getOldUserId()) + " since it is the base for all super admin users");
+			}
+		}
+		if (EMailIdUtil.getEmailIdFromName(user.getUserId()).equals(user.getManagersId())) {
+			throw new AdminException("You can't set userid and managersid to be the same");
+		}
+		User userLoggedIn = new LoginServiceImpl().getUserForBulkUpload();
+		if (userLoggedIn.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER)) {
+			List<User> userList = new UserDaoImpl().listUsers(User.USERID_PARAM, EMailIdUtil.getEmailIdFromName(user.getUserId()));
+			if ((!userList.get(0).getSubOrganization().equals(userLoggedIn.getSubOrganization()))
+					|| (!userList.get(0).getLocation().equals(userLoggedIn.getLocation()))) {
+				throw new AdminException(
+						"You don't have privilege to update information of user who belongs to another vendor/location. UserId already exists");
+			}
+		}
+		if (userLoggedIn.getUserId().equals(EMailIdUtil.getEmailIdFromName(user.getUserId()))) {
+			if (userLoggedIn.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)
+					&& !user.getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+				throw new AdminException("You can't depriciate your privilege");
+			}
+		}
 
 		//Updating an existing user in the domain
 		user = new GoogleUserManager().updateDomainUser(user);
@@ -388,9 +429,6 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		if (userList == null || !(userList.size() > 0)) {
 			throw new AdminException("Invalid UserId/UserId not exists");
 		}
-		if (userList.get(0).getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
-			throw new AdminException("SuperAdmin user can't be deleted through ADELite application");
-		}
 
 		User userLoggedIn = new LoginServiceImpl().getUserForBulkUpload();
 
@@ -404,6 +442,9 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 			}
 			if (!userLoggedIn.getLocation().equals(userList.get(0).getLocation())) {
 				throw new AdminException("You don't have privilege to delete user who belongs to another Location");
+			}
+			if (userList.get(0).getCredential().equals(AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)) {
+				throw new AdminException("You don't have privilege to delete super admin user");
 			}
 		}
 	}

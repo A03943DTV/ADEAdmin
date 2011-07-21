@@ -5,6 +5,8 @@
 package com.directv.adminuserinterface.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -65,6 +67,9 @@ public class BulkUploadDto implements Serializable {
 
 	/** The status. */
 	private String status;
+
+	/** The user list. */
+	private List<User> userList = new ArrayList<User>();
 
 	/**
 	 * Instantiates a new bulk upload dto.
@@ -302,4 +307,23 @@ public class BulkUploadDto implements Serializable {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	/**
+	 * Gets the user list.
+	 *
+	 * @return the user list
+	 */
+	public List<User> getUserList() {
+		return userList;
+	}
+
+	/**
+	 * Sets the user list.
+	 *
+	 * @param userList the new user list
+	 */
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
+	}
+
 }

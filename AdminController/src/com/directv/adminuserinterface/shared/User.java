@@ -161,6 +161,28 @@ public class User implements Serializable {
 	}
 
 	/**
+	 * Copy data.
+	 *
+	 * @param toObject the to object
+	 * @return the user
+	 */
+	public User copyData(User toObject) {
+
+		toObject.setFirstName(this.getFirstName());
+		toObject.setLastName(this.getLastName());
+		toObject.setGroup(this.getGroup());
+		toObject.setLocation(this.getLocation());
+		toObject.setManagersId(this.getManagersId());
+		toObject.setRole(this.getRole());
+		toObject.setCampaign(this.getCampaign());
+		toObject.setOldUserId(this.getOldUserId());
+		toObject.setOrganization(this.getOrganization());
+		toObject.setSubOrganization(this.getSubOrganization());
+
+		return toObject;
+	}
+
+	/**
 	 * Gets the first name.
 	 *
 	 * @return the first name

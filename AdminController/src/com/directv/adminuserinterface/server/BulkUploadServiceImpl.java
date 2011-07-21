@@ -75,49 +75,28 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	 */
 	private BulkUpload processRecord(BulkUpload bulkUpload) {
 
-		InputStream is = new ByteArrayInputStream(bulkUpload.getBlob().getBytes());
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-		String line = null;
 		int noOfSuccessfullRecords = 0;
 		int noOfUnSuccessFullRecords = 0;
-		int count = 1;
-		List<User> userList = new ArrayList<User>();
 
-		try {
+		List<User> userList = getUsersList(bulkUpload.getBlob().getBytes(), false);
 
-			while ((line = br.readLine()) != null) {
-
-				if (count == 1) {
-					System.out.println("Ignoring Header Information");
-				} else {
-
-					User user = getSingleUserData(line);
-					try {
-
-						validateBUAction(user);
-						if (user.getBuAction().equals(INSERT)) {
-							new UserServiceImpl().addBulkUploadUser(user);
-						} else if (user.getBuAction().equals(DELETE)) {
-							new UserServiceImpl().deleteBulkUploadUser(user);
-						}
-						user.setStatus(User.STATUS_SUCCESS);
-						noOfSuccessfullRecords++;
-					} catch (AdminException e) {
-
-						e.printStackTrace();
-						user.setStatus(User.STATUS_ERROR);
-						user.setErrorMessage(e.getMessage());
-						noOfUnSuccessFullRecords++;
-					}
-					userList.add(user);
+		for (User user : userList) {
+			try {
+				validateBUAction(user);
+				if (user.getBuAction().equals(INSERT)) {
+					new UserServiceImpl().addBulkUploadUser(user);
+				} else if (user.getBuAction().equals(DELETE)) {
+					new UserServiceImpl().deleteBulkUploadUser(user);
 				}
-				count++;
+				user.setStatus(User.STATUS_SUCCESS);
+				noOfSuccessfullRecords++;
+			} catch (AdminException e) {
+				e.printStackTrace();
+				user.setStatus(User.STATUS_ERROR);
+				user.setErrorMessage(e.getMessage());
+				noOfUnSuccessFullRecords++;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-
 		bulkUpload.setNoOfSuccessRecords(new Long(noOfSuccessfullRecords));
 		bulkUpload.setNoOfFailureRecords(new Long(noOfUnSuccessFullRecords));
 
@@ -142,10 +121,8 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	private void validateBUAction(User user) throws AdminException {
 
 		if (user.getBuAction() == null || user.getBuAction().equals("")) {
-
 			throw new AdminException("Action[I/D] field is required");
 		} else if (!(user.getBuAction().equals(INSERT) || user.getBuAction().equals(DELETE))) {
-
 			throw new AdminException("Action[I/D] field is value can be either I or D");
 		}
 	}
@@ -154,11 +131,17 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 	 * Gets the single user data.
 	 *
 	 * @param line the line
+	 * @param isInfoCheck the is info check
 	 * @return the single user data
 	 */
-	private User getSingleUserData(String line) {
+	private User getSingleUserData(String line, boolean isInfoCheck) {
 
-		String userInfoArray[] = new String[COLUMN_COUNT];
+		String userInfoArray[] = null;
+		if (!isInfoCheck) {
+			userInfoArray = new String[COLUMN_COUNT];
+		} else {
+			userInfoArray = new String[HEADER_DATA.length];
+		}
 		String userInfoTempArray[] = line.split(",");
 		for (int idx = 0; idx < userInfoTempArray.length; idx++) {
 			userInfoArray[idx] = userInfoTempArray[idx];
@@ -167,6 +150,10 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 		User user = new User(userInfoArray[1], userInfoArray[2], userInfoArray[3], userInfoArray[4], userInfoArray[5], userInfoArray[6],
 				userInfoArray[7], userInfoArray[8], userInfoArray[9], userInfoArray[10], userInfoArray[11]);
 		user.setBuAction(userInfoArray[0]);
+		if (isInfoCheck) {
+			user.setStatus(userInfoArray[12]);
+			user.setErrorMessage(userInfoArray[13]);
+		}
 		return user;
 	}
 
@@ -179,13 +166,73 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 
 		List<BulkUploadDto> bulkuploadDtoList = new ArrayList<BulkUploadDto>();
 		for (BulkUpload bulkUpload : new BulkUploadDaoImpl().getBulkUploadResults(userId)) {
-
-			byte[] byteArray = bulkUpload.getBlob().getBytes();
-			bulkuploadDtoList.add(new BulkUploadDto(bulkUpload.getId(), bulkUpload.getDescription(), bulkUpload.getUserId(), byteArray, bulkUpload
-					.getProcessStatus(), bulkUpload.getSubmittedTime(), bulkUpload.getProcessStratTime(), bulkUpload.getProcessEndTime(), bulkUpload
-					.getNoOfSuccessRecords(), bulkUpload.getNoOfFailureRecords(), bulkUpload.getStatus()));
+			bulkuploadDtoList.add(getBulkUploadDto(bulkUpload));
 		}
 		return bulkuploadDtoList;
+	}
+
+	/**
+	 * Gets the bulk upload dto.
+	 *
+	 * @param bulkUpload the bulk upload
+	 * @return the bulk upload dto
+	 */
+	private BulkUploadDto getBulkUploadDto(BulkUpload bulkUpload) {
+
+		byte[] byteArray = bulkUpload.getBlob().getBytes();
+		return new BulkUploadDto(bulkUpload.getId(), bulkUpload.getDescription(), bulkUpload.getUserId(), byteArray, bulkUpload.getProcessStatus(),
+				bulkUpload.getSubmittedTime(), bulkUpload.getProcessStratTime(), bulkUpload.getProcessEndTime(), bulkUpload.getNoOfSuccessRecords(),
+				bulkUpload.getNoOfFailureRecords(), bulkUpload.getStatus());
+	}
+
+	/**
+	 * Overridden Method
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public BulkUploadDto getBulkUploadById(Long id) {
+
+		BulkUpload bulkUpload = new BulkUploadDaoImpl().getBulkUploadById(id);
+		byte[] byteArray = bulkUpload.getBlob().getBytes();
+
+		List<User> userList = getUsersList(byteArray, true);
+
+		BulkUploadDto bulkUploadDto = getBulkUploadDto(bulkUpload);
+		bulkUploadDto.setUserList(userList);
+
+		return bulkUploadDto;
+	}
+
+	/**
+	 * Gets the users list.
+	 *
+	 * @param byteArray the byte array
+	 * @param isInfoCheck the is info check
+	 * @return the users list
+	 */
+	private List<User> getUsersList(byte[] byteArray, boolean isInfoCheck) {
+
+		InputStream is = new ByteArrayInputStream(byteArray);
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+		String line = null;
+		int count = 1;
+		List<User> userList = new ArrayList<User>();
+		try {
+			while ((line = br.readLine()) != null) {
+				if (count == 1) {
+					System.out.println("Ignoring Header Information");
+				} else {
+					User user = getSingleUserData(line, isInfoCheck);
+					userList.add(user);
+				}
+				count++;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return userList;
 	}
 
 	/**
