@@ -6,7 +6,6 @@ package com.directv.adminuserinterface.client.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -1070,19 +1069,12 @@ public class UserAdminScreen extends Composite {
 				System.out.println("User Removed Successfully");
 				logger.log(Level.INFO, "User Removed Successfully");
 
-				//To prevent arrayIndexOutOfBound exception while removing objects
-				//So remove objects index from Max to Min
-				Collections.sort(result.getRemovedUserIndex(), Collections.reverseOrder());
 				for (Integer index : result.getRemovedUserIndex()) {
-					dataProvider.getList().remove(index.intValue());
 					reflectDeletedUserInSession(usersToBeDeletedMap.get(index));
 				}
 
-				dataProvider.refresh();//To replicate the change in table
-				userTable.setRowCount(dataProvider.getList().size(), true);
-				userTable.redraw();
+				fillGridWithUsersFromSession();//Filling the grid with the new data
 				clearFormFields();
-				loadingDialogBox.hideLoaderDialog();
 
 				if (result.getErrorMessageList().size() > 0) {
 					String errorMessage = "";
@@ -1463,7 +1455,7 @@ public class UserAdminScreen extends Composite {
 		Column<User, Boolean> removeButtonColumn = new Column<User, Boolean>(new CheckboxCell()) {
 			@Override
 			public Boolean getValue(User object) {
-				return object.getIsSelected();
+				return false;
 			}
 		};
 		removeButtonColumn.setFieldUpdater(new FieldUpdater<User, Boolean>() {

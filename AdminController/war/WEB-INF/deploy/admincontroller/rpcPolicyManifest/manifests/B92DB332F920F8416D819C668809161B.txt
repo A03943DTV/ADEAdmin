@@ -1,2 +1,2 @@
 serviceClass: com.directv.adminuserinterface.login.LoginService
-path: FDCB471261DC56A6626EB44DEC845842.gwt.rpc
+path: 5B1D74159CEA39A6285825678DFC0033.gwt.rpc

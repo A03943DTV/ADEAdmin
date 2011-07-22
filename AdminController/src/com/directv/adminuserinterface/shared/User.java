@@ -118,10 +118,6 @@ public class User implements Serializable {
 	@NotPersistent
 	private Boolean resetPassword;
 
-	/** The is selected. */
-	@NotPersistent
-	private Boolean isSelected = false;
-
 	/**
 	 * Instantiates a new user.
 	 *
@@ -545,24 +541,4 @@ public class User implements Serializable {
 	public void setResetPassword(Boolean resetPassword) {
 		this.resetPassword = resetPassword;
 	}
-
-	/**
-	 * Gets the checks if is selected.
-	 *
-	 * @return the checks if is selected
-	 */
-	@XmlElement
-	public Boolean getIsSelected() {
-		return isSelected;
-	}
-
-	/**
-	 * Sets the checks if is selected.
-	 *
-	 * @param isSelected the new checks if is selected
-	 */
-	public void setIsSelected(Boolean isSelected) {
-		this.isSelected = isSelected;
-	}
-
 }

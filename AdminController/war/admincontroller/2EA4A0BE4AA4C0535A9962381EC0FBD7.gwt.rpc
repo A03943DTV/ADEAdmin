@@ -2,8 +2,8 @@
 com.directv.adminuserinterface.client.bulkupload.BulkUploadService, false, false, false, false, _, 746125012
 com.directv.adminuserinterface.shared.BulkUploadDto, true, true, true, true, com.directv.adminuserinterface.shared.BulkUploadDto/3076070254, 3076070254
 [Lcom.directv.adminuserinterface.shared.BulkUploadDto;, true, true, false, false, [Lcom.directv.adminuserinterface.shared.BulkUploadDto;/2685974328, 2685974328
-com.directv.adminuserinterface.shared.User, true, true, true, true, com.directv.adminuserinterface.shared.User/3587010593, 3587010593
-[Lcom.directv.adminuserinterface.shared.User;, true, true, true, true, [Lcom.directv.adminuserinterface.shared.User;/3678216215, 3678216215
+com.directv.adminuserinterface.shared.User, true, true, true, true, com.directv.adminuserinterface.shared.User/440464264, 440464264
+[Lcom.directv.adminuserinterface.shared.User;, true, true, true, true, [Lcom.directv.adminuserinterface.shared.User;/2782719701, 2782719701
 com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException, true, true, true, true, com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException/3936916533, 3936916533
 com.google.gwt.user.client.rpc.RpcTokenException, true, true, false, false, com.google.gwt.user.client.rpc.RpcTokenException/2345075298, 2345075298
 com.google.gwt.user.client.rpc.XsrfToken, false, false, true, true, com.google.gwt.user.client.rpc.XsrfToken/4254043109, 4254043109
