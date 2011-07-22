@@ -240,6 +240,7 @@ public class BulkUploadScreen extends Composite {
 		userTable.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 
 		//Adding the columns to userTable
+		Column<User, String> insertOrDeleteColumn = generateInsertOrDeleteColumn();
 		Column<User, String> userIdColumn = generateUserIdColumn();
 		Column<User, String> firstNameColumn = generateFirstNameColumn();
 		Column<User, String> lastNameColumn = generateLastNameColumn();
@@ -255,12 +256,13 @@ public class BulkUploadScreen extends Composite {
 		Column<User, String> errorMessageColumn = generateErrorMessageColumn();
 
 		// Set the width of the userTable and put the userTable in fixed width mode.
-		userTable.setWidth("2600px", true);
+		userTable.setWidth("2670px", true);
 
 		// Set the width of each column.
-		userTable.setColumnWidth(userIdColumn, 6.0, Unit.PCT);
-		userTable.setColumnWidth(firstNameColumn, 6.0, Unit.PCT);
-		userTable.setColumnWidth(lastNameColumn, 6.0, Unit.PCT);
+		userTable.setColumnWidth(insertOrDeleteColumn, 2.0, Unit.PCT);
+		userTable.setColumnWidth(userIdColumn, 7.5, Unit.PCT);
+		userTable.setColumnWidth(firstNameColumn, 5.5, Unit.PCT);
+		userTable.setColumnWidth(lastNameColumn, 5.0, Unit.PCT);
 		userTable.setColumnWidth(groupColumn, 4.0, Unit.PCT);
 		userTable.setColumnWidth(organizationColumn, 5.0, Unit.PCT);
 		userTable.setColumnWidth(subOrganizationColumn, 5.0, Unit.PCT);
@@ -270,7 +272,7 @@ public class BulkUploadScreen extends Composite {
 		userTable.setColumnWidth(campaignColumn, 5.0, Unit.PCT);
 		userTable.setColumnWidth(credentialColumn, 5.0, Unit.PCT);
 		userTable.setColumnWidth(statusColumn, 4.0, Unit.PCT);
-		userTable.setColumnWidth(errorMessageColumn, 31.0, Unit.PCT);
+		userTable.setColumnWidth(errorMessageColumn, 29.0, Unit.PCT);
 
 		userDataProvider.addDataDisplay(userTable);
 	}
@@ -325,19 +327,19 @@ public class BulkUploadScreen extends Composite {
 		Column<BulkUploadDto, String> statusColumn = generateStatusColumn();
 
 		// Set the width of the buTable and put the buTable in fixed width mode.
-		buTable.setWidth("1540px", true);
+		buTable.setWidth("1550px", true);
 
 		// Set the width of each column.
 		buTable.setColumnWidth(infoColumn, 4.0, Unit.PCT);
 		buTable.setColumnWidth(downloadColumn, 6.0, Unit.PCT);
 		buTable.setColumnWidth(processStatusColumn, 10.0, Unit.PCT);
 		buTable.setColumnWidth(idColumn, 4.0, Unit.PCT);
-		buTable.setColumnWidth(descriptionColumn, 11.0, Unit.PCT);
+		buTable.setColumnWidth(descriptionColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(submittedTimeColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(processStartTimeColumn, 13.0, Unit.PCT);
 		buTable.setColumnWidth(processEndTimeColumn, 13.0, Unit.PCT);
-		buTable.setColumnWidth(noOfFailureRecordsColumn, 10.0, Unit.PCT);
-		buTable.setColumnWidth(noOfSuccessRecordsColumn, 10.0, Unit.PCT);
+		buTable.setColumnWidth(noOfFailureRecordsColumn, 9.0, Unit.PCT);
+		buTable.setColumnWidth(noOfSuccessRecordsColumn, 9.0, Unit.PCT);
 		buTable.setColumnWidth(statusColumn, 6.0, Unit.PCT);
 
 		dataProvider.addDataDisplay(buTable);
@@ -941,6 +943,23 @@ public class BulkUploadScreen extends Composite {
 		};
 		userTable.addColumn(userIdColumn, "User Id");
 		return userIdColumn;
+	}
+
+	/**
+	 * Generate insert or delete column.
+	 *
+	 * @return the column
+	 */
+	private Column<User, String> generateInsertOrDeleteColumn() {
+
+		Column<User, String> insertOrDeleteColumn = new Column<User, String>(new TextCell()) {
+			@Override
+			public String getValue(User object) {
+				return object.getBuAction();
+			}
+		};
+		userTable.addColumn(insertOrDeleteColumn, "I/D");
+		return insertOrDeleteColumn;
 	}
 
 	/**

@@ -178,6 +178,7 @@ public class User implements Serializable {
 		toObject.setOldUserId(this.getOldUserId());
 		toObject.setOrganization(this.getOrganization());
 		toObject.setSubOrganization(this.getSubOrganization());
+		toObject.setCredential(this.getCredential());
 
 		return toObject;
 	}
