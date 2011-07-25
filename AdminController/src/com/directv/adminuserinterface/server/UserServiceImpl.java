@@ -102,9 +102,12 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 		if (!isInsert) {
 			User dbUser = getUserDao().getUser(user.getUserId());
-			oldPath = googleOrgManager.createOrgPathFromOrgUnits(dbUser.getOrganization(), dbUser.getSubOrganization(), dbUser.getLocation(), (dbUser
-					.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER) || dbUser.getCredential().equals(
-					AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)));
+			if (dbUser.getOrganization() != null && !dbUser.getOrganization().equals("") && dbUser.getSubOrganization() != null
+					&& !dbUser.getSubOrganization().equals("") && dbUser.getLocation() != null && !dbUser.getLocation().equals("")) {
+				oldPath = googleOrgManager.createOrgPathFromOrgUnits(dbUser.getOrganization(), dbUser.getSubOrganization(), dbUser.getLocation(),
+						(dbUser.getCredential().equals(AdminConstants.CREDENTIAL_ADMIN_USER) || dbUser.getCredential().equals(
+								AdminConstants.CREDENTIAL_SUPER_ADMIN_USER)));
+			}
 		}
 		googleOrgManager.updateOrganizationUser(user.getUserId(), oldPath, newPath);
 	}
