@@ -33,13 +33,7 @@ public class GoogleUserManager {
 	 */
 	public AppsForYourDomainClient getClient() throws AdminException {
 
-		try {
-			return new AppsForYourDomainClient(AdminConstants.DOMAIN_ADMIN_USER_ID, AdminConstants.DOMAIN_ADMIN_USER_PASSWORD,
-					AdminConstants.DOMAIN_NAME);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new AdminException("Exception occured while authenticating using admin login credentials in directv domain.");
-		}
+		return InstanceFactory.getAFYDCInstance();
 	}
 
 	/**

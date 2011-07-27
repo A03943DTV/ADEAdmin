@@ -13,7 +13,6 @@ import com.directv.adminuserinterface.util.AdminConstants;
 import com.directv.adminuserinterface.util.AdminException;
 import com.google.gdata.data.appsforyourdomain.AppsForYourDomainException;
 import com.google.gdata.data.appsforyourdomain.generic.GenericEntry;
-import com.google.gdata.util.AuthenticationException;
 import com.google.gdata.util.ServiceException;
 
 // TODO: Auto-generated Javadoc
@@ -30,14 +29,7 @@ public class GoogleOrgManager {
 	 */
 	private OrgManagementClient getOrgManagementClient() throws AdminException {
 
-		try {
-			return new OrgManagementClient(AdminConstants.DOMAIN_ADMIN_USER_ID, AdminConstants.DOMAIN_ADMIN_USER_PASSWORD,
-					AdminConstants.DOMAIN_NAME, ("AdminController-" + AdminConstants.DOMAIN_NAME));
-		} catch (AuthenticationException e) {
-			e.printStackTrace();
-			throw new AdminException(
-					"Exception occured while authenticating using admin login credentials in directv domain for organization management.");
-		}
+		return InstanceFactory.getOMCInstance();
 	}
 
 	/**

@@ -95,6 +95,11 @@ public class BulkUploadServiceImpl extends RemoteServiceServlet implements BulkU
 				user.setStatus(User.STATUS_ERROR);
 				user.setErrorMessage(e.getMessage());
 				noOfUnSuccessFullRecords++;
+			} catch (Throwable e) {
+				e.printStackTrace();
+				user.setStatus(User.STATUS_ERROR);
+				user.setErrorMessage("Unexpected exception occured");
+				noOfUnSuccessFullRecords++;
 			}
 		}
 		bulkUpload.setNoOfSuccessRecords(new Long(noOfSuccessfullRecords));
